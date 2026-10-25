@@ -52,12 +52,12 @@
 .grid-overlay {
   position: absolute;
   inset: 0;
-  background-image: 
+  background-image:
     linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
   background-size: 32px 32px;
-  mask-image: radial-gradient(ellipse at center, rgba(0,0,0,0.85) 0%, transparent 75%);
-  -webkit-mask-image: radial-gradient(ellipse at center, rgba(0,0,0,0.85) 0%, transparent 75%);
+  mask-image: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.85) 0%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.85) 0%, transparent 75%);
   pointer-events: none;
   z-index: 0;
 }
@@ -170,8 +170,17 @@
 }
 
 @keyframes pulseDot {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.85); }
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.4;
+    transform: scale(0.85);
+  }
 }
 
 /* =========================================================
@@ -277,7 +286,9 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* =========================================================
@@ -323,9 +334,19 @@
 }
 
 @keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-4px); }
-  75% { transform: translateX(4px); }
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-4px);
+  }
+
+  75% {
+    transform: translateX(4px);
+  }
 }
 
 /* =========================================================
@@ -998,9 +1019,17 @@
   border-radius: 50%;
 }
 
-.dot-red { background-color: #ef4444; }
-.dot-yellow { background-color: #f59e0b; }
-.dot-green { background-color: #10b981; }
+.dot-red {
+  background-color: #ef4444;
+}
+
+.dot-yellow {
+  background-color: #f59e0b;
+}
+
+.dot-green {
+  background-color: #10b981;
+}
 
 .terminal-title {
   font-family: var(--font-mono);
@@ -1512,7 +1541,7 @@
 .landing-grid-pattern {
   position: absolute;
   inset: 0;
-  background-image: 
+  background-image:
     linear-gradient(to right, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
   background-size: 40px 40px;
@@ -1829,8 +1858,17 @@
 }
 
 @keyframes pulse-dot {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.5; transform: scale(0.85); }
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.5;
+    transform: scale(0.85);
+  }
 }
 
 .eyebrow-separator {
@@ -2024,9 +2062,17 @@
   border-radius: 50%;
 }
 
-.dot-close { background: #ef4444; }
-.dot-min { background: #f59e0b; }
-.dot-max { background: #a3e635; }
+.dot-close {
+  background: #ef4444;
+}
+
+.dot-min {
+  background: #f59e0b;
+}
+
+.dot-max {
+  background: #a3e635;
+}
 
 .console-tabs {
   display: flex;
@@ -2112,10 +2158,23 @@
   font-weight: 500;
 }
 
-.c-teal, .c-lime { color: #a3e635; }
-.c-indigo, .c-cyan { color: #22d3ee; }
-.c-muted { color: #64748b; }
-.mt-2 { margin-top: 0.65rem; }
+.c-teal,
+.c-lime {
+  color: #a3e635;
+}
+
+.c-indigo,
+.c-cyan {
+  color: #22d3ee;
+}
+
+.c-muted {
+  color: #64748b;
+}
+
+.mt-2 {
+  margin-top: 0.65rem;
+}
 
 /* General Landing Section Styles */
 .landing-section {
@@ -2141,7 +2200,9 @@
   margin: 0 auto 3.5rem;
 }
 
-.text-center { text-align: center; }
+.text-center {
+  text-align: center;
+}
 
 .section-pill {
   display: inline-block;
@@ -2224,13 +2285,15 @@
   font-weight: 600;
 }
 
-.badge-teal, .badge-lime {
+.badge-teal,
+.badge-lime {
   background: rgba(163, 230, 53, 0.15);
   color: #a3e635;
   border: 1px solid rgba(163, 230, 53, 0.35);
 }
 
-.badge-indigo, .badge-cyan {
+.badge-indigo,
+.badge-cyan {
   background: rgba(34, 211, 238, 0.15);
   color: #22d3ee;
   border: 1px solid rgba(34, 211, 238, 0.35);
@@ -2777,7 +2840,7 @@
   .pipeline-steps-nav {
     grid-template-columns: repeat(3, 1fr);
   }
-  
+
   .about-grid {
     grid-template-columns: 1fr;
     gap: 2.5rem;
@@ -2836,7 +2899,7 @@
   .hero-features-summary {
     gap: 0.75rem;
   }
-  
+
   .summary-pill {
     width: 100%;
     justify-content: center;
@@ -2948,5 +3011,3 @@
     display: none;
   }
 }
-
-
