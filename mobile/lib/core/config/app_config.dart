@@ -3,14 +3,14 @@
 /// Physical Device Networking:
 /// - When running on a physical Android device over Wi-Fi, the app must connect to
 ///   your Mac's reachable local network (LAN) IP address.
-/// - The default development URL is configured with your Mac's LAN IP (`192.168.29.219:5000`).
+/// - The default development URL is configured with your Mac's LAN IP (`172.16.4.29:5000`).
 /// - You can override this at compile-time using:
 ///   `flutter run -d <DEVICE_ID> --dart-define=API_URL=http://<YOUR_IP>:5000/api`
 class AppConfig {
   AppConfig._();
 
   /// Mac LAN IP default for physical Android device testing on local Wi-Fi
-  static const String defaultLanBaseUrl = 'http://192.168.29.219:5000/api';
+  static const String defaultLanBaseUrl = 'http://172.16.4.29:5000/api';
 
   /// Compile-time environment override using `--dart-define=API_URL=http://.../api`
   static const String _envApiUrl = String.fromEnvironment(
