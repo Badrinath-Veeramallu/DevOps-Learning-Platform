@@ -1,6 +1,6 @@
 /**
  * 21st.dev inspired BackgroundGrid
- * Subtle developer grid with Indigo/Teal radial glow
+ * Subtle developer grid with Deep Burgundy radial glow
  */
 export const BackgroundGrid = ({ children, className = "" }) => {
   return (

@@ -1,10 +1,10 @@
 /**
  * 21st.dev inspired Badge
- * Variants: "indigo" (primary), "teal" (secondary), "success", "warning", "neutral"
+ * Variants: "burgundy" / "indigo" (primary), "secondary" / "teal", "success", "warning", "neutral"
  */
 export const Badge = ({
   children,
-  variant = "indigo",
+  variant = "burgundy",
   size = "md",
   dot = false,
   className = "",

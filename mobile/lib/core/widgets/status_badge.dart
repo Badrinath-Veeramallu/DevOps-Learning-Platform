@@ -64,22 +64,22 @@ class StatusBadge extends StatelessWidget {
         return (
           bg: AppColors.primarySubtle,
           border: AppColors.primaryBorder,
-          accent: AppColors.primary,
-          text: AppColors.primaryLight,
+          accent: AppColors.accent,
+          text: AppColors.subtleHighlight,
         );
       case BadgeVariant.lime:
         return (
           bg: AppColors.secondarySubtle,
           border: AppColors.secondaryBorder,
-          accent: AppColors.secondary,
-          text: AppColors.secondaryLight,
+          accent: AppColors.lightAccent,
+          text: AppColors.subtleHighlight,
         );
       case BadgeVariant.indigo:
         return (
           bg: AppColors.indigoSubtle,
           border: AppColors.indigoBorder,
-          accent: AppColors.indigo,
-          text: const Color(0xFFA5B4FC),
+          accent: AppColors.accent,
+          text: AppColors.lightAccent,
         );
       case BadgeVariant.warning:
         return (

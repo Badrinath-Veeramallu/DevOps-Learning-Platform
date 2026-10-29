@@ -2,13 +2,15 @@ import { useEffect, useRef } from "react";
 import * as THREE from "three";
 
 /**
- * DevOpsCanvas3D — Cyber Midnight Three.js WebGL Visualization
+ * DevOpsCanvas3D — Deep Burgundy Three.js WebGL Visualization
  *
- * Distinctive Cyber Midnight theme:
- * - Background: #090D16
- * - Primary: #22D3EE (Cyan)
- * - Secondary: #A3E635 (Lime)
- * - Subdued Slate / Muted: #64748B, #94A3B8
+ * White + Burgundy theme:
+ * - Background: #FFFFFF (Clean White) / Transparent WebGL canvas
+ * - Primary: #3B1F24 (Deep Burgundy)
+ * - Secondary: #60343D (Muted Burgundy)
+ * - Accent: #82535D (Dusty Rose Burgundy)
+ * - Light Accent: #B88A91 (Soft Rose)
+ * - Subtle Highlight: #E7D4D7 (Pale Blush)
  *
  * Framing Architecture:
  * - The central coordinator core & orbital rings are positioned below the hero text
@@ -32,9 +34,9 @@ export const DevOpsCanvas3D = () => {
       "(prefers-reduced-motion: reduce)"
     ).matches;
 
-    // Scene, Camera, Renderer (Cyber Midnight Background #090D16)
+    // Scene, Camera, Renderer (Clean White Light Theme with Transparent Canvas)
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x090d16, 0.02);
+    scene.fog = new THREE.FogExp2(0xffffff, 0.015);
 
     const camera = new THREE.PerspectiveCamera(
       50,
@@ -51,7 +53,7 @@ export const DevOpsCanvas3D = () => {
     });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-    renderer.setClearColor(0x090d16, 1);
+    renderer.setClearColor(0xffffff, 0);
     container.appendChild(renderer.domElement);
 
     // Group for mouse parallax tilt
@@ -67,10 +69,10 @@ export const DevOpsCanvas3D = () => {
     // Core wireframe icosahedron
     const coreGeo = new THREE.IcosahedronGeometry(2.2, 2);
     const coreMat = new THREE.MeshBasicMaterial({
-      color: 0x22d3ee, // Cyber Midnight Primary Cyan
+      color: 0x82535d, // Dusty Rose Burgundy
       wireframe: true,
       transparent: true,
-      opacity: 0.28,
+      opacity: 0.32,
     });
     const coreMesh = new THREE.Mesh(coreGeo, coreMat);
     coreGroup.add(coreMesh);
@@ -78,9 +80,9 @@ export const DevOpsCanvas3D = () => {
     // Core inner glowing halo
     const haloGeo = new THREE.SphereGeometry(1.5, 20, 20);
     const haloMat = new THREE.MeshBasicMaterial({
-      color: 0x0891b2, // Deep Cyan
+      color: 0x3b1f24, // Deep Burgundy Core
       transparent: true,
-      opacity: 0.16,
+      opacity: 0.22,
     });
     const haloMesh = new THREE.Mesh(haloGeo, haloMat);
     coreGroup.add(haloMesh);
@@ -101,24 +103,24 @@ export const DevOpsCanvas3D = () => {
       return ring;
     };
 
-    const ring1 = createRing(3.2, Math.PI / 3, 0.2, 0x22d3ee, 0.22);
-    const ring2 = createRing(4.4, -Math.PI / 4, 0.5, 0xa3e635, 0.18); // Lime accent
-    const ring3 = createRing(5.4, Math.PI / 6, -0.4, 0x0891b2, 0.15);
+    const ring1 = createRing(3.2, Math.PI / 3, 0.2, 0x82535d, 0.25); // Dusty Rose Accent
+    const ring2 = createRing(4.4, -Math.PI / 4, 0.5, 0x60343d, 0.22); // Muted Burgundy
+    const ring3 = createRing(5.4, Math.PI / 6, -0.4, 0xb88a91, 0.18); // Soft Rose Accent
 
     // --- 2. Flanking Constellation Nodes (Strict Lateral Positioning) ---
     // Positioned exclusively on outer flanks (|x| >= 19.0), leaving a 38-unit wide central corridor
     const nodeCoords = [
       // Left Flank Nodes (Frame left edge of viewport)
-      { x: -21.0, y: 6.0, z: -2.0, color: 0x22d3ee, size: 0.85, label: "k8s-ingress" },
-      { x: -24.5, y: 1.0, z: -4.0, color: 0x0891b2, size: 0.78, label: "api-gateway" },
-      { x: -19.5, y: -4.0, z: -1.0, color: 0xa3e635, size: 0.80, label: "auth-service" },
-      { x: -23.0, y: -9.0, z: -3.0, color: 0x22d3ee, size: 0.72, label: "ci-runner" },
+      { x: -21.0, y: 6.0, z: -2.0, color: 0x82535d, size: 0.85, label: "k8s-ingress" },
+      { x: -24.5, y: 1.0, z: -4.0, color: 0x60343d, size: 0.78, label: "api-gateway" },
+      { x: -19.5, y: -4.0, z: -1.0, color: 0xb88a91, size: 0.80, label: "auth-service" },
+      { x: -23.0, y: -9.0, z: -3.0, color: 0x82535d, size: 0.72, label: "ci-runner" },
 
       // Right Flank Nodes (Frame right edge of viewport)
-      { x: 21.0, y: 6.0, z: -2.0, color: 0x22d3ee, size: 0.85, label: "cloud-lb" },
-      { x: 24.5, y: 1.0, z: -4.0, color: 0xa3e635, size: 0.78, label: "monitoring" },
-      { x: 19.5, y: -4.0, z: -1.0, color: 0x22d3ee, size: 0.80, label: "db-cluster" },
-      { x: 23.0, y: -9.0, z: -3.0, color: 0x0891b2, size: 0.72, label: "argocd-gitops" },
+      { x: 21.0, y: 6.0, z: -2.0, color: 0x82535d, size: 0.85, label: "cloud-lb" },
+      { x: 24.5, y: 1.0, z: -4.0, color: 0xb88a91, size: 0.78, label: "monitoring" },
+      { x: 19.5, y: -4.0, z: -1.0, color: 0x60343d, size: 0.80, label: "db-cluster" },
+      { x: 23.0, y: -9.0, z: -3.0, color: 0x82535d, size: 0.72, label: "argocd-gitops" },
     ];
 
     const nodeMeshes = [];
@@ -137,9 +139,9 @@ export const DevOpsCanvas3D = () => {
       // Node inner core
       const innerGeo = new THREE.SphereGeometry(n.size * 0.42, 12, 12);
       const innerMat = new THREE.MeshBasicMaterial({
-        color: 0xf1f5f9,
+        color: 0xe7d4d7, // Pale Blush Highlight
         transparent: true,
-        opacity: 0.55,
+        opacity: 0.65,
       });
       const innerMesh = new THREE.Mesh(innerGeo, innerMat);
       nMesh.add(innerMesh);
@@ -156,14 +158,14 @@ export const DevOpsCanvas3D = () => {
       [nodeCoords[0], nodeCoords[1]],
       [nodeCoords[1], nodeCoords[2]],
       [nodeCoords[2], nodeCoords[3]],
-      [nodeCoords[3], { x: -8.0, y: -12.0, z: -3.5, color: 0x22d3ee }],
+      [nodeCoords[3], { x: -8.0, y: -12.0, z: -3.5, color: 0x82535d }],
     ];
     // Right flank pipeline curves
     const rightPairs = [
       [nodeCoords[4], nodeCoords[5]],
       [nodeCoords[5], nodeCoords[6]],
       [nodeCoords[6], nodeCoords[7]],
-      [nodeCoords[7], { x: 8.0, y: -12.0, z: -3.5, color: 0x22d3ee }],
+      [nodeCoords[7], { x: 8.0, y: -12.0, z: -3.5, color: 0x82535d }],
     ];
 
     [...leftPairs, ...rightPairs].forEach(([from, to]) => {
@@ -205,9 +207,9 @@ export const DevOpsCanvas3D = () => {
         new THREE.Vector3(b.x, b.y, b.z),
       ]);
       const linkMat = new THREE.LineBasicMaterial({
-        color: 0x334155,
+        color: 0xd4c3c7,
         transparent: true,
-        opacity: 0.18,
+        opacity: 0.28,
       });
       worldGroup.add(new THREE.Line(linkGeo, linkMat));
     });
@@ -221,7 +223,7 @@ export const DevOpsCanvas3D = () => {
 
     let pIdx = 0;
     pipelineCurves.forEach((curve, cIdx) => {
-      const curveColor = cIdx < 4 ? 0x22d3ee : (cIdx === 5 ? 0xa3e635 : 0x0891b2);
+      const curveColor = cIdx < 4 ? 0x82535d : (cIdx === 5 ? 0xb88a91 : 0x60343d);
       for (let k = 0; k < 2; k++) {
         const offset = (k / 2) + Math.random() * 0.15;
         const color = new THREE.Color(curveColor);
@@ -245,20 +247,20 @@ export const DevOpsCanvas3D = () => {
     packetGeo.setAttribute("color", new THREE.BufferAttribute(packetColors, 3));
 
     const packetMat = new THREE.PointsMaterial({
-      size: 0.32,
+      size: 0.45,
       vertexColors: true,
       transparent: true,
-      opacity: 0.85,
-      blending: THREE.AdditiveBlending,
+      opacity: 0.75,
+      blending: THREE.NormalBlending,
     });
     const packetPoints = new THREE.Points(packetGeo, packetMat);
     worldGroup.add(packetPoints);
 
-    // --- 5. Isometric Telemetry Grid Plane (Cyber Midnight Floor) ---
-    const gridHelper = new THREE.GridHelper(70, 45, 0x22d3ee, 0x1e293b);
+    // --- 5. Isometric Telemetry Grid Plane (Light Theme Subtle Grid Floor) ---
+    const gridHelper = new THREE.GridHelper(70, 45, 0x82535d, 0xe8dde0);
     gridHelper.position.y = -14.0;
     gridHelper.material.transparent = true;
-    gridHelper.material.opacity = 0.12;
+    gridHelper.material.opacity = 0.25;
     worldGroup.add(gridHelper);
 
     // --- 6. Ambient Dust Particles (Telemetry Field with Spatial Exclusion) ---
@@ -278,7 +280,7 @@ export const DevOpsCanvas3D = () => {
     }
     dustGeo.setAttribute("position", new THREE.Float32BufferAttribute(dustPos, 3));
     const dustMat = new THREE.PointsMaterial({
-      color: 0x94a3b8,
+      color: 0xb88a91,
       size: 0.07,
       transparent: true,
       opacity: 0.22,

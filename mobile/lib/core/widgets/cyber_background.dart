@@ -16,7 +16,7 @@ class CyberBackground extends StatelessWidget {
       color: AppColors.background,
       child: Stack(
         children: [
-          // Ambient Radial Gradient - Top Right (Cyan glow)
+          // Ambient Radial Gradient - Top Right (Burgundy glow)
           Positioned(
             top: -120,
             right: -100,
@@ -27,7 +27,7 @@ class CyberBackground extends StatelessWidget {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    AppColors.primary.withValues(alpha: 0.12),
+                    AppColors.secondary.withValues(alpha: 0.28),
                     Colors.transparent,
                   ],
                 ),
@@ -35,7 +35,7 @@ class CyberBackground extends StatelessWidget {
             ),
           ),
 
-          // Ambient Radial Gradient - Bottom Left (Indigo / Lime glow)
+          // Ambient Radial Gradient - Bottom Left (Dusty Rose glow)
           Positioned(
             bottom: -100,
             left: -80,
@@ -46,7 +46,7 @@ class CyberBackground extends StatelessWidget {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    AppColors.indigo.withValues(alpha: 0.10),
+                    AppColors.accent.withValues(alpha: 0.22),
                     Colors.transparent,
                   ],
                 ),

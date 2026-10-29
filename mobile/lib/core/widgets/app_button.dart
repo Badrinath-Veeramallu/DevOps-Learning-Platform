@@ -71,10 +71,17 @@ class AppButton extends StatelessWidget {
         buttonWidget = Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
+            gradient: enabled
+                ? const LinearGradient(
+                    colors: [AppColors.accent, AppColors.secondary],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  )
+                : null,
             boxShadow: enabled
                 ? [
                     BoxShadow(
-                      color: AppColors.primary.withValues(alpha: 0.28),
+                      color: AppColors.accent.withValues(alpha: 0.35),
                       blurRadius: 18,
                       offset: const Offset(0, 4),
                     ),
@@ -84,8 +91,9 @@ class AppButton extends StatelessWidget {
           child: ElevatedButton(
             onPressed: enabled ? onPressed : null,
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: AppColors.background,
+              backgroundColor: enabled ? Colors.transparent : AppColors.surfaceElevated,
+              foregroundColor: AppColors.textMain,
+              shadowColor: Colors.transparent,
               disabledBackgroundColor: AppColors.surfaceElevated,
               disabledForegroundColor: AppColors.textSubtle,
               elevation: 0,
@@ -104,7 +112,7 @@ class AppButton extends StatelessWidget {
           onPressed: enabled ? onPressed : null,
           style: OutlinedButton.styleFrom(
             backgroundColor: AppColors.surfaceElevated.withValues(alpha: 0.6),
-            foregroundColor: AppColors.primary,
+            foregroundColor: AppColors.subtleHighlight,
             disabledForegroundColor: AppColors.textSubtle,
             side: BorderSide(
               color: enabled
@@ -152,11 +160,11 @@ class AppButton extends StatelessWidget {
     switch (variant) {
       case ButtonVariant.primary:
         return AppTypography.buttonText.copyWith(
-          color: AppColors.background,
+          color: AppColors.textMain,
           fontWeight: FontWeight.w700,
         );
       case ButtonVariant.secondary:
-        return AppTypography.buttonText.copyWith(color: AppColors.primary);
+        return AppTypography.buttonText.copyWith(color: AppColors.subtleHighlight);
       case ButtonVariant.ghost:
         return AppTypography.buttonText.copyWith(color: AppColors.textMuted);
     }

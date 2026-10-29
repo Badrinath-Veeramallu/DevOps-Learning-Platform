@@ -62,19 +62,23 @@ mobile/
 
 ## 3. Design System: Web to Mobile Token Translation
 
-The web application uses the **Cyber Midnight** theme (`web/src/index.css`). Here is how those exact CSS tokens were mapped into Dart classes in [`mobile/lib/core/theme/app_colors.dart`](file:///Users/badrinathveeramallu/Desktop/DevOps-Learning-Platform/mobile/lib/core/theme/app_colors.dart):
+The web application uses the **Deep Burgundy** theme (`web/src/index.css`). Here is how those exact CSS tokens were mapped into Dart classes in [`mobile/lib/core/theme/app_colors.dart`](file:///c:/Users/DELL/Desktop/DevOps-Learning-Platform/mobile/lib/core/theme/app_colors.dart):
 
 | CSS Token | Hex Value | Flutter `Color` Representation | Role |
 |---|---|---|---|
 | `--color-background` | `#090D16` | `const Color(0xFF090D16)` | Scaffold background canvas |
-| `--color-surface` | `#111827` | `const Color(0xFF111827)` | Cards and modals |
+| `--color-surface` | `#0F172A` | `const Color(0xFF0F172A)` | Cards and modals |
 | `--color-surface-elevated`| `#1E293B` | `const Color(0xFF1E293B)` | Terminal headers, elevated rows |
-| `--color-primary` | `#22D3EE` | `const Color(0xFF22D3EE)` | Primary CTA, links, cyan glow |
-| `--color-secondary` | `#A3E635` | `const Color(0xFFA3E635)` | Lime accent, live status dots |
-| `--color-text` | `#F1F5F9` | `const Color(0xFFF1F5F9)` | High-contrast main headings |
+| `--color-primary` | `#3B1F24` | `const Color(0xFF3B1F24)` | Primary Deep Burgundy brand accent |
+| `--color-secondary` | `#60343D` | `const Color(0xFF60343D)` | Secondary Muted Burgundy |
+| `--color-accent` | `#82535D` | `const Color(0xFF82535D)` | Accent Dusty Rose Burgundy |
+| `--color-light-accent` | `#B88A91` | `const Color(0xFFB88A91)` | Light Accent Soft Rose |
+| `--color-subtle-highlight` | `#E7D4D7` | `const Color(0xFFE7D4D7)` | Subtle Highlight Pale Blush |
+| `--color-text` | `#F8FAFC` | `const Color(0xFFF8FAFC)` | High-contrast main headings |
 | `--color-text-muted` | `#94A3B8` | `const Color(0xFF94A3B8)` | Subtitles, body descriptions |
 | `--color-text-subtle` | `#64748B` | `const Color(0xFF64748B)` | Footers, disabled states |
 | `--color-error` | `#EF4444` | `const Color(0xFFEF4444)` | Validation errors, failed checks |
+| `--color-success` | `#10B981` | `const Color(0xFF10B981)` | Operational checks, status dots |
 
 ---
 

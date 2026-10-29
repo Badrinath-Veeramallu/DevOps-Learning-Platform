@@ -8,32 +8,39 @@ A comprehensive developer-focused learning platform for DevOps engineering, cont
 
 The platform interface has been redesigned following the **UI UX Pro Max** design intelligence guidelines and modern **21st.dev** component patterns.
 
-### Brand Palette (Strict Two-Color System)
+### Brand Palette (White + Burgundy Light Theme)
 
-- **Primary Brand Accent — Indigo (`#4F46E5`)**:
-  Used for primary buttons, main interactive actions, active navigation tabs, links, and key focus rings.
-- **Secondary Brand Accent — Teal (`#0D9488`)**:
-  Used for verified status badges, progress indicators, course completion tracks, and supporting highlights.
-- **Surface & Neutrals**: Dark developer theme (`#090D16` app background, `#0F172A` elevated cards, `#1E293B` borders, `#F8FAFC` high-contrast typography).
+- **Primary — Deep Burgundy (`#3B1F24`)**:
+  Dominant brand colour for primary call-to-action buttons, active navigation states, links, brand logo, and active badges.
+- **Secondary — Muted Burgundy (`#60343D`)**:
+  Used for gradient accents, secondary highlights, active tab states, and learning track indicators.
+- **Accent — Dusty Rose Burgundy (`#82535D`)**:
+  Used for headline gradients, interactive hover states, active borders, and focus rings.
+- **Light Accent — Soft Rose (`#B88A91`)**:
+  Used for progress fill gradients, subtle button hover borders, and interactive highlights.
+- **Subtle Highlight — Pale Blush (`#E7D4D7`)**:
+  Used for pill badges, ambient glows, and subtle card hover tints.
+- **Surfaces & Neutrals**:
+  Clean light theme (`#FFFFFF` main background and card surface, `#FCF8F9` alternate background and code console, `#E8DDE0` crisp borders, `#F5ECEF` subtle developer grid, `#171521` high-contrast dark primary text, `#454252` readable body text).
 
 ### 21st.dev Components Integrated
 
 1. **6-Digit OTP / PIN Input** (`web/src/components/OtpInput.jsx`):
-   - Individual box slots with active Indigo focus rings and Teal filled highlights.
+   - Individual box slots with active Dusty Rose focus rings and Soft Rose filled highlights.
    - Automatic focus advancement on single-digit entry, backspace backward step, and arrow-key navigation.
    - Full clipboard paste parsing with automatic slot distribution.
 2. **Developer Background Grid** (`web/src/components/BackgroundGrid.jsx`):
-   - Subtle developer grid with radial ambient Indigo and Teal glow overlays.
+   - Subtle developer grid with radial ambient Deep Burgundy and Dusty Rose glow overlays.
 3. **Glassmorphic Spotlight Card** (`web/src/components/Card.jsx`):
    - Frosted glass depth (`backdrop-filter: blur(16px)`), subtle borders, and smooth elevation on hover.
 4. **Pill Badges & Live Status Dots** (`web/src/components/Badge.jsx`):
    - Compact badges for verified accounts, learning tracks, and live session pulse indicators.
 5. **Interactive Glow Buttons** (`web/src/components/Button.jsx`):
-   - Primary (Indigo), Secondary (Teal), Outline, and Ghost variants with accessible focus rings and built-in loading spinners.
+   - Primary (Deep Burgundy), Secondary (Muted Burgundy), Outline, and Ghost variants with accessible focus rings and built-in loading spinners.
 6. **Segmented Curriculum Tabs** (`web/src/components/Tabs.jsx`):
    - Interactive track switcher for Kubernetes, CI/CD, Docker, and Terraform modules.
 7. **Gradient Progress Indicators** (`web/src/components/ProgressBar.jsx`):
-   - Accessible progress bar with Teal-to-Indigo gradient track and real-time completion percentages.
+   - Accessible progress bar with Muted Burgundy to Soft Rose gradient track and real-time completion percentages.
 
 ---
 

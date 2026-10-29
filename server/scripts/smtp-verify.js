@@ -59,11 +59,11 @@ async function main() {
         "— DevOps Learning Platform",
       ].join("\n"),
       html: `
-        <div style="font-family:sans-serif;padding:24px;background:#0f172a;color:#f8fafc;border-radius:12px;max-width:480px">
-          <h2 style="color:#4F46E5;margin-top:0">✅ SMTP Test Successful</h2>
+        <div style="font-family:sans-serif;padding:24px;background:#0f172a;color:#f8fafc;border:1px solid #1e293b;border-radius:12px;max-width:480px">
+          <h2 style="color:#b88a91;margin-top:0">✅ SMTP Test Successful</h2>
           <p>This is an automated test message from the <strong>DevOps Learning Platform</strong>.</p>
           <p>If you received this email, your SMTP configuration is working correctly and OTP verification emails will be delivered.</p>
-          <p style="color:#0D9488;font-size:13px">— DevOps Learning Platform</p>
+          <p style="color:#e7d4d7;font-size:13px">— DevOps Learning Platform</p>
         </div>
       `,
     });

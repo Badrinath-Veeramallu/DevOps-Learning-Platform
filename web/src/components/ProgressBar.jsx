@@ -1,6 +1,6 @@
 /**
  * 21st.dev inspired ProgressBar
- * Features a Teal (#0D9488) to Indigo (#4F46E5) gradient track
+ * Features a Muted Burgundy (#60343D) to Soft Rose (#B88A91) gradient track
  */
 export const ProgressBar = ({
   progress = 0,

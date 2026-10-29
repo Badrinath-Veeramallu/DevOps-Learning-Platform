@@ -1,8 +1,8 @@
 /**
  * 21st.dev inspired Button
  * Variants:
- * - "primary": Indigo (#4F46E5)
- * - "secondary": Teal (#0D9488)
+ * - "primary": Deep Burgundy (#3B1F24)
+ * - "secondary": Muted Burgundy (#60343D)
  * - "outline": Subtle border with hover glow
  * - "ghost": Minimalist hover state
  */

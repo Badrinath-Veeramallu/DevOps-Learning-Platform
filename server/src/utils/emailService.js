@@ -157,9 +157,9 @@ function buildOtpEmailTemplate(otp) {
         <table role="presentation" width="100%" style="max-width: 520px; background-color: #0f172a; border: 1px solid #1e293b; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.6);">
           <!-- Header Banner -->
           <tr>
-            <td style="background: linear-gradient(135deg, #4F46E5 0%, #0D9488 100%); padding: 32px 30px; text-align: center;">
+            <td style="background: linear-gradient(135deg, #82535D 0%, #60343D 100%); padding: 32px 30px; text-align: center;">
               <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 700; letter-spacing: -0.5px;">DevOps Learning Platform</h1>
-              <p style="margin: 8px 0 0 0; color: #e0e7ff; font-size: 14px;">Master CI/CD, Kubernetes, and Cloud Architecture</p>
+              <p style="margin: 8px 0 0 0; color: #e7d4d7; font-size: 14px;">Master CI/CD, Kubernetes, and Cloud Architecture</p>
             </td>
           </tr>
 
@@ -172,8 +172,8 @@ function buildOtpEmailTemplate(otp) {
               </p>
 
               <!-- OTP Code Display Box -->
-              <div style="background-color: #1e293b; border: 1.5px solid #334155; border-radius: 12px; padding: 24px; text-align: center; margin-bottom: 24px;">
-                <div style="font-family: 'Courier New', Courier, monospace; font-size: 38px; font-weight: 700; letter-spacing: 12px; color: #38bdf8; text-shadow: 0 0 14px rgba(56, 189, 248, 0.4);">
+              <div style="background-color: #1e293b; border: 1.5px solid #60343d; border-radius: 12px; padding: 24px; text-align: center; margin-bottom: 24px;">
+                <div style="font-family: 'Courier New', Courier, monospace; font-size: 38px; font-weight: 700; letter-spacing: 12px; color: #e7d4d7; text-shadow: 0 0 14px rgba(184, 138, 145, 0.4);">
                   ${otp}
                 </div>
                 <div style="margin-top: 10px; color: #94a3b8; font-size: 13px;">
@@ -182,9 +182,9 @@ function buildOtpEmailTemplate(otp) {
               </div>
 
               <!-- Security Information -->
-              <div style="border-left: 3px solid #0D9488; padding-left: 14px; margin-bottom: 24px;">
+              <div style="border-left: 3px solid #82535d; padding-left: 14px; margin-bottom: 24px;">
                 <p style="margin: 0; color: #94a3b8; font-size: 13px; line-height: 1.5;">
-                  <strong style="color: #0D9488;">Security Notice:</strong> Never share this verification code with anyone. Platform support will never request your code. If you did not request this registration, please disregard this email.
+                  <strong style="color: #b88a91;">Security Notice:</strong> Never share this verification code with anyone. Platform support will never request your code. If you did not request this registration, please disregard this email.
                 </p>
               </div>
 

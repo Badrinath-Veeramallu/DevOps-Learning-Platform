@@ -18,13 +18,20 @@
 
 | Role | Hex | CSS Variable |
 |------|-----|--------------|
-| Primary | `#4F46E5` | `--color-primary` |
-| Secondary | `#818CF8` | `--color-secondary` |
-| CTA/Accent | `#22C55E` | `--color-cta` |
-| Background | `#EEF2FF` | `--color-background` |
-| Text | `#312E81` | `--color-text` |
+| Primary — Deep Burgundy | `#3B1F24` | `--color-primary` |
+| Secondary — Muted Burgundy | `#60343D` | `--color-secondary` |
+| Accent — Dusty Rose Burgundy | `#82535D` | `--color-accent` |
+| Light Accent — Soft Rose | `#B88A91` | `--color-light-accent` |
+| Subtle Highlight — Pale Blush | `#E7D4D7` | `--color-subtle-highlight` |
+| Main Background | `#FFFFFF` | `--color-background` |
+| Alternate Background | `#FCF8F9` | `--color-background-alt` |
+| Elevated Cards | `#FFFFFF` | `--color-surface` |
+| Borders | `#E8DDE0` | `--border-default` |
+| Primary Text | `#171521` | `--color-text` |
+| Secondary Text | `#454252` | `--color-text-muted` |
+| Subtle Text | `#797587` | `--color-text-subtle` |
 
-**Color Notes:** Learning indigo + progress green
+**Color Notes:** Premium White + Deep Burgundy brand identity featuring clean white and pale-blush surfaces, deep burgundy interactive controls, subtle pinkish borders, and dark readable typography.
 
 ### Typography
 
@@ -54,10 +61,10 @@
 
 | Level | Value | Usage |
 |-------|-------|-------|
-| `--shadow-sm` | `0 1px 2px rgba(0,0,0,0.05)` | Subtle lift |
-| `--shadow-md` | `0 4px 6px rgba(0,0,0,0.1)` | Cards, buttons |
-| `--shadow-lg` | `0 10px 15px rgba(0,0,0,0.1)` | Modals, dropdowns |
-| `--shadow-xl` | `0 20px 25px rgba(0,0,0,0.15)` | Hero images, featured cards |
+| `--shadow-sm` | `0 1px 3px rgba(59, 31, 36, 0.04)` | Subtle lift |
+| `--shadow-md` | `0 4px 16px -2px rgba(59, 31, 36, 0.05)` | Cards, buttons |
+| `--shadow-lg` | `0 10px 25px -4px rgba(59, 31, 36, 0.08)` | Modals, dropdowns |
+| `--shadow-xl` | `0 20px 35px -5px rgba(59, 31, 36, 0.12)` | Hero elements, featured cards |
 
 ---
 
@@ -68,30 +75,42 @@
 ```css
 /* Primary Button */
 .btn-primary {
-  background: #22C55E;
-  color: white;
+  background: #3B1F24;
+  color: #FFFFFF;
+  border: 1px solid #3B1F24;
   padding: 12px 24px;
   border-radius: 8px;
   font-weight: 600;
+  box-shadow: 0 4px 14px rgba(59, 31, 36, 0.2);
   transition: all 200ms ease;
   cursor: pointer;
 }
 
 .btn-primary:hover {
-  opacity: 0.9;
+  background: #60343D;
+  border-color: #60343D;
+  box-shadow: 0 6px 20px rgba(96, 52, 61, 0.3);
   transform: translateY(-1px);
 }
 
 /* Secondary Button */
 .btn-secondary {
-  background: transparent;
-  color: #4F46E5;
-  border: 2px solid #4F46E5;
+  background: #FFFFFF;
+  color: #171521;
+  border: 1px solid #E8DDE0;
   padding: 12px 24px;
   border-radius: 8px;
   font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   transition: all 200ms ease;
   cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background: #FCF8F9;
+  color: #3B1F24;
+  border-color: #B88A91;
+  transform: translateY(-1px);
 }
 ```
 
@@ -99,7 +118,8 @@
 
 ```css
 .card {
-  background: #EEF2FF;
+  background: #FFFFFF;
+  border: 1px solid #E8DDE0;
   border-radius: 12px;
   padding: 24px;
   box-shadow: var(--shadow-md);
@@ -108,7 +128,8 @@
 }
 
 .card:hover {
-  box-shadow: var(--shadow-lg);
+  border-color: #B88A91;
+  box-shadow: var(--shadow-lg), 0 0 15px -3px rgba(96, 52, 61, 0.1);
   transform: translateY(-2px);
 }
 ```
@@ -117,17 +138,19 @@
 
 ```css
 .input {
+  background: #FFFFFF;
+  color: #171521;
   padding: 12px 16px;
-  border: 1px solid #E2E8F0;
+  border: 1px solid #E8DDE0;
   border-radius: 8px;
   font-size: 16px;
-  transition: border-color 200ms ease;
+  transition: border-color 200ms ease, box-shadow 200ms ease;
 }
 
 .input:focus {
-  border-color: #4F46E5;
+  border-color: #82535D;
   outline: none;
-  box-shadow: 0 0 0 3px #4F46E520;
+  box-shadow: 0 0 0 3px rgba(130, 83, 93, 0.2);
 }
 ```
 

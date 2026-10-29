@@ -16,9 +16,9 @@ class AppTheme {
       primaryColor: AppColors.primary,
       colorScheme: const ColorScheme.dark(
         primary: AppColors.primary,
-        onPrimary: AppColors.background,
+        onPrimary: AppColors.textMain,
         secondary: AppColors.secondary,
-        onSecondary: AppColors.background,
+        onSecondary: AppColors.textMain,
         surface: AppColors.surface,
         onSurface: AppColors.textMain,
         error: AppColors.error,
@@ -84,7 +84,7 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+          borderSide: const BorderSide(color: AppColors.accent, width: 1.5),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
@@ -99,7 +99,7 @@ class AppTheme {
 
       // Progress Indicator theme
       progressIndicatorTheme: const ProgressIndicatorThemeData(
-        color: AppColors.primary,
+        color: AppColors.lightAccent,
         linearTrackColor: AppColors.surfaceElevated,
         circularTrackColor: AppColors.surfaceElevated,
       ),
