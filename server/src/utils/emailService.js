@@ -1,6 +1,8 @@
-const nodemailer = require("nodemailer");
 
-// In-memory mock storage used exclusively by automated unit/integration tests (NODE_ENV === "test")
+const nodemailer = require("nodemailer");
+const { Resend } = require("resend");
+
+// In-memory mock storage used exclusively by automated tests.
 let mockSentEmails = [];
 
 function resetMockEmails() {
@@ -12,7 +14,9 @@ function getMockEmails() {
 }
 
 /**
- * Check whether required SMTP configuration variables are present
+ * Check SMTP configuration.
+ * Retained for compatibility with existing diagnostics.
+ * Production OTP emails are sent through Resend.
  */
 function getSmtpStatus() {
   const host = process.env.SMTP_HOST?.trim();
@@ -38,10 +42,10 @@ function getSmtpStatus() {
 }
 
 /**
- * Create a Nodemailer transporter
+ * Retain the existing SMTP transporter for compatibility
+ * with existing diagnostics and automated tests.
  */
 function getTransporter() {
-  // Only use in-memory mock during automated test suite execution
   if (process.env.NODE_ENV === "test") {
     return {
       sendMail: async (mailOptions) => {
@@ -52,6 +56,7 @@ function getTransporter() {
           html: mailOptions.html,
           timestamp: new Date(),
         });
+
         return {
           messageId: `mock-${Date.now()}`,
           accepted: [mailOptions.to],
@@ -66,30 +71,26 @@ function getTransporter() {
 
   if (!status.isConfigured) {
     const error = new Error(
-      `SMTP email service is not configured. Missing variables in server/.env: ${status.missing.join(", ")}`
+      `SMTP email service is not configured. Missing variables: ${status.missing.join(", ")}`
     );
     error.code = "SMTP_NOT_CONFIGURED";
     error.missing = status.missing;
     throw error;
   }
 
-  const isSecure = status.port === 465;
-
   const transportOptions = {
     host: status.host,
     port: status.port,
-    secure: isSecure, // true for port 465, false for 587 or 25
+    secure: status.port === 465,
     auth: {
       user: process.env.SMTP_USER.trim(),
       pass: process.env.SMTP_PASS.trim(),
     },
-    // Prevent indefinite hanging on network/firewall issues
-    connectionTimeout: 10000, // 10s
+    connectionTimeout: 10000,
     greetingTimeout: 10000,
     socketTimeout: 15000,
   };
 
-  // If using port 587 (standard STARTTLS for Gmail/Outlook/SendGrid)
   if (status.port === 587) {
     transportOptions.requireTLS = true;
   }
@@ -98,7 +99,8 @@ function getTransporter() {
 }
 
 /**
- * Verify live connection to the configured SMTP server without exposing secrets
+ * Verify the SMTP connection.
+ * This is a diagnostic helper; OTP sending uses Resend.
  */
 async function verifySmtpConnection() {
   const status = getSmtpStatus();
@@ -107,7 +109,7 @@ async function verifySmtpConnection() {
     return {
       success: false,
       code: "SMTP_NOT_CONFIGURED",
-      message: `SMTP configuration incomplete. Missing: ${status.missing.join(", ")} in server/.env`,
+      message: `SMTP configuration incomplete. Missing: ${status.missing.join(", ")}`,
       missing: status.missing,
     };
   }
@@ -115,19 +117,23 @@ async function verifySmtpConnection() {
   try {
     const transporter = getTransporter();
     await transporter.verify();
+
     return {
       success: true,
-      message: `Successfully connected and authenticated with SMTP server (${status.host}:${status.port}).`,
+      message: `Successfully connected to SMTP server (${status.host}:${status.port}).`,
     };
   } catch (err) {
     let message = err.message || "Failed to connect to SMTP server";
 
-    // Provide friendly diagnostics for common SMTP issues
     if (err.code === "EAUTH") {
       message =
-        "SMTP Authentication failed. For Gmail, ensure you are using a 16-character Google App Password (not your normal Gmail password or OAuth Client ID).";
-    } else if (err.code === "ESOCKET" || err.code === "ETIMEDOUT") {
-      message = `Connection timed out connecting to ${status.host}:${status.port}. Check your firewall, host, and port settings.`;
+        "SMTP authentication failed. Check your SMTP credentials.";
+    } else if (
+      err.code === "ESOCKET" ||
+      err.code === "ETIMEDOUT" ||
+      err.code === "ECONNECTION"
+    ) {
+      message = `Connection timed out connecting to ${status.host}:${status.port}.`;
     }
 
     return {
@@ -139,7 +145,7 @@ async function verifySmtpConnection() {
 }
 
 /**
- * Generate professional HTML template for OTP verification email
+ * Generate the existing verification email template.
  */
 function buildOtpEmailTemplate(otp) {
   const html = `
@@ -155,23 +161,18 @@ function buildOtpEmailTemplate(otp) {
     <tr>
       <td align="center">
         <table role="presentation" width="100%" style="max-width: 520px; background-color: #0f172a; border: 1px solid #1e293b; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.6);">
-          <!-- Header Banner -->
           <tr>
             <td style="background: linear-gradient(135deg, #82535D 0%, #60343D 100%); padding: 32px 30px; text-align: center;">
               <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 700; letter-spacing: -0.5px;">DevOps Learning Platform</h1>
               <p style="margin: 8px 0 0 0; color: #e7d4d7; font-size: 14px;">Master CI/CD, Kubernetes, and Cloud Architecture</p>
             </td>
           </tr>
-
-          <!-- Main Content -->
           <tr>
             <td style="padding: 36px 32px;">
               <h2 style="margin: 0 0 16px 0; color: #f8fafc; font-size: 20px; font-weight: 600;">Confirm your email address</h2>
               <p style="margin: 0 0 24px 0; color: #94a3b8; font-size: 15px; line-height: 1.6;">
                 Thank you for creating an account. Please use the following 6-digit confirmation code to complete your registration:
               </p>
-
-              <!-- OTP Code Display Box -->
               <div style="background-color: #1e293b; border: 1.5px solid #60343d; border-radius: 12px; padding: 24px; text-align: center; margin-bottom: 24px;">
                 <div style="font-family: 'Courier New', Courier, monospace; font-size: 38px; font-weight: 700; letter-spacing: 12px; color: #e7d4d7; text-shadow: 0 0 14px rgba(184, 138, 145, 0.4);">
                   ${otp}
@@ -180,14 +181,11 @@ function buildOtpEmailTemplate(otp) {
                   This code expires in <strong style="color: #f8fafc;">10 minutes</strong>
                 </div>
               </div>
-
-              <!-- Security Information -->
               <div style="border-left: 3px solid #82535d; padding-left: 14px; margin-bottom: 24px;">
                 <p style="margin: 0; color: #94a3b8; font-size: 13px; line-height: 1.5;">
                   <strong style="color: #b88a91;">Security Notice:</strong> Never share this verification code with anyone. Platform support will never request your code. If you did not request this registration, please disregard this email.
                 </p>
               </div>
-
               <p style="margin: 0; color: #64748b; font-size: 12px; line-height: 1.5; border-top: 1px solid #1e293b; padding-top: 20px;">
                 Automated security notification from DevOps Learning Platform.
               </p>
@@ -217,34 +215,62 @@ If you did not attempt to register on the DevOps Learning Platform, please disre
 }
 
 /**
- * Send OTP verification email to recipient
+ * Send OTP email through Resend in production.
  */
 async function sendOtpEmail(recipientEmail, otp) {
-  const transporter = getTransporter();
   const { html, text } = buildOtpEmailTemplate(otp);
 
-  const from =
-    process.env.EMAIL_FROM?.trim() ||
-    process.env.SMTP_USER?.trim() ||
-    '"DevOps Learning Platform" <noreply@devops.example.com>';
+  // Preserve the existing mock behavior in automated tests.
+  if (process.env.NODE_ENV === "test") {
+    const transporter = getTransporter();
 
-  const mailOptions = {
-    from,
-    to: recipientEmail,
-    subject: "Your Verification Code - DevOps Learning Platform",
-    text,
-    html,
-  };
+    return transporter.sendMail({
+      from: process.env.EMAIL_FROM || "DevOps Learning Platform",
+      to: recipientEmail,
+      subject: "Your Verification Code - DevOps Learning Platform",
+      text,
+      html,
+    });
+  }
 
-  const info = await transporter.sendMail(mailOptions);
+  const apiKey = process.env.RESEND_API_KEY?.trim();
 
-  if (info.rejected && info.rejected.length > 0) {
-    const error = new Error(`Recipient email ${recipientEmail} was rejected by SMTP server.`);
-    error.code = "RECIPIENT_REJECTED";
+  if (!apiKey) {
+    const error = new Error("RESEND_API_KEY is not configured");
+    error.code = "RESEND_NOT_CONFIGURED";
     throw error;
   }
 
-  return info;
+  const from =
+    process.env.RESEND_FROM_EMAIL?.trim() ||
+    process.env.EMAIL_FROM?.trim() ||
+    "DevOps Learning Platform <onboarding@resend.dev>";
+
+  const resend = new Resend(apiKey);
+
+  const { data, error } = await resend.emails.send({
+    from,
+    to: [recipientEmail],
+    subject: "Your Verification Code - DevOps Learning Platform",
+    text,
+    html,
+  });
+
+  if (error) {
+    const sendError = new Error(`Resend email failed: ${error.message}`);
+    sendError.code = error.name || "RESEND_SEND_FAILED";
+    throw sendError;
+  }
+
+  if (!data?.id) {
+    throw new Error("Resend did not return an email ID");
+  }
+
+  return {
+    messageId: data.id,
+    accepted: [recipientEmail],
+    rejected: [],
+  };
 }
 
 module.exports = {
