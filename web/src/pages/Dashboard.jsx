@@ -1,10 +1,12 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 
 export const Dashboard = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [activeTrackId, setActiveTrackId] = useState(() => {
-    return localStorage.getItem("devops_active_track") || null;
+    return localStorage.getItem("devops_active_track") || "git";
   });
 
   const firstName = user?.name ? user.name.trim().split(" ")[0] : "Learner";
@@ -12,20 +14,22 @@ export const Dashboard = () => {
   // 6 Core Learning Paths from actual application data
   const learningPaths = [
     {
+      id: "git",
+      title: "Git & Collaborative Workflows",
+      level: "Foundational",
+      modules: "7 Modules · Interactive Pathway",
+      description:
+        "Version control strategies, GitOps branch patterns, interactive rebasing, merge conflict resolution, and commit workflows.",
+      hasPathway: true,
+    },
+    {
       id: "linux",
       title: "Linux Systems & Automation",
       level: "Foundational",
       modules: "8 Modules",
       description:
         "Linux kernel fundamentals, process management, permissions, systemd services, and bash shell automation.",
-    },
-    {
-      id: "git",
-      title: "Git & Collaborative Workflows",
-      level: "Foundational",
-      modules: "6 Modules",
-      description:
-        "Version control strategies, GitOps branch patterns, interactive rebasing, merge conflict resolution, and commit workflows.",
+      hasPathway: false,
     },
     {
       id: "docker",
@@ -34,6 +38,7 @@ export const Dashboard = () => {
       modules: "8 Modules",
       description:
         "Container isolation, multi-stage Dockerfile architecture, layer caching, container networking, and security best practices.",
+      hasPathway: false,
     },
     {
       id: "kubernetes",
@@ -42,6 +47,7 @@ export const Dashboard = () => {
       modules: "12 Modules",
       description:
         "Workload orchestration: Deployments, StatefulSets, Services, Ingress controllers, ConfigMaps, and Helm charts.",
+      hasPathway: false,
     },
     {
       id: "cicd",
@@ -50,6 +56,7 @@ export const Dashboard = () => {
       modules: "10 Modules",
       description:
         "Automated deployment pipelines using GitHub Actions, container registries, test automation, and GitOps synchronization.",
+      hasPathway: false,
     },
     {
       id: "iac",
@@ -58,12 +65,24 @@ export const Dashboard = () => {
       modules: "9 Modules",
       description:
         "Infrastructure as Code: declarative cloud provisioning, modular configurations, remote state management, and cloud networking.",
+      hasPathway: false,
     },
   ];
 
   const handleSelectTrack = (trackId) => {
     setActiveTrackId(trackId);
     localStorage.setItem("devops_active_track", trackId);
+    if (trackId === "git") {
+      navigate("/pathways/git");
+    }
+  };
+
+  const handleContinue = (path) => {
+    if (path.id === "git") {
+      navigate("/pathways/git");
+    } else {
+      alert(`Continuing ${path.title}`);
+    }
   };
 
   const activePath = learningPaths.find((p) => p.id === activeTrackId);
@@ -90,7 +109,9 @@ export const Dashboard = () => {
                   <span className={`badge-pill badge-${activePath.level.toLowerCase()}`}>
                     {activePath.level}
                   </span>
-                  <span className="continue-module-label">Module 1 in progress</span>
+                  <span className="continue-module-label">
+                    {activePath.id === "git" ? "Interactive Pathway Active" : "Module in progress"}
+                  </span>
                 </div>
                 <h3 className="continue-track-title">{activePath.title}</h3>
                 <p className="continue-track-desc">{activePath.description}</p>
@@ -100,9 +121,9 @@ export const Dashboard = () => {
                 <button
                   type="button"
                   className="btn-continue-primary"
-                  onClick={() => alert(`Continuing ${activePath.title}`)}
+                  onClick={() => handleContinue(activePath)}
                 >
-                  <span>Continue</span>
+                  <span>{activePath.id === "git" ? "Open Pathway" : "Continue"}</span>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
                     <polyline points="9 18 15 12 9 6" />
                   </svg>
@@ -131,6 +152,8 @@ export const Dashboard = () => {
           <div className="dashboard-paths-grid">
             {learningPaths.map((path) => {
               const isActive = path.id === activeTrackId;
+              const isGit = path.id === "git";
+
               return (
                 <div key={path.id} className={`dashboard-path-card ${isActive ? "active-path-card" : ""}`}>
                   <div className="path-card-body">
@@ -157,9 +180,11 @@ export const Dashboard = () => {
                     <button
                       type="button"
                       onClick={() => handleSelectTrack(path.id)}
-                      className={`btn-path-action ${isActive ? "btn-active-track" : ""}`}
+                      className={`btn-path-action ${isGit ? "btn-path-highlight" : ""} ${isActive ? "btn-active-track" : ""}`}
                     >
-                      <span>{isActive ? "Active Path" : "Start Learning"}</span>
+                      <span>
+                        {isGit ? "View Pathway" : isActive ? "Active Path" : "Start Learning"}
+                      </span>
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                         <polyline points="9 18 15 12 9 6" />
                       </svg>

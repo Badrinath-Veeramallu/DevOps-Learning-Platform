@@ -8,6 +8,8 @@ import { Register } from "./pages/Register";
 import { VerifyEmail } from "./pages/VerifyEmail";
 import { Dashboard } from "./pages/Dashboard";
 import { Profile } from "./pages/Profile";
+import { GitPathwayPage } from "./pages/GitPathwayPage";
+import { GitModulePage } from "./pages/GitModulePage";
 import "./App.css";
 
 /**
@@ -45,6 +47,33 @@ function AppLayout() {
                 <Profile />
               </ProtectedRoute>
             }
+          />
+
+          {/* Git & GitHub Learning Pathway Routes */}
+          <Route
+            path="/pathways/git"
+            element={
+              <ProtectedRoute>
+                <GitPathwayPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/pathways/git/:moduleId"
+            element={
+              <ProtectedRoute>
+                <GitModulePage />
+              </ProtectedRoute>
+            }
+          />
+          {/* Aliases for convenience */}
+          <Route
+            path="/pathway/git"
+            element={<Navigate to="/pathways/git" replace />}
+          />
+          <Route
+            path="/pathway/git/:moduleId"
+            element={<Navigate to="/pathways/git" replace />}
           />
 
           {/* Catch-all fallback */}
