@@ -1,23 +1,20 @@
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
+import { UserProfileMenu } from "./UserProfileMenu";
 
 export const Navbar = () => {
-  const { user, isAuthenticated, logout } = useAuth();
-  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   const location = useLocation();
 
-  const handleLogout = () => {
-    logout();
-    navigate("/login");
-  };
-
   const isActive = (path) => location.pathname === path;
+  const isLoginPage = location.pathname === "/login";
+  const isRegisterPage = location.pathname === "/register";
 
   return (
     <header className="navbar-wrapper">
       <div className="navbar-container">
         {/* Brand Logo */}
-        <Link to="/" className="navbar-brand">
+        <Link to="/" className="navbar-brand" aria-label="DevOps Learning Platform Home">
           <div className="brand-logo-icon" aria-hidden="true">
             <svg
               width="20"
@@ -54,45 +51,32 @@ export const Navbar = () => {
                   isActive("/dashboard") ? "nav-item-active" : ""
                 }`}
               >
-                Command Center
+                Dashboard
               </Link>
 
-              <div className="nav-user-profile">
-                <span className="nav-avatar-circle" aria-hidden="true">
-                  {user?.name ? user.name.charAt(0).toUpperCase() : "U"}
-                </span>
-                <div className="nav-user-meta">
-                  <span className="nav-user-name">{user?.name}</span>
-                  {user?.isEmailVerified && (
-                    <span className="nav-verified-badge" title="Verified Account">
-                      ✓ Verified
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={handleLogout}
-                className="nav-btn-logout"
-                title="Sign out of your account"
-              >
-                Sign Out
-              </button>
+              {/* User Profile Control with Dropdown (My Profile & Sign Out) */}
+              <UserProfileMenu />
             </>
           ) : (
             <div className="nav-auth-actions">
-              <Link
-                to="/login"
-                className={`nav-item ${
-                  isActive("/login") ? "nav-item-active" : ""
-                }`}
-              >
-                Sign In
-              </Link>
-              <Link to="/register" className="nav-btn-primary">
-                Get Started Free
-              </Link>
+              {/* Only show Sign In if not already on /login */}
+              {!isLoginPage && (
+                <Link
+                  to="/login"
+                  className={`nav-item ${
+                    isActive("/login") ? "nav-item-active" : ""
+                  }`}
+                >
+                  Sign In
+                </Link>
+              )}
+
+              {/* Only show Get Started Free if not already on /register */}
+              {!isRegisterPage && (
+                <Link to="/register" className="nav-btn-primary">
+                  Get Started Free
+                </Link>
+              )}
             </div>
           )}
         </nav>

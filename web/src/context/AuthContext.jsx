@@ -161,6 +161,23 @@ export const AuthProvider = ({ children }) => {
     setAuthError(null);
   };
 
+  // Update Profile action (updates user name)
+  const updateProfile = async (name) => {
+    setAuthError(null);
+    try {
+      const response = await authAPI.updateProfile({ name });
+      if (response.user) {
+        setUser((prev) => ({ ...prev, ...response.user }));
+        return response.user;
+      }
+      throw new Error("Invalid response from server");
+    } catch (err) {
+      const message = err.message || "Failed to update profile";
+      setAuthError(message);
+      throw err;
+    }
+  };
+
   const value = {
     user,
     loading,
@@ -172,6 +189,7 @@ export const AuthProvider = ({ children }) => {
     resendOtp,
     googleLogin,
     logout,
+    updateProfile,
     checkAuthStatus,
   };
 

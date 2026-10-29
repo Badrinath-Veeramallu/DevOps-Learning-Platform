@@ -237,7 +237,7 @@ export const Register = () => {
           <p>
             Already have an account?{" "}
             <Link to="/login" className="auth-link">
-              Sign In
+              Sign in
             </Link>
           </p>
         </div>

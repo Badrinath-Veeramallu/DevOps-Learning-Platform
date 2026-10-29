@@ -193,7 +193,7 @@ export const Login = () => {
           <p>
             Don't have an account?{" "}
             <Link to="/register" className="auth-link">
-              Create an account
+              Create one
             </Link>
           </p>
         </div>

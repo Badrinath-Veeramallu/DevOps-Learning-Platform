@@ -1,316 +1,177 @@
 import { useState } from "react";
 import { useAuth } from "../context/useAuth";
-import { authAPI } from "../services/api";
-import { Card } from "../components/Card";
-import { Badge } from "../components/Badge";
-import { Button } from "../components/Button";
-import { Tabs } from "../components/Tabs";
-import { ProgressBar } from "../components/ProgressBar";
-import { BackgroundGrid } from "../components/BackgroundGrid";
 
 export const Dashboard = () => {
-  const { user, logout } = useAuth();
-  const [liveCheck, setLiveCheck] = useState(null);
-  const [checking, setChecking] = useState(false);
-  const [activeTab, setActiveTab] = useState("k8s");
+  const { user } = useAuth();
+  const [activeTrackId, setActiveTrackId] = useState(() => {
+    return localStorage.getItem("devops_active_track") || null;
+  });
 
-  const handleVerifySession = async () => {
-    setChecking(true);
-    try {
-      const data = await authAPI.getMe();
-      setLiveCheck({
-        success: true,
-        message: "GET /api/auth/me returned HTTP 200 OK. Bearer token is verified!",
-        timestamp: new Date().toLocaleTimeString(),
-        data: data.user,
-      });
-    } catch (err) {
-      setLiveCheck({
-        success: false,
-        message: `Verification failed: ${err.message}`,
-        timestamp: new Date().toLocaleTimeString(),
-      });
-    } finally {
-      setChecking(false);
-    }
-  };
+  const firstName = user?.name ? user.name.trim().split(" ")[0] : "Learner";
 
-  const learningTracks = {
-    k8s: {
-      title: "Kubernetes Cloud Native Architecture",
-      desc: "Deploy pods, services, ingress controllers, Helm charts, and custom resource definitions on multi-node clusters.",
-      progress: 68,
-      modules: [
-        { name: "Cluster Architecture & Control Plane", done: true },
-        { name: "Pod Deployments & DaemonSets", done: true },
-        { name: "Service Mesh & Ingress Routing", done: false },
-        { name: "Persistent Volumes & StatefulSets", done: false },
-      ],
+  // 6 Core Learning Paths from actual application data
+  const learningPaths = [
+    {
+      id: "linux",
+      title: "Linux Systems & Automation",
+      level: "Foundational",
+      modules: "8 Modules",
+      description:
+        "Linux kernel fundamentals, process management, permissions, systemd services, and bash shell automation.",
     },
-    cicd: {
-      title: "Automated CI/CD Pipelines with GitHub Actions",
-      desc: "Implement automated unit testing, container build caches, security vulnerability scans, and canary deployments.",
-      progress: 85,
-      modules: [
-        { name: "Workflow Triggers & Secret Management", done: true },
-        { name: "Docker Image Multi-Stage Builds", done: true },
-        { name: "Automated Linting & Test Matrix", done: true },
-        { name: "Canary Rollouts & GitOps ArgoCD", done: false },
-      ],
+    {
+      id: "git",
+      title: "Git & Collaborative Workflows",
+      level: "Foundational",
+      modules: "6 Modules",
+      description:
+        "Version control strategies, GitOps branch patterns, interactive rebasing, merge conflict resolution, and commit workflows.",
     },
-    docker: {
-      title: "Production Docker Containers & Registries",
-      desc: "Write lightweight, secure distroless containers, optimize layer caching, and manage container networking.",
-      progress: 92,
-      modules: [
-        { name: "Dockerfile Best Practices & Caching", done: true },
-        { name: "Container Security & Non-Root Users", done: true },
-        { name: "Multi-Container Docker Compose", done: true },
-        { name: "Docker Healthchecks & Graceful Stops", done: true },
-      ],
+    {
+      id: "docker",
+      title: "Docker & Container Engineering",
+      level: "Intermediate",
+      modules: "8 Modules",
+      description:
+        "Container isolation, multi-stage Dockerfile architecture, layer caching, container networking, and security best practices.",
     },
-    iac: {
-      title: "Infrastructure as Code with Terraform & AWS",
-      desc: "Provision AWS VPCs, EKS clusters, S3 buckets, and RDS instances with modular state locking.",
-      progress: 45,
-      modules: [
-        { name: "HCL Syntax & Provider Config", done: true },
-        { name: "State Files & Remote S3 Backend", done: true },
-        { name: "Reusable VPC & Security Modules", done: false },
-        { name: "Terraform Cloud & Automated Drift", done: false },
-      ],
+    {
+      id: "kubernetes",
+      title: "Kubernetes Cluster Architecture",
+      level: "Advanced",
+      modules: "12 Modules",
+      description:
+        "Workload orchestration: Deployments, StatefulSets, Services, Ingress controllers, ConfigMaps, and Helm charts.",
     },
-  };
-
-  const tabs = [
-    { id: "k8s", label: "Kubernetes", badge: "Track 1" },
-    { id: "cicd", label: "CI/CD Pipelines", badge: "Track 2" },
-    { id: "docker", label: "Docker", badge: "Track 3" },
-    { id: "iac", label: "Terraform & IaC", badge: "Track 4" },
+    {
+      id: "cicd",
+      title: "CI/CD & GitOps Delivery",
+      level: "Intermediate",
+      modules: "10 Modules",
+      description:
+        "Automated deployment pipelines using GitHub Actions, container registries, test automation, and GitOps synchronization.",
+    },
+    {
+      id: "iac",
+      title: "Cloud Infrastructure & Terraform",
+      level: "Advanced",
+      modules: "9 Modules",
+      description:
+        "Infrastructure as Code: declarative cloud provisioning, modular configurations, remote state management, and cloud networking.",
+    },
   ];
 
-  const currentTrack = learningTracks[activeTab];
+  const handleSelectTrack = (trackId) => {
+    setActiveTrackId(trackId);
+    localStorage.setItem("devops_active_track", trackId);
+  };
+
+  const activePath = learningPaths.find((p) => p.id === activeTrackId);
 
   return (
-    <BackgroundGrid className="dashboard-wrapper">
+    <div className="dashboard-wrapper">
       <div className="dashboard-content-container">
-        {/* Top Header Banner */}
-        <header className="dashboard-hero-header">
-          <div className="dashboard-hero-left">
-            <div className="badge-group">
-              <Badge variant="teal" dot>
-                Live Session
-              </Badge>
-              <Badge variant="indigo">
-                {user?.isEmailVerified ? "Verified Account" : "Registered User"}
-              </Badge>
-            </div>
-            <h1>DevOps Command Center</h1>
-            <p className="dashboard-subtitle">
-              Welcome back, <strong>{user?.name}</strong>. Your cloud sandbox and automated learning pipelines are ready.
-            </p>
-          </div>
-          <div className="dashboard-hero-actions">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={logout}
-              icon={
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                  <polyline points="16 17 21 12 16 7" />
-                  <line x1="21" y1="12" x2="9" y2="12" />
-                </svg>
-              }
-            >
-              Sign Out
-            </Button>
-          </div>
+        {/* Welcome Section */}
+        <header className="dashboard-welcome-header">
+          <h1>Welcome back, {firstName}</h1>
+          <p className="dashboard-subtitle">
+            Continue learning or choose a learning path to get started.
+          </p>
         </header>
 
-        {/* Stats Row */}
-        <section className="dashboard-stats-grid" aria-label="DevOps Stats Overview">
-          <Card glow className="stat-card">
-            <div className="stat-card-top">
-              <span className="stat-label">Active Track</span>
-              <span className="stat-icon-wrap stat-icon-teal">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <polygon points="12 2 2 7 12 12 22 7 12 2" />
-                  <polyline points="2 17 12 22 22 17" />
-                  <polyline points="2 12 12 17 22 12" />
-                </svg>
-              </span>
-            </div>
-            <div className="stat-value">{currentTrack.title.split(" ")[0]}</div>
-            <p className="stat-subtext">Module 3 of 4 in progress</p>
-          </Card>
+        {/* Continue Learning Section */}
+        <section className="dashboard-continue-section" aria-label="Current Learning Progress">
+          <h2 className="section-heading">Continue Learning</h2>
 
-          <Card glow className="stat-card">
-            <div className="stat-card-top">
-              <span className="stat-label">Average Completion</span>
-              <span className="stat-icon-wrap stat-icon-indigo">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="12" cy="12" r="10" />
-                  <polyline points="12 6 12 12 16 14" />
-                </svg>
-              </span>
-            </div>
-            <div className="stat-value">72%</div>
-            <p className="stat-subtext">Across 4 core tracks</p>
-          </Card>
+          {activePath ? (
+            <div className="continue-learning-card">
+              <div className="continue-card-body">
+                <div className="continue-card-meta">
+                  <span className={`badge-pill badge-${activePath.level.toLowerCase()}`}>
+                    {activePath.level}
+                  </span>
+                  <span className="continue-module-label">Module 1 in progress</span>
+                </div>
+                <h3 className="continue-track-title">{activePath.title}</h3>
+                <p className="continue-track-desc">{activePath.description}</p>
+              </div>
 
-          <Card glow className="stat-card">
-            <div className="stat-card-top">
-              <span className="stat-label">Email Status</span>
-              <span className="stat-icon-wrap stat-icon-teal">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                  <polyline points="22 4 12 14.01 9 11.01" />
-                </svg>
-              </span>
+              <div className="continue-card-actions">
+                <button
+                  type="button"
+                  className="btn-continue-primary"
+                  onClick={() => alert(`Continuing ${activePath.title}`)}
+                >
+                  <span>Continue</span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
+                    <polyline points="9 18 15 12 9 6" />
+                  </svg>
+                </button>
+              </div>
             </div>
-            <div className="stat-value text-teal">
-              {user?.isEmailVerified ? "Verified" : "Pending"}
+          ) : (
+            <div className="empty-learning-prompt">
+              <p>You haven't started a learning path yet.</p>
+              <a href="#available-paths" className="btn-select-path">
+                Choose a learning path below
+              </a>
             </div>
-            <p className="stat-subtext">{user?.email}</p>
-          </Card>
+          )}
         </section>
 
-        {/* Main Grid: Learning Tracks & Profile */}
-        <div className="dashboard-main-grid">
-          {/* Left Column: Interactive Curriculum Tabs */}
-          <div className="dashboard-track-section">
-            <Card className="track-card-container">
-              <div className="track-card-header">
-                <div>
-                  <h2>Curriculum Tracks</h2>
-                  <p className="card-subtext">Hands-on interactive labs and cloud environments</p>
-                </div>
-              </div>
-
-              {/* 21st.dev Tabs */}
-              <Tabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
-
-              {/* Active Track Details */}
-              <div className="active-track-content">
-                <div className="track-title-row">
-                  <h3>{currentTrack.title}</h3>
-                  <Badge variant="teal">{currentTrack.progress}% Complete</Badge>
-                </div>
-                <p className="track-description">{currentTrack.desc}</p>
-
-                <ProgressBar
-                  progress={currentTrack.progress}
-                  label="Track Progress"
-                  className="track-progress-bar"
-                />
-
-                <div className="modules-list">
-                  <h4>Curriculum Modules</h4>
-                  {currentTrack.modules.map((mod, i) => (
-                    <div key={i} className={`module-item ${mod.done ? "module-done" : ""}`}>
-                      <span className="module-checkbox">
-                        {mod.done ? (
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                            <polyline points="20 6 9 17 4 12" />
-                          </svg>
-                        ) : (
-                          <span className="module-number">{i + 1}</span>
-                        )}
-                      </span>
-                      <span className="module-name">{mod.name}</span>
-                      <span className="module-status-badge">
-                        {mod.done ? "Completed" : "In Progress"}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </Card>
+        {/* Available Learning Paths */}
+        <section className="dashboard-tracks-section" id="available-paths" aria-label="Available Learning Paths">
+          <div className="tracks-header">
+            <h2 className="section-heading">Available Learning Paths</h2>
+            <p className="tracks-subtext">
+              Select a path to build practical skills across the DevOps lifecycle.
+            </p>
           </div>
 
-          {/* Right Column: User Profile & Token Verification */}
-          <aside className="dashboard-sidebar-section">
-            {/* User Profile Card */}
-            <Card className="profile-card">
-              <div className="sidebar-card-header">
-                <h3>User Profile</h3>
-                <Badge variant="indigo">{user?.role || "user"}</Badge>
-              </div>
+          <div className="dashboard-paths-grid">
+            {learningPaths.map((path) => {
+              const isActive = path.id === activeTrackId;
+              return (
+                <div key={path.id} className={`dashboard-path-card ${isActive ? "active-path-card" : ""}`}>
+                  <div className="path-card-body">
+                    <div className="path-card-header">
+                      <h3 className="path-card-title">{path.title}</h3>
+                      <span className={`badge-pill badge-${path.level.toLowerCase()}`}>
+                        {path.level}
+                      </span>
+                    </div>
 
-              <div className="profile-details-list">
-                <div className="profile-item">
-                  <span className="profile-key">Full Name</span>
-                  <span className="profile-val">{user?.name}</span>
-                </div>
-                <div className="profile-item">
-                  <span className="profile-key">Email Address</span>
-                  <span className="profile-val">{user?.email}</span>
-                </div>
-                <div className="profile-item">
-                  <span className="profile-key">Email Verified</span>
-                  <span className="profile-val text-teal">
-                    {user?.isEmailVerified ? "✓ Confirmed" : "✗ Pending"}
-                  </span>
-                </div>
-                <div className="profile-item">
-                  <span className="profile-key">Auth Provider</span>
-                  <span className="profile-val">
-                    {user?.googleId ? "Google OAuth 2.0" : "Email & Password"}
-                  </span>
-                </div>
-                <div className="profile-item">
-                  <span className="profile-key">User ID</span>
-                  <span className="profile-val mono-val">{user?._id || user?.id}</span>
-                </div>
-              </div>
-            </Card>
-
-            {/* Token Diagnostic Tool */}
-            <Card className="session-verify-card">
-              <div className="sidebar-card-header">
-                <h3>Bearer Token Inspection</h3>
-                <span className="badge-chip">JWT Security</span>
-              </div>
-              <p className="card-subtext">
-                Verify that your signed Bearer token grants protected access to <code>GET /api/auth/me</code>.
-              </p>
-
-              <Button
-                variant="secondary"
-                size="md"
-                onClick={handleVerifySession}
-                loading={checking}
-                className="btn-full"
-                icon={
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
-                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                  </svg>
-                }
-              >
-                Verify Session (GET /api/auth/me)
-              </Button>
-
-              {liveCheck && (
-                <div
-                  className={`live-result ${
-                    liveCheck.success ? "result-success" : "result-error"
-                  }`}
-                  role="status"
-                >
-                  <div className="result-header">
-                    <strong>{liveCheck.success ? "✓ Valid Session" : "✗ Error"}</strong>
-                    <span className="result-time">{liveCheck.timestamp}</span>
+                    <p className="path-card-desc">{path.description}</p>
                   </div>
-                  <p className="result-msg">{liveCheck.message}</p>
+
+                  <div className="path-card-footer">
+                    <span className="meta-item">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                        <rect width="18" height="18" x="3" y="3" rx="2" />
+                        <line x1="9" y1="9" x2="15" y2="9" />
+                        <line x1="9" y1="13" x2="15" y2="13" />
+                      </svg>
+                      {path.modules}
+                    </span>
+
+                    <button
+                      type="button"
+                      onClick={() => handleSelectTrack(path.id)}
+                      className={`btn-path-action ${isActive ? "btn-active-track" : ""}`}
+                    >
+                      <span>{isActive ? "Active Path" : "Start Learning"}</span>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                        <polyline points="9 18 15 12 9 6" />
+                      </svg>
+                    </button>
+                  </div>
                 </div>
-              )}
-            </Card>
-          </aside>
-        </div>
+              );
+            })}
+          </div>
+        </section>
       </div>
-    </BackgroundGrid>
+    </div>
   );
 };
 

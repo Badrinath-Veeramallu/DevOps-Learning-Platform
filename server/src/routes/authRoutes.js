@@ -7,6 +7,7 @@ const {
   login,
   getMe,
   googleLogin,
+  updateProfile,
 } = require("../controllers/authController");
 const { protect } = require("../middleware/authMiddleware");
 const { createRateLimiter } = require("../middleware/rateLimiter");
@@ -45,5 +46,6 @@ router.post("/google", googleLogin);
 
 // Protected routes
 router.get("/me", protect, getMe);
+router.put("/profile", protect, updateProfile);
 
 module.exports = router;
