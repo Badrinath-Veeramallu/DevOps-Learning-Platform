@@ -25,12 +25,19 @@ export const ActivityHeatmap = ({ className = "" }) => {
       setActivityData(data);
       setError(null);
     } catch (err) {
-      console.error("Failed to load activity heatmap:", err);
-      setError(err.message || "Failed to load learning activity data");
+      if (err.status === 404) {
+        // Backend hasn't deployed activity tracking routes yet; fallback gracefully to empty activity grid
+        setActivityData({ total: 0, days: [] });
+        setError(null);
+      } else {
+        console.error("Failed to load activity heatmap:", err);
+        setError(err.message || "Failed to load learning activity data");
+      }
     } finally {
       setLoading(false);
     }
   }, []);
+
 
   useEffect(() => {
     fetchActivity();

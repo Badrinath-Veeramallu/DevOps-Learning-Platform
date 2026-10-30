@@ -145,3 +145,11 @@ export const progressAPI = {
       body: JSON.stringify({ moduleId }),
     }),
 };
+
+export const systemAPI = {
+  warmup: () =>
+    fetch(`${API_BASE_URL}/health`, { method: "GET" })
+      .then((r) => r.json())
+      .catch(() => null),
+};
+

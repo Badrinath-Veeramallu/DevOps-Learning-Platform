@@ -13,6 +13,7 @@ export const GoogleSignInButton = ({ text = "continue_with" }) => {
   const buttonRef = useRef(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isWakingUp, setIsWakingUp] = useState(false);
 
   const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
   const from = location.state?.from?.pathname || "/dashboard";
@@ -26,6 +27,10 @@ export const GoogleSignInButton = ({ text = "continue_with" }) => {
     const handleCredentialResponse = async (response) => {
       setError("");
       setLoading(true);
+      const slowTimer = setTimeout(() => {
+        setIsWakingUp(true);
+      }, 1500);
+
       try {
         if (!response.credential) {
           throw new Error("No credential received from Google");
@@ -35,7 +40,9 @@ export const GoogleSignInButton = ({ text = "continue_with" }) => {
       } catch (err) {
         setError(err.message || "Google sign-in failed");
       } finally {
+        clearTimeout(slowTimer);
         setLoading(false);
+        setIsWakingUp(false);
       }
     };
 
@@ -98,7 +105,13 @@ export const GoogleSignInButton = ({ text = "continue_with" }) => {
           <span>{error}</span>
         </div>
       )}
-      {loading && <div className="google-loading-text">Verifying Google account with server...</div>}
+      {loading && (
+        <div className="google-loading-text">
+          {isWakingUp
+            ? "Connecting to secure cloud server (waking up backend)..."
+            : "Verifying Google account with server..."}
+        </div>
+      )}
       <div ref={buttonRef} className="google-btn-container"></div>
     </div>
   );

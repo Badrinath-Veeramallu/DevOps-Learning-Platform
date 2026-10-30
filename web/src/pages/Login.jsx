@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
+import { systemAPI } from "../services/api";
 import { GoogleSignInButton } from "../components/GoogleSignInButton";
 import { Button } from "../components/Button";
 import { BackgroundGrid } from "../components/BackgroundGrid";
@@ -13,6 +14,7 @@ export const Login = () => {
 
   const [formErrors, setFormErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isWakingUp, setIsWakingUp] = useState(false);
   const [serverError, setServerError] = useState("");
   const [unverifiedEmail, setUnverifiedEmail] = useState(null);
 
@@ -21,6 +23,11 @@ export const Login = () => {
   const location = useLocation();
 
   const from = location.state?.from?.pathname || "/dashboard";
+
+  // Pre-warm the backend immediately on mount to prevent cold start latency on submission
+  useEffect(() => {
+    systemAPI.warmup();
+  }, []);
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -73,6 +80,11 @@ export const Login = () => {
     setServerError("");
     setUnverifiedEmail(null);
 
+    // If server takes longer than 1.5s (e.g. Render free tier waking up), inform the user
+    const slowTimer = setTimeout(() => {
+      setIsWakingUp(true);
+    }, 1500);
+
     try {
       await login(formData.email.trim(), formData.password);
       navigate(from, { replace: true });
@@ -85,7 +97,9 @@ export const Login = () => {
         err.message || "Invalid credentials or email not verified."
       );
     } finally {
+      clearTimeout(slowTimer);
       setIsSubmitting(false);
+      setIsWakingUp(false);
     }
   };
 
@@ -179,8 +193,14 @@ export const Login = () => {
             loading={isSubmitting}
             className="btn-full"
           >
-            Sign In
+            {isSubmitting ? "Signing in..." : "Sign In"}
           </Button>
+
+          {isWakingUp && (
+            <p className="auth-status-hint" style={{ marginTop: "0.5rem", fontSize: "0.825rem", color: "var(--text-muted, #94a3b8)", textAlign: "center" }}>
+              Connecting to secure cloud server (waking up backend)...
+            </p>
+          )}
         </form>
 
         <div className="auth-divider">

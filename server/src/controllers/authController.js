@@ -19,6 +19,15 @@ const generateToken = (id) => {
   });
 };
 
+// Singleton OAuth2Client to preserve in-memory certificate cache across requests
+let googleOAuthClient = null;
+const getGoogleOAuthClient = (clientId) => {
+  if (!googleOAuthClient) {
+    googleOAuthClient = new OAuth2Client(clientId);
+  }
+  return googleOAuthClient;
+};
+
 /**
  * @desc    Register a new user & dispatch email verification OTP
  * @route   POST /api/auth/register
@@ -518,8 +527,8 @@ const googleLogin = async (req, res) => {
       });
     }
 
-    // Verify Google ID token using official Google Auth Library
-    const client = new OAuth2Client(googleClientId);
+    // Verify Google ID token using cached OAuth2Client to reuse certificateCache
+    const client = getGoogleOAuthClient(googleClientId);
     let payload;
 
     try {
