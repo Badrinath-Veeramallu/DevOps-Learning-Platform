@@ -48,6 +48,17 @@ class ProgressService extends ChangeNotifier {
     return Set<String>.from(set);
   }
 
+  /// Synchronously checks if a module is completed from the in-memory cache.
+  bool isModuleCompleted(
+    String userId,
+    String moduleId, {
+    String pathway = 'git',
+  }) {
+    final cacheKey = '${userId}_$pathway';
+    final current = _cache[cacheKey] ?? <String>{};
+    return current.contains(moduleId);
+  }
+
   /// Sets in-memory completed modules directly (useful for tests and initialization).
   void setCompletedModulesCache(
     String userId,

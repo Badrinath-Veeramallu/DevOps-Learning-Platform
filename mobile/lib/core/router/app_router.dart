@@ -5,6 +5,7 @@ import '../../features/auth/screens/login_screen.dart';
 import '../../features/auth/screens/register_screen.dart';
 import '../../features/auth/screens/verify_otp_screen.dart';
 import '../../features/dashboard/screens/dashboard_screen.dart';
+import '../../features/module/screens/git_module_screen.dart';
 import '../../features/onboarding/screens/splash_screen.dart';
 import '../../features/onboarding/screens/welcome_screen.dart';
 import '../../features/pathway/screens/git_pathway_screen.dart';
@@ -130,13 +131,7 @@ class AppRouter {
           name: 'gitModule',
           builder: (BuildContext context, GoRouterState state) {
             final moduleId = state.pathParameters['moduleId'] ?? '';
-            return PhasePlaceholderScreen(
-              title: 'Module $moduleId',
-              phaseDescription:
-                  'Interactive module reader with animations and practical exercises.',
-              comingInPhase: 'Phase 4',
-              icon: Icons.menu_book_rounded,
-            );
+            return GitModuleScreen(moduleId: moduleId);
           },
         ),
         GoRoute(
