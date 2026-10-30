@@ -18,8 +18,12 @@ export const GitPathwayPage = () => {
       if (Array.isArray(ids)) setCompletedIds(ids);
     });
 
-    const handleProgressUpdate = () => {
-      setCompletedIds(getCompletedModules(userId, "git"));
+    const handleProgressUpdate = (e) => {
+      if (e?.detail?.allCompleted && Array.isArray(e.detail.allCompleted)) {
+        setCompletedIds(e.detail.allCompleted);
+      } else {
+        setCompletedIds(getCompletedModules(userId, "git"));
+      }
     };
 
     window.addEventListener("devops_progress_updated", handleProgressUpdate);
@@ -104,6 +108,7 @@ export const GitPathwayPage = () => {
           <GitPathwayMap
             modules={gitCurriculum}
             completedIds={completedIds}
+            completedModuleIds={completedIds}
           />
         </section>
       </div>

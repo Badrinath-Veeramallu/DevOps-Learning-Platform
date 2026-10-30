@@ -13,7 +13,7 @@ export const GitModulePage = () => {
   const { moduleId } = useParams();
   const { user } = useAuth();
 
-  const userId = user?.id || user?.email || "guest";
+  const userId = user?._id || user?.id || user?.email || "guest";
 
   // Find module in curriculum
   const moduleIndex = gitCurriculum.findIndex(

@@ -89,26 +89,31 @@ function Terminal({ frame, step }) {
   const ref = useRef(null);
   useEffect(() => { if (ref.current) ref.current.scrollTop = ref.current.scrollHeight; }, [step]);
   if (!frame || !frame.term) return null;
-  let t = 0; // running delay so each new command "types" before its output appears
+
+  let accDelay = 0;
+  const lineStyles = frame.term.map((line, idx) => {
+    const isNew = idx >= frame.termStart;
+    if (!isNew) return null;
+    const isCmd = line.startsWith("$ ");
+    const ms = isCmd ? Math.min((line.length - 2) * 26, 1500) : 180;
+    const style = isCmd
+      ? { "--n": line.length - 2, "--d": `${ms}ms`, "--delay": `${accDelay}ms` }
+      : { "--delay": `${accDelay}ms` };
+    accDelay += ms + 150;
+    return style;
+  });
+
   return (
     <div className="sa-term" role="log" aria-label="Terminal">
       <div className="sa-term-bar"><i /><i /><i /><span>terminal</span></div>
       <div className="sa-term-body" ref={ref}>
-        {frame.term.map((line, i) => {
-          const isNew = i >= frame.termStart;
+        {frame.term.map((line, idx) => {
+          const isNew = idx >= frame.termStart;
           const isCmd = line.startsWith("$ ");
           const tone = !isCmd && /^[+~!]/.test(line) ? line[0] : "";
           const text = tone ? line.slice(1) : line;
-          let style;
-          if (isNew) {
-            const ms = isCmd ? Math.min(text.length * 26, 1500) : 180;
-            style = isCmd
-              ? { "--n": text.length - 2, "--d": `${ms}ms`, "--delay": `${t}ms` }
-              : { "--delay": `${t}ms` };
-            t += ms + 150;
-          }
           return (
-            <div key={`${i}-${text}`} className={`sa-tl ${isCmd ? "cmd" : "out"} ${tone ? "tn" + tone : ""} ${isNew ? "new" : ""}`} style={style}>
+            <div key={`${idx}-${text}`} className={`sa-tl ${isCmd ? "cmd" : "out"} ${tone ? "tn" + tone : ""} ${isNew ? "new" : ""}`} style={lineStyles[idx] || undefined}>
               {isCmd ? (<><span className="sa-prompt">$</span><span className="sa-typed">{text.slice(2)}</span></>) : text}
             </div>
           );
@@ -123,14 +128,14 @@ function Terminal({ frame, step }) {
 /**
  * <StepAnimation animation={...} />
  *   animation : one subtopic object from git-animations.json  ({ id, title, steps })
- *   autoPlay  : start playing on mount (default true, skipped when the user prefers reduced motion)
+ *   autoPlay  : start playing on mount (default false, skipped when the user prefers reduced motion)
  *   stepMs    : base time each step stays on screen (default 3400)
  *   showTitle : show the card header (default true)
  *   onFinish  : callback fired when the animation completes the last step
  */
 export default function StepAnimation({
   animation,
-  autoPlay = true,
+  autoPlay = false,
   stepMs = 3400,
   showTitle = true,
   className = "",
@@ -142,8 +147,12 @@ export default function StepAnimation({
   const last = Math.max(0, frames.length - 1);
 
   const reduced = typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+  const initialPlay = autoPlay && !reduced;
+
   const [i, setI] = useState(0);
-  const [playing, setPlaying] = useState(autoPlay && !reduced);
+  const [playing, setPlaying] = useState(initialPlay);
+  const [hasStarted, setHasStarted] = useState(initialPlay);
+  const [isCompleted, setIsCompleted] = useState(false);
   const finishedFiredRef = useRef(false);
 
   // If subtopic animation ID changes, reset state during render
@@ -151,8 +160,9 @@ export default function StepAnimation({
   if (animation?.id !== prevAnimId) {
     setPrevAnimId(animation?.id);
     setI(0);
-    setPlaying(autoPlay && !reduced);
-    finishedFiredRef.current = false;
+    setPlaying(initialPlay);
+    setHasStarted(initialPlay);
+    setIsCompleted(false);
   }
 
   useEffect(() => {
@@ -161,7 +171,14 @@ export default function StepAnimation({
 
   useEffect(() => {
     if (!playing) return;
-    if (i >= last) { setPlaying(false); return; }
+    if (i >= last) {
+      // Allow viewing the final frame for stepMs before marking playback as completed
+      const id = setTimeout(() => {
+        setPlaying(false);
+        setIsCompleted(true);
+      }, stepMs);
+      return () => clearTimeout(id);
+    }
     const f = frames[i + 1];
     if (!f) return;
     const typing = (f.term.length - f.termStart) * 700; // leave time for typed commands
@@ -169,26 +186,75 @@ export default function StepAnimation({
     return () => clearTimeout(id);
   }, [playing, i, last, frames, stepMs]);
 
-  const go = useCallback((n) => { setPlaying(false); setI(Math.max(0, Math.min(last, n))); }, [last]);
-  const togglePlay = () => { if (playing) return setPlaying(false); if (i >= last) setI(0); setPlaying(true); };
-  const onKey = (e) => {
-    if (e.key === "ArrowRight") go(i + 1);
-    if (e.key === "ArrowLeft") go(i - 1);
-    if (e.key === " ") { e.preventDefault(); togglePlay(); }
+  const go = useCallback((n) => {
+    setPlaying(false);
+    const target = Math.max(0, Math.min(last, n));
+    setI(target);
+    if (target === 0) {
+      setIsCompleted(false);
+      setHasStarted(false);
+      finishedFiredRef.current = false;
+    } else if (target < last) {
+      setIsCompleted(false);
+      setHasStarted(true);
+    }
+  }, [last]);
+
+  const togglePlay = () => {
+    if (playing) {
+      setPlaying(false);
+      return;
+    }
+    if (isCompleted) {
+      // Replay: reset to step 0 and start playing again
+      setI(0);
+      setIsCompleted(false);
+      setHasStarted(true);
+      setPlaying(true);
+      finishedFiredRef.current = false;
+      return;
+    }
+    // Resume or start Play from current step
+    if (i >= last) {
+      setI(0);
+    }
+    setHasStarted(true);
+    setPlaying(true);
   };
 
   const safeI = Math.max(0, Math.min(last, i));
   const frame = frames[safeI] || frames[0] || { actors: {}, edges: [], term: [], say: "" };
 
-  // Trigger onFinish when reaching the last step
+  const onKey = (e) => {
+    if (e.key === "ArrowRight") go(safeI + 1);
+    if (e.key === "ArrowLeft") go(safeI - 1);
+    if (e.key === " ") { e.preventDefault(); togglePlay(); }
+  };
+
+  // Trigger onFinish when playback genuinely completes
   useEffect(() => {
-    if (safeI === last && last > 0 && !finishedFiredRef.current) {
+    if (isCompleted && !finishedFiredRef.current) {
       finishedFiredRef.current = true;
       if (typeof onFinish === "function") {
         onFinish();
       }
     }
-  }, [safeI, last, onFinish]);
+  }, [isCompleted, onFinish]);
+
+  const getPlayButtonContent = () => {
+    if (playing) {
+      return { text: "Ⅱ Pause", label: "Pause" };
+    }
+    if (isCompleted) {
+      return { text: "↻ Replay", label: "Replay" };
+    }
+    if (hasStarted && safeI > 0) {
+      return { text: "▶ Resume", label: "Resume" };
+    }
+    return { text: "▶ Play", label: "Play" };
+  };
+
+  const { text: playBtnText, label: playBtnLabel } = getPlayButtonContent();
 
   return (
     <section className={`sa ${className}`} tabIndex={0} onKeyDown={onKey} aria-label={`Animation: ${animation?.title || "Step Animation"}`}>
@@ -216,7 +282,7 @@ export default function StepAnimation({
       <footer className="sa-ctrl">
         <button onClick={() => go(0)} aria-label="Restart" title="Restart">↺</button>
         <button onClick={() => go(safeI - 1)} disabled={safeI === 0} aria-label="Previous step">‹</button>
-        <button className="primary" onClick={togglePlay} aria-label={playing ? "Pause" : "Play"}>{playing ? "❚❚ Pause" : safeI >= last ? "↻ Replay" : "▶ Play"}</button>
+        <button className="primary" onClick={togglePlay} aria-label={playBtnLabel}>{playBtnText}</button>
         <button onClick={() => go(safeI + 1)} disabled={safeI === last} aria-label="Next step">›</button>
         <div className="sa-dots">
           {frames.map((_, n) => (

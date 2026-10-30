@@ -9,12 +9,23 @@ import { gitCurriculum } from "../../data/gitCurriculum";
  * with alternating left/right stops, progress states (completed, current, upcoming),
  * and direct links to each learning module.
  */
-export const GitPathwayMap = ({ completedModuleIds = [] }) => {
+export const GitPathwayMap = ({
+  modules = gitCurriculum,
+  completedIds,
+  completedModuleIds,
+}) => {
+  const pathwayModules = Array.isArray(modules) && modules.length > 0 ? modules : gitCurriculum;
+  const activeCompletedIds = Array.isArray(completedIds)
+    ? completedIds
+    : Array.isArray(completedModuleIds)
+    ? completedModuleIds
+    : [];
+
   // Determine current active stop (the first non-completed module, or the last one if all are done)
-  const currentStopIndex = gitCurriculum.findIndex(
-    (mod) => !completedModuleIds.includes(mod.id)
+  const currentStopIndex = pathwayModules.findIndex(
+    (mod) => !activeCompletedIds.includes(mod.id)
   );
-  const activeIndex = currentStopIndex === -1 ? gitCurriculum.length - 1 : currentStopIndex;
+  const activeIndex = currentStopIndex === -1 ? pathwayModules.length - 1 : currentStopIndex;
 
   return (
     <div className="pathway-journey-container" role="region" aria-label="Git & GitHub Learning Pathway">
@@ -75,8 +86,8 @@ export const GitPathwayMap = ({ completedModuleIds = [] }) => {
 
         {/* 7 Pathway Stops */}
         <div className="pathway-stops-list">
-          {gitCurriculum.map((module, idx) => {
-            const isCompleted = completedModuleIds.includes(module.id);
+          {pathwayModules.map((module, idx) => {
+            const isCompleted = activeCompletedIds.includes(module.id);
             const isCurrent = idx === activeIndex && !isCompleted;
             const isUpcoming = !isCompleted && !isCurrent;
             const isEven = idx % 2 === 0;
@@ -213,7 +224,7 @@ export const GitPathwayMap = ({ completedModuleIds = [] }) => {
           <div className="pathway-endpoint-anchor">
             <div
               className={`pathway-endpoint-monument finish-monument ${
-                completedModuleIds.length === gitCurriculum.length ? "is-completed-all" : ""
+                activeCompletedIds.length === pathwayModules.length ? "is-completed-all" : ""
               }`}
             >
               <div className="endpoint-icon-circle finish-circle" title="Pathway Finish">

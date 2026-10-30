@@ -35,20 +35,20 @@ export const KagePage = () => {
   // 6 Core Structured Learning Paths from actual application data
   const learningPaths = [
     {
-      id: "linux",
-      title: "Linux Systems & Automation",
-      level: "Foundational",
-      modules: "8 Modules",
-      description:
-        "Linux kernel fundamentals, process management, permissions, systemd services, and bash shell automation.",
-    },
-    {
       id: "git",
       title: "Git & Collaborative Workflows",
       level: "Foundational",
       modules: "6 Modules",
       description:
         "Version control strategies, GitOps branch patterns, interactive rebasing, merge conflict resolution, and commit workflows.",
+    },
+    {
+      id: "linux",
+      title: "Linux Systems & Automation",
+      level: "Foundational",
+      modules: "8 Modules",
+      description:
+        "Linux kernel fundamentals, process management, permissions, systemd services, and bash shell automation.",
     },
     {
       id: "docker",
@@ -321,7 +321,15 @@ export const KagePage = () => {
                     </span>
 
                     <Link
-                      to={isAuthenticated ? "/dashboard" : "/register"}
+                      to={
+                        path.id === "git"
+                          ? isAuthenticated
+                            ? "/pathways/git"
+                            : "/register"
+                          : isAuthenticated
+                          ? "/dashboard"
+                          : "/register"
+                      }
                       className="btn-path-action"
                     >
                       <span>Start Learning</span>
