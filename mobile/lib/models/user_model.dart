@@ -12,6 +12,7 @@ class UserModel {
   final String role;
   final bool isEmailVerified;
   final String authProvider;
+  final DateTime? createdAt;
 
   const UserModel({
     required this.id,
@@ -21,6 +22,7 @@ class UserModel {
     this.role = 'user',
     this.isEmailVerified = true,
     this.authProvider = 'local',
+    this.createdAt,
   });
 
   /// Factory constructor to deserialize JSON received from Express API.
@@ -33,6 +35,9 @@ class UserModel {
       role: (json['role'] ?? 'user').toString(),
       isEmailVerified: json['isEmailVerified'] == true,
       authProvider: (json['authProvider'] ?? 'local').toString(),
+      createdAt: json['createdAt'] != null
+          ? DateTime.tryParse(json['createdAt'].toString())
+          : null,
     );
   }
 
@@ -46,6 +51,7 @@ class UserModel {
       'role': role,
       'isEmailVerified': isEmailVerified,
       'authProvider': authProvider,
+      if (createdAt != null) 'createdAt': createdAt!.toIso8601String(),
     };
   }
 
@@ -58,6 +64,7 @@ class UserModel {
     String? role,
     bool? isEmailVerified,
     String? authProvider,
+    DateTime? createdAt,
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -67,6 +74,7 @@ class UserModel {
       role: role ?? this.role,
       isEmailVerified: isEmailVerified ?? this.isEmailVerified,
       authProvider: authProvider ?? this.authProvider,
+      createdAt: createdAt ?? this.createdAt,
     );
   }
 }

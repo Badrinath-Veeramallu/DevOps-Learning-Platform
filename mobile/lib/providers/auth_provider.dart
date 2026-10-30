@@ -30,7 +30,7 @@ class AuthProvider extends ChangeNotifier {
   bool get isAuthenticated => _user != null;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
-  bool get isInitialized => _isInitialized;
+  bool get isInitialized => _isInitialized || _user != null;
 
   /// Check whether an authenticated session exists on app startup.
   Future<void> checkAuthStatus() async {
@@ -82,6 +82,7 @@ class AuthProvider extends ChangeNotifier {
       // Securely persist token in Android KeyStore
       await storageService.saveToken(result.token);
       _user = result.user;
+      _isInitialized = true;
       _errorMessage = null;
     } on ApiException catch (e) {
       _errorMessage = e.message;
@@ -130,6 +131,7 @@ class AuthProvider extends ChangeNotifier {
 
       await storageService.saveToken(result.token);
       _user = result.user;
+      _isInitialized = true;
       _errorMessage = null;
     } on ApiException catch (e) {
       _errorMessage = e.message;
@@ -185,6 +187,7 @@ class AuthProvider extends ChangeNotifier {
 
       await storageService.saveToken(result.token);
       _user = result.user;
+      _isInitialized = true;
       _errorMessage = null;
       debugPrint(
         '[AuthProvider] loginWithGoogle: session token saved. isAuthenticated=$isAuthenticated',
@@ -211,6 +214,26 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  /// Update the authenticated user's profile name.
+  Future<UserModel> updateProfile({required String name}) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final updatedUser = await apiClient.updateProfile(name: name);
+      _user = updatedUser;
+      _errorMessage = null;
+      return updatedUser;
+    } on ApiException catch (e) {
+      _errorMessage = e.message;
+      rethrow;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
   /// Log out by wiping the token from secure storage and resetting state.
   Future<void> logout() async {
     await storageService.deleteToken();
@@ -219,6 +242,7 @@ class AuthProvider extends ChangeNotifier {
     } catch (_) {}
     _user = null;
     _errorMessage = null;
+    _isInitialized = true;
     notifyListeners();
   }
 

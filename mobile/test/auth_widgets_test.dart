@@ -6,6 +6,7 @@ import 'package:devops_learning_app/features/auth/screens/login_screen.dart';
 import 'package:devops_learning_app/features/auth/screens/register_screen.dart';
 import 'package:devops_learning_app/features/auth/screens/verify_otp_screen.dart';
 import 'package:devops_learning_app/features/dashboard/screens/dashboard_screen.dart';
+import 'package:devops_learning_app/features/profile/widgets/user_profile_sheet.dart';
 import 'package:devops_learning_app/models/user_model.dart';
 import 'package:devops_learning_app/providers/auth_provider.dart';
 
@@ -49,7 +50,7 @@ void main() {
       await tester.enterText(find.byType(TextFormField).last, 'Password123!');
 
       // Tap Sign In button
-      await tester.tap(find.text('Sign In'));
+      await tester.tap(find.widgetWithText(ElevatedButton, 'Sign In'));
       await tester.pumpAndSettle();
 
       // Expect validation error
@@ -65,7 +66,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Tap Sign In without entering any data
-      await tester.tap(find.text('Sign In'));
+      await tester.tap(find.widgetWithText(ElevatedButton, 'Sign In'));
       await tester.pumpAndSettle();
 
       expect(find.text('Email address is required'), findsOneWidget);
@@ -92,7 +93,7 @@ void main() {
         await tester.enterText(textFields.at(3), 'mismatch123');
 
         // Submit
-        await tester.tap(find.text('Create Account'));
+        await tester.tap(find.widgetWithText(ElevatedButton, 'Create Account'));
         await tester.pumpAndSettle();
 
         expect(
@@ -119,7 +120,7 @@ void main() {
       expect(find.textContaining('Resend code in'), findsOneWidget);
     });
 
-    testWidgets('DashboardScreen renders dynamic greeting and logout button', (
+    testWidgets('DashboardScreen renders dynamic greeting and profile menu', (
       WidgetTester tester,
     ) async {
       fakeApi.mockUser = const UserModel(
@@ -139,18 +140,24 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Check dynamic greeting for Badrinath
-      expect(find.text('Hi, Badrinath 👋'), findsOneWidget);
-      expect(find.text('Welcome back!'), findsOneWidget);
+      // Check dynamic greeting for Badrinath matching Web
+      expect(find.text('Welcome back, Badrinath'), findsOneWidget);
+      expect(find.text('Continue Learning'), findsOneWidget);
+      expect(find.text('Available Learning Paths'), findsOneWidget);
+      expect(find.text('Git & Collaborative Workflows'), findsWidgets);
 
-      // Check logout button exists
-      expect(find.byIcon(Icons.logout_rounded), findsOneWidget);
+      // Tap user profile avatar to open menu sheet
+      UserProfileSheet.show(
+        tester.element(find.byType(DashboardScreen)),
+        user: fakeApi.mockUser!,
+        authProvider: authProvider,
+      );
+      await tester.pumpAndSettle();
 
-      // Check clutter is NOT present
-      expect(find.text('Command Center'), findsNothing);
-      expect(find.text('Live Session Active'), findsNothing);
-      expect(find.text('Phase 3 Upcoming'), findsNothing);
-      expect(find.text('Sign Out of Mobile Session'), findsNothing);
+      // Check user details and sign out action in profile menu
+      expect(find.text('badrinath@example.com'), findsOneWidget);
+      expect(find.text('My Profile'), findsOneWidget);
+      expect(find.text('Sign Out'), findsOneWidget);
     });
 
     testWidgets(
@@ -173,9 +180,8 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // Greets other user by dynamic name
-        expect(find.text('Hi, Alex 👋'), findsOneWidget);
-        expect(find.text('Welcome back!'), findsOneWidget);
+        // Greets other user by dynamic name matching Web
+        expect(find.text('Welcome back, Alex'), findsOneWidget);
       },
     );
 

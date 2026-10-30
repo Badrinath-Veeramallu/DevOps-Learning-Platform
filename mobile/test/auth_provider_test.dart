@@ -64,6 +64,19 @@ class FakeApiClient extends ApiClient {
   FakeApiClient({required super.storageService});
 
   @override
+  Future<UserModel> updateProfile({required String name}) async {
+    final current = mockUser ??
+        const UserModel(
+          id: 'usr_orig',
+          name: 'Original Name',
+          email: 'user@example.com',
+        );
+    final updated = current.copyWith(name: name);
+    mockUser = updated;
+    return updated;
+  }
+
+  @override
   Future<({String token, UserModel user})> googleLogin({
     required String idToken,
   }) async {
@@ -361,11 +374,25 @@ void main() {
         statusCode: 400,
       );
 
-      expect(
-        () => authProvider.loginWithGoogle(),
+      await expectLater(
+        authProvider.loginWithGoogle(),
         throwsA(isA<ApiException>()),
       );
       expect(authProvider.errorMessage, 'Google Sign-In configuration error');
+    });
+
+    test('updateProfile updates user state on success', () async {
+      fakeApi.mockUser = const UserModel(
+        id: 'usr_orig',
+        name: 'Original Name',
+        email: 'user@example.com',
+      );
+
+      final updated = await authProvider.updateProfile(name: 'New Name');
+
+      expect(updated.name, 'New Name');
+      expect(authProvider.user?.name, 'New Name');
+      expect(authProvider.errorMessage, isNull);
     });
   });
 }

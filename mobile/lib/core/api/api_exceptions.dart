@@ -25,13 +25,13 @@ class ApiException implements Exception {
       case DioExceptionType.sendTimeout:
       case DioExceptionType.receiveTimeout:
         return const ApiException(
-          message: 'Connection timed out. Verify your phone and Mac are on the same Wi-Fi network and the server is running on port 5000.',
+          message: 'Connection timed out. Please check your internet connection or server availability and try again.',
           statusCode: 408,
         );
 
       case DioExceptionType.connectionError:
         return const ApiException(
-          message: 'Cannot connect to backend server. Make sure the Node.js server is running (`npm start` in server/) and reachable on your Mac LAN IP.',
+          message: 'Unable to reach the backend server. Please verify your internet connection or try again later.',
           statusCode: 503,
         );
 

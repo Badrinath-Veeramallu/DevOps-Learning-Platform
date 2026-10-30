@@ -1,0 +1,6163 @@
+{
+ "course": "Git & GitHub",
+ "version": 1,
+ "stage": {
+  "width": 1000,
+  "height": 400
+ },
+ "modules": [
+  {
+   "id": "01",
+   "title": "Introduction to Git & Setup",
+   "subtopics": [
+    {
+     "id": "01.1",
+     "title": "Why Do We Need Version Control?",
+     "steps": [
+      {
+       "say": "Without version control, copies pile up: final, final_v2, FINAL_really…",
+       "actors": {
+        "a": {
+         "k": "file",
+         "text": "report_final.docx",
+         "x": 18,
+         "y": 38,
+         "tone": "warn",
+         "w": 13
+        },
+        "b": {
+         "k": "file",
+         "text": "report_final_v2.docx",
+         "x": 42,
+         "y": 24,
+         "tone": "warn",
+         "w": 13
+        },
+        "c": {
+         "k": "file",
+         "text": "report_FINAL_really.docx",
+         "x": 68,
+         "y": 38,
+         "tone": "warn",
+         "w": 13
+        },
+        "d": {
+         "k": "file",
+         "text": "report_final_JOHN.docx",
+         "x": 30,
+         "y": 70,
+         "tone": "warn",
+         "w": 13
+        },
+        "e": {
+         "k": "file",
+         "text": "report_v3_use_this.docx",
+         "x": 62,
+         "y": 72,
+         "tone": "warn",
+         "w": 13
+        }
+       }
+      },
+      {
+       "say": "As the project grows, nobody knows which copy is latest, who changed what, or how to go back.",
+       "actors": {
+        "q1": {
+         "k": "pill",
+         "text": "Which copy is the latest?",
+         "x": 22,
+         "y": 10,
+         "tone": "bad"
+        },
+        "q2": {
+         "k": "pill",
+         "text": "Who changed this?",
+         "x": 78,
+         "y": 10,
+         "tone": "bad"
+        },
+        "q3": {
+         "k": "pill",
+         "text": "How do I go back?",
+         "x": 50,
+         "y": 92,
+         "tone": "bad"
+        }
+       }
+      },
+      {
+       "say": "Version control is the better solution: one project, with its history saved as snapshots.",
+       "actors": {
+        "a": null,
+        "b": null,
+        "c": null,
+        "d": null,
+        "e": null,
+        "q1": null,
+        "q2": null,
+        "q3": null,
+        "v1": {
+         "k": "commit",
+         "text": "v1",
+         "x": 18,
+         "y": 45,
+         "tone": "soft",
+         "sub": "Initial version"
+        },
+        "v2": {
+         "k": "commit",
+         "text": "v2",
+         "x": 50,
+         "y": 45,
+         "tone": "soft",
+         "sub": "Add login"
+        },
+        "v3": {
+         "k": "commit",
+         "text": "v3",
+         "x": 82,
+         "y": 45,
+         "tone": "soft",
+         "sub": "Add dashboard"
+        }
+       },
+       "edges": [
+        [
+         "v1",
+         "v2"
+        ],
+        [
+         "v2",
+         "v3"
+        ]
+       ]
+      },
+      {
+       "say": "Git records how your project develops over time — it is more than a place to store files.",
+       "actors": {
+        "g": {
+         "k": "pill",
+         "text": "Every change keeps an author, a date and a message",
+         "x": 50,
+         "y": 18,
+         "tone": "brand"
+        },
+        "back": {
+         "k": "pill",
+         "text": "Jump back to any snapshot",
+         "x": 18,
+         "y": 80,
+         "tone": "ok"
+        }
+       },
+       "edges": [
+        [
+         "v1",
+         "v2"
+        ],
+        [
+         "v2",
+         "v3"
+        ],
+        [
+         "back",
+         "v1",
+         "",
+         "ok"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "01.2",
+     "title": "Git vs GitHub",
+     "steps": [
+      {
+       "say": "Git is the version control tool. It runs on your computer and manages your repository’s history.",
+       "actors": {
+        "zl": {
+         "k": "zone",
+         "text": "Your computer",
+         "x": 25,
+         "y": 50,
+         "w": 44,
+         "h": 88
+        },
+        "git": {
+         "k": "box",
+         "text": "Git",
+         "x": 25,
+         "y": 28,
+         "tone": "brand",
+         "w": 22,
+         "sub": "tracks changes to your project"
+        },
+        "c1": {
+         "k": "commit",
+         "text": "C1",
+         "x": 12,
+         "y": 62,
+         "tone": "soft",
+         "sub": "history"
+        },
+        "c2": {
+         "k": "commit",
+         "text": "C2",
+         "x": 25,
+         "y": 62,
+         "tone": "soft"
+        },
+        "c3": {
+         "k": "commit",
+         "text": "C3",
+         "x": 38,
+         "y": 62,
+         "tone": "soft"
+        }
+       },
+       "edges": [
+        [
+         "c1",
+         "c2"
+        ],
+        [
+         "c2",
+         "c3"
+        ]
+       ]
+      },
+      {
+       "say": "You can use Git without GitHub — everything lives on your machine.",
+       "actors": {
+        "off": {
+         "k": "pill",
+         "text": "Works offline · no GitHub required",
+         "x": 25,
+         "y": 84,
+         "tone": "ok"
+        }
+       }
+      },
+      {
+       "say": "GitHub adds remote hosting and collaboration for Git repositories.",
+       "actors": {
+        "zr": {
+         "k": "zone",
+         "text": "GitHub",
+         "x": 75,
+         "y": 50,
+         "w": 44,
+         "h": 88,
+         "tone": "brand"
+        },
+        "gh": {
+         "k": "box",
+         "text": "GitHub",
+         "x": 75,
+         "y": 28,
+         "w": 22,
+         "sub": "remote hosting + collaboration"
+        },
+        "r1": {
+         "k": "commit",
+         "text": "C1",
+         "x": 62,
+         "y": 62,
+         "tone": "soft"
+        },
+        "r2": {
+         "k": "commit",
+         "text": "C2",
+         "x": 75,
+         "y": 62,
+         "tone": "soft"
+        },
+        "r3": {
+         "k": "commit",
+         "text": "C3",
+         "x": 88,
+         "y": 62,
+         "tone": "soft"
+        }
+       },
+       "edges": [
+        [
+         "c1",
+         "c2"
+        ],
+        [
+         "c2",
+         "c3"
+        ],
+        [
+         "r1",
+         "r2"
+        ],
+        [
+         "r2",
+         "r3"
+        ],
+        [
+         "git",
+         "gh",
+         "push / pull",
+         "dash"
+        ]
+       ]
+      },
+      {
+       "say": "Git is the tool. GitHub is the service built around it.",
+       "actors": {
+        "sh": {
+         "k": "pill",
+         "text": "Share · Review · Collaborate",
+         "x": 75,
+         "y": 84,
+         "tone": "ok"
+        }
+       }
+      }
+     ]
+    },
+    {
+     "id": "01.3",
+     "title": "Install Git",
+     "steps": [
+      {
+       "say": "Select the instructions for your operating system.",
+       "actors": {
+        "w": {
+         "k": "box",
+         "text": "Windows",
+         "x": 20,
+         "y": 30,
+         "sub": "installer"
+        },
+        "m": {
+         "k": "box",
+         "text": "macOS",
+         "x": 50,
+         "y": 30,
+         "sub": "installer / brew"
+        },
+        "l": {
+         "k": "box",
+         "text": "Linux",
+         "x": 80,
+         "y": 30,
+         "sub": "package manager"
+        }
+       }
+      },
+      {
+       "say": "Complete the installation for your system.",
+       "actors": {
+        "w": {
+         "tone": "brand",
+         "glow": true
+        },
+        "inst": {
+         "k": "box",
+         "text": "Installing Git…",
+         "x": 50,
+         "y": 72,
+         "w": 30,
+         "tone": "soft",
+         "bar": 55,
+         "sub": "downloading and setting up"
+        }
+       },
+       "edges": [
+        [
+         "w",
+         "inst"
+        ]
+       ]
+      },
+      {
+       "say": "Installation finished.",
+       "actors": {
+        "inst": {
+         "text": "Git installed",
+         "tone": "ok",
+         "bar": 100,
+         "sub": "ready to use",
+         "ic": "✓"
+        }
+       }
+      },
+      {
+       "say": "If the installation is successful, Git displays its version number.",
+       "actors": {
+        "ver": {
+         "k": "pill",
+         "text": "Version number shown = Git works",
+         "x": 50,
+         "y": 90,
+         "tone": "ok",
+         "ic": "✓"
+        }
+       },
+       "term": [
+        "$ git --version",
+        "+git version 2.47.0"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "01.4",
+     "title": "Configure Your Git Identity",
+     "steps": [
+      {
+       "say": "Every commit records author information — a name and an email address.",
+       "actors": {
+        "meta": {
+         "k": "code",
+         "lines": [
+          [
+           "commit a1b2c3d",
+           "mark"
+          ],
+          [
+           "Author: ???",
+           "del"
+          ],
+          "Date:   today",
+          "    Add homepage layout"
+         ],
+         "x": 72,
+         "y": 40,
+         "w": 34,
+         "title": "a commit (no identity set yet)"
+        }
+       }
+      },
+      {
+       "say": "Set your name. Replace the sample value with your own.",
+       "actors": {
+        "cfg": {
+         "k": "code",
+         "lines": [
+          [
+           "[user]",
+           "mark"
+          ],
+          "  name = Your Name"
+         ],
+         "x": 24,
+         "y": 40,
+         "w": 30,
+         "title": "~/.gitconfig"
+        }
+       },
+       "term": [
+        "$ git config --global user.name \"Your Name\""
+       ]
+      },
+      {
+       "say": "Set your email. This helps developers identify who made a change.",
+       "actors": {
+        "cfg": {
+         "lines": [
+          [
+           "[user]",
+           "mark"
+          ],
+          "  name = Your Name",
+          "  email = you@example.com"
+         ]
+        }
+       },
+       "term": [
+        "$ git config --global user.email \"you@example.com\""
+       ]
+      },
+      {
+       "say": "New commits now carry your identity.",
+       "actors": {
+        "meta": {
+         "lines": [
+          [
+           "commit a1b2c3d",
+           "mark"
+          ],
+          [
+           "Author: Your Name <you@example.com>",
+           "add"
+          ],
+          "Date:   today",
+          "    Add homepage layout"
+         ],
+         "title": "a commit (identity set)"
+        },
+        "tip": {
+         "k": "pill",
+         "text": "Use an email linked to your GitHub account, or a GitHub private email",
+         "x": 50,
+         "y": 88,
+         "tone": "warn"
+        }
+       },
+       "edges": [
+        [
+         "cfg",
+         "meta",
+         "used by",
+         "ok"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "01.5",
+     "title": "Understand Your Working Environment",
+     "steps": [
+      {
+       "say": "Before running Git commands, know which folder your terminal is in.",
+       "actors": {
+        "zh": {
+         "k": "zone",
+         "text": "~  (home folder)",
+         "x": 32,
+         "y": 52,
+         "w": 58,
+         "h": 82
+        },
+        "d1": {
+         "k": "box",
+         "text": "Documents",
+         "x": 14,
+         "y": 40,
+         "w": 12
+        },
+        "d2": {
+         "k": "box",
+         "text": "Downloads",
+         "x": 30,
+         "y": 40,
+         "w": 12
+        },
+        "d3": {
+         "k": "box",
+         "text": "my-project",
+         "x": 47,
+         "y": 40,
+         "w": 13,
+         "tone": "soft"
+        },
+        "here": {
+         "k": "pill",
+         "text": "▸ you are here: ~",
+         "x": 22,
+         "y": 72,
+         "tone": "brand"
+        }
+       },
+       "term": [
+        "$ pwd",
+        "/home/you"
+       ]
+      },
+      {
+       "say": "Move into the project directory.",
+       "actors": {
+        "here": {
+         "text": "▸ you are here: my-project",
+         "x": 47,
+         "y": 64
+        },
+        "d3": {
+         "tone": "brand"
+        }
+       },
+       "term": [
+        "$ cd my-project",
+        "$ pwd",
+        "/home/you/my-project"
+       ],
+       "edges": [
+        [
+         "here",
+         "d3"
+        ]
+       ]
+      },
+      {
+       "say": "List the files to confirm you are in the right place.",
+       "actors": {
+        "ls": {
+         "k": "code",
+         "lines": [
+          "index.html",
+          "style.css",
+          "app.js"
+         ],
+         "x": 84,
+         "y": 40,
+         "w": 22,
+         "title": "files in my-project"
+        },
+        "win": {
+         "k": "pill",
+         "text": "Windows Command Prompt: dir",
+         "x": 84,
+         "y": 66,
+         "tone": "warn"
+        }
+       },
+       "term": [
+        "$ ls"
+       ],
+       "edges": [
+        [
+         "here",
+         "d3"
+        ],
+        [
+         "d3",
+         "ls",
+         "",
+         "ok"
+        ]
+       ]
+      },
+      {
+       "say": "Wrong folder, wrong repository: check before you initialize or change anything.",
+       "actors": {
+        "warn": {
+         "k": "pill",
+         "text": "Always confirm your location before git init",
+         "x": 50,
+         "y": 91,
+         "tone": "bad"
+        }
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "02",
+   "title": "Git Basics & Tracking Changes",
+   "subtopics": [
+    {
+     "id": "02.1",
+     "title": "Start Tracking an Existing Project",
+     "steps": [
+      {
+       "say": "Your website runs locally, but there is no history yet.",
+       "actors": {
+        "z": {
+         "k": "zone",
+         "text": "my-project",
+         "x": 35,
+         "y": 50,
+         "w": 62,
+         "h": 86
+        },
+        "f1": {
+         "k": "file",
+         "text": "index.html",
+         "x": 15,
+         "y": 42,
+         "tone": "plain"
+        },
+        "f2": {
+         "k": "file",
+         "text": "style.css",
+         "x": 30,
+         "y": 42,
+         "tone": "plain"
+        },
+        "f3": {
+         "k": "file",
+         "text": "app.js",
+         "x": 45,
+         "y": 42,
+         "tone": "plain"
+        },
+        "none": {
+         "k": "pill",
+         "text": "No history yet",
+         "x": 30,
+         "y": 76,
+         "tone": "dim"
+        }
+       }
+      },
+      {
+       "say": "git init creates the internal repository structure Git needs.",
+       "actors": {
+        "none": null,
+        "g": {
+         "k": "box",
+         "text": ".git/",
+         "x": 62,
+         "y": 42,
+         "w": 10,
+         "tone": "brand",
+         "sub": "hidden"
+        }
+       },
+       "term": [
+        "$ git init",
+        "Initialized empty Git repository in /home/you/my-project/.git/"
+       ]
+      },
+      {
+       "say": "The current directory is now a Git repository, ready to keep a history.",
+       "actors": {
+        "repo": {
+         "k": "box",
+         "text": "Repository",
+         "x": 85,
+         "y": 50,
+         "w": 18,
+         "tone": "soft",
+         "sub": "empty — ready for commits"
+        },
+        "done": {
+         "k": "pill",
+         "text": "Git can now maintain a history",
+         "x": 35,
+         "y": 78,
+         "tone": "ok",
+         "ic": "✓"
+        }
+       },
+       "edges": [
+        [
+         "g",
+         "repo",
+         "",
+         "ok"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "02.2",
+     "title": "Check the Repository Status",
+     "steps": [
+      {
+       "say": "Files move between three places: working directory, staging area and repository.",
+       "actors": {
+        "wd": {
+         "k": "zone",
+         "text": "Working directory",
+         "x": 18,
+         "y": 50,
+         "w": 30,
+         "h": 86
+        },
+        "sa": {
+         "k": "zone",
+         "text": "Staging area",
+         "x": 50,
+         "y": 50,
+         "w": 30,
+         "h": 86
+        },
+        "rp": {
+         "k": "zone",
+         "text": "Repository",
+         "x": 82,
+         "y": 50,
+         "w": 30,
+         "h": 86
+        },
+        "f1": {
+         "k": "file",
+         "text": "index.html",
+         "x": 18,
+         "y": 36,
+         "tone": "plain"
+        },
+        "f2": {
+         "k": "file",
+         "text": "style.css",
+         "x": 18,
+         "y": 66,
+         "tone": "plain"
+        },
+        "f3": {
+         "k": "file",
+         "text": "app.js",
+         "x": 50,
+         "y": 36,
+         "tone": "plain"
+        },
+        "c1": {
+         "k": "commit",
+         "text": "C1",
+         "x": 82,
+         "y": 40,
+         "tone": "soft",
+         "sub": "last commit"
+        }
+       }
+      },
+      {
+       "say": "git status shows each file’s state.",
+       "actors": {
+        "f1": {
+         "tone": "bad",
+         "sub": "untracked"
+        },
+        "f2": {
+         "tone": "warn",
+         "sub": "modified"
+        },
+        "f3": {
+         "tone": "ok",
+         "sub": "staged"
+        }
+       },
+       "term": [
+        "$ git status",
+        "On branch main",
+        "+Changes to be committed:  app.js",
+        "~Changes not staged:  style.css",
+        "!Untracked files:  index.html"
+       ]
+      },
+      {
+       "say": "Only staged changes go into the next commit. A modified file is not included just because another file is.",
+       "actors": {
+        "next": {
+         "k": "commit",
+         "text": "next",
+         "x": 82,
+         "y": 72,
+         "tone": "dim",
+         "sub": "next commit"
+        }
+       },
+       "edges": [
+        [
+         "f3",
+         "next",
+         "included",
+         "ok"
+        ],
+        [
+         "f2",
+         "next",
+         "not included",
+         "warn"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "02.3",
+     "title": "Stage Your Changes",
+     "steps": [
+      {
+       "say": "Three files have changed. Staging selects what goes into the next commit.",
+       "actors": {
+        "wd": {
+         "k": "zone",
+         "text": "Working directory",
+         "x": 22,
+         "y": 50,
+         "w": 40,
+         "h": 86
+        },
+        "sa": {
+         "k": "zone",
+         "text": "Staging area",
+         "x": 73,
+         "y": 50,
+         "w": 40,
+         "h": 86
+        },
+        "f1": {
+         "k": "file",
+         "text": "README.md",
+         "x": 22,
+         "y": 28,
+         "tone": "warn",
+         "sub": "modified"
+        },
+        "f2": {
+         "k": "file",
+         "text": "login.js",
+         "x": 22,
+         "y": 52,
+         "tone": "warn",
+         "sub": "modified"
+        },
+        "f3": {
+         "k": "file",
+         "text": "notes.txt",
+         "x": 22,
+         "y": 76,
+         "tone": "warn",
+         "sub": "modified"
+        }
+       }
+      },
+      {
+       "say": "Stage one file by name.",
+       "actors": {
+        "f1": {
+         "x": 73,
+         "tone": "ok",
+         "sub": "staged"
+        }
+       },
+       "term": [
+        "$ git add README.md"
+       ]
+      },
+      {
+       "say": "The dot means the current directory: convenient, but it can stage unrelated work too.",
+       "actors": {
+        "f2": {
+         "x": 73,
+         "tone": "ok",
+         "sub": "staged"
+        },
+        "f3": {
+         "x": 73,
+         "tone": "bad",
+         "sub": "unrelated!"
+        },
+        "w": {
+         "k": "pill",
+         "text": "git add . stages everything",
+         "x": 50,
+         "y": 92,
+         "tone": "bad"
+        }
+       },
+       "term": [
+        "$ git add ."
+       ]
+      },
+      {
+       "say": "To commit only the login feature, stage its files individually for more control.",
+       "actors": {
+        "w": null,
+        "f1": {
+         "x": 22,
+         "tone": "warn",
+         "sub": "modified"
+        },
+        "f3": {
+         "x": 22,
+         "tone": "warn",
+         "sub": "modified"
+        },
+        "f2": {
+         "x": 73,
+         "tone": "ok",
+         "sub": "staged"
+        }
+       },
+       "clear": true,
+       "term": [
+        "$ git add login.js"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "02.4",
+     "title": "Review Changes Before Committing",
+     "steps": [
+      {
+       "say": "Before creating a commit, inspect the changes you made.",
+       "actors": {
+        "zu": {
+         "k": "zone",
+         "text": "Working directory",
+         "x": 15,
+         "y": 28,
+         "w": 26,
+         "h": 42
+        },
+        "zs": {
+         "k": "zone",
+         "text": "Staging area",
+         "x": 15,
+         "y": 74,
+         "w": 26,
+         "h": 42
+        },
+        "f": {
+         "k": "file",
+         "text": "style.css",
+         "x": 15,
+         "y": 30,
+         "tone": "warn",
+         "sub": "modified"
+        }
+       }
+      },
+      {
+       "say": "git diff displays unstaged changes to tracked files.",
+       "actors": {
+        "d": {
+         "k": "code",
+         "lines": [
+          " .hero {",
+          [
+           "-  color: #888;",
+           "del"
+          ],
+          [
+           "+  color: #3b1c22;",
+           "add"
+          ],
+          " }"
+         ],
+         "x": 63,
+         "y": 50,
+         "w": 46,
+         "title": "git diff · unstaged changes"
+        }
+       },
+       "term": [
+        "$ git diff"
+       ]
+      },
+      {
+       "say": "After staging, the change moves — so git diff now shows nothing.",
+       "actors": {
+        "f": {
+         "y": 76,
+         "tone": "ok",
+         "sub": "staged"
+        },
+        "d": {
+         "lines": [
+          [
+           "(no unstaged changes)",
+           "dim"
+          ]
+         ]
+        }
+       },
+       "term": [
+        "$ git add style.css"
+       ]
+      },
+      {
+       "say": "git diff --staged displays the changes selected for the next commit.",
+       "actors": {
+        "d": {
+         "title": "git diff --staged · next commit",
+         "lines": [
+          " .hero {",
+          [
+           "-  color: #888;",
+           "del"
+          ],
+          [
+           "+  color: #3b1c22;",
+           "add"
+          ],
+          " }"
+         ]
+        }
+       },
+       "term": [
+        "$ git diff --staged"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "02.5",
+     "title": "Create a Commit",
+     "steps": [
+      {
+       "say": "Staged changes are ready to be recorded.",
+       "actors": {
+        "sa": {
+         "k": "zone",
+         "text": "Staging area",
+         "x": 20,
+         "y": 50,
+         "w": 30,
+         "h": 86
+        },
+        "rp": {
+         "k": "zone",
+         "text": "Repository",
+         "x": 68,
+         "y": 50,
+         "w": 56,
+         "h": 86
+        },
+        "f1": {
+         "k": "file",
+         "text": "index.html",
+         "x": 20,
+         "y": 36,
+         "tone": "ok",
+         "sub": "staged"
+        },
+        "f2": {
+         "k": "file",
+         "text": "style.css",
+         "x": 20,
+         "y": 66,
+         "tone": "ok",
+         "sub": "staged"
+        }
+       }
+      },
+      {
+       "say": "A commit records a snapshot of the staged changes.",
+       "actors": {
+        "f1": {
+         "x": 56,
+         "y": 40
+        },
+        "f2": {
+         "x": 56,
+         "y": 62
+        },
+        "cm": {
+         "k": "commit",
+         "text": "a1b2c3d",
+         "x": 80,
+         "y": 50,
+         "tone": "brand",
+         "sub": "Add homepage layout"
+        }
+       },
+       "term": [
+        "$ git commit -m \"Add homepage layout\"",
+        "[main a1b2c3d] Add homepage layout",
+        " 2 files changed"
+       ]
+      },
+      {
+       "say": "The snapshot is stored with its author, timestamp and message.",
+       "actors": {
+        "f1": null,
+        "f2": null,
+        "cm": {
+         "x": 52,
+         "y": 50
+        },
+        "info": {
+         "k": "code",
+         "lines": [
+          "commit a1b2c3d",
+          "Author: Your Name",
+          "Date:   Oct 30 10:42",
+          "    Add homepage layout"
+         ],
+         "x": 80,
+         "y": 50,
+         "w": 30,
+         "title": "commit details"
+        }
+       },
+       "edges": [
+        [
+         "cm",
+         "info",
+         "",
+         "dash"
+        ]
+       ]
+      },
+      {
+       "say": "Messages should describe the purpose of the change.",
+       "actors": {
+        "info": null,
+        "m1": {
+         "k": "box",
+         "text": "“changes”",
+         "x": 76,
+         "y": 24,
+         "w": 26,
+         "tone": "bad",
+         "sub": "unclear"
+        },
+        "m2": {
+         "k": "box",
+         "text": "Fix dashboard loading state",
+         "x": 76,
+         "y": 50,
+         "w": 26,
+         "tone": "ok",
+         "sub": "clear purpose"
+        },
+        "m3": {
+         "k": "box",
+         "text": "Add login validation",
+         "x": 76,
+         "y": 76,
+         "w": 26,
+         "tone": "ok",
+         "sub": "clear purpose"
+        }
+       },
+       "edges": []
+      }
+     ]
+    },
+    {
+     "id": "02.6",
+     "title": "Verify Your Commit",
+     "steps": [
+      {
+       "say": "After committing, check whether any changes remain.",
+       "actors": {
+        "zl": {
+         "k": "zone",
+         "text": "Your computer",
+         "x": 30,
+         "y": 50,
+         "w": 56,
+         "h": 86
+        },
+        "zr": {
+         "k": "zone",
+         "text": "GitHub",
+         "x": 82,
+         "y": 50,
+         "w": 32,
+         "h": 86,
+         "tone": "brand"
+        },
+        "wt": {
+         "k": "box",
+         "text": "Working tree",
+         "x": 17,
+         "y": 34,
+         "w": 16,
+         "sub": "checking…"
+        },
+        "cm": {
+         "k": "commit",
+         "text": "a1b2c3d",
+         "x": 42,
+         "y": 64,
+         "tone": "soft",
+         "sub": "Add homepage layout"
+        }
+       },
+       "term": [
+        "$ git status"
+       ]
+      },
+      {
+       "say": "Nothing is left to commit: the working tree is clean.",
+       "actors": {
+        "wt": {
+         "tone": "ok",
+         "sub": "clean",
+         "ic": "✓"
+        }
+       },
+       "term": [
+        "+nothing to commit, working tree clean"
+       ]
+      },
+      {
+       "say": "The second command displays the most recent commit.",
+       "actors": {
+        "cm": {
+         "tone": "brand",
+         "glow": true
+        },
+        "head": {
+         "k": "pill",
+         "text": "HEAD → main",
+         "x": 42,
+         "y": 82,
+         "tone": "soft"
+        }
+       },
+       "term": [
+        "$ git log -1 --oneline",
+        "a1b2c3d (HEAD -> main) Add homepage layout"
+       ]
+      },
+      {
+       "say": "Committing does not upload anything. GitHub does not have this commit yet.",
+       "actors": {
+        "empty": {
+         "k": "box",
+         "text": "No commits yet",
+         "x": 82,
+         "y": 40,
+         "w": 24,
+         "tone": "dim",
+         "sub": "not pushed"
+        }
+       },
+       "edges": [
+        [
+         "cm",
+         "empty",
+         "not uploaded",
+         "warn"
+        ]
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "03",
+   "title": "GitHub & Remote Repositories",
+   "subtopics": [
+    {
+     "id": "03.1",
+     "title": "Why Do We Need a Remote Repository?",
+     "steps": [
+      {
+       "say": "Your project and its commits live only on your laptop.",
+       "actors": {
+        "lap": {
+         "k": "box",
+         "text": "Your laptop",
+         "x": 15,
+         "y": 50,
+         "w": 20,
+         "sub": "local repository"
+        }
+       }
+      },
+      {
+       "say": "Teammates, or your other machine, cannot reach it.",
+       "actors": {
+        "t": {
+         "k": "box",
+         "text": "Teammate",
+         "x": 86,
+         "y": 24,
+         "w": 16,
+         "tone": "dim",
+         "sub": "needs the code"
+        },
+        "o": {
+         "k": "box",
+         "text": "Another computer",
+         "x": 86,
+         "y": 76,
+         "w": 18,
+         "tone": "dim",
+         "sub": "needs the code"
+        }
+       },
+       "edges": [
+        [
+         "lap",
+         "t",
+         "no access",
+         "warn"
+        ],
+        [
+         "lap",
+         "o",
+         "no access",
+         "warn"
+        ]
+       ]
+      },
+      {
+       "say": "A remote repository stores the Git repository outside your local environment.",
+       "actors": {
+        "rem": {
+         "k": "box",
+         "text": "Remote repository",
+         "x": 50,
+         "y": 50,
+         "w": 22,
+         "tone": "brand",
+         "sub": "hosted on GitHub"
+        }
+       },
+       "edges": [
+        [
+         "lap",
+         "rem",
+         "push",
+         "ok"
+        ],
+        [
+         "rem",
+         "t",
+         "pull",
+         "ok"
+        ],
+        [
+         "rem",
+         "o",
+         "pull",
+         "ok"
+        ]
+       ]
+      },
+      {
+       "say": "Developers exchange commits and collaborate on one shared codebase.",
+       "actors": {
+        "s": {
+         "k": "pill",
+         "text": "Publish changes · retrieve updates · work together",
+         "x": 50,
+         "y": 88,
+         "tone": "ok"
+        }
+       }
+      }
+     ]
+    },
+    {
+     "id": "03.2",
+     "title": "Create a GitHub Repository",
+     "steps": [
+      {
+       "say": "Create a new repository and choose a name, such as task-manager.",
+       "actors": {
+        "form": {
+         "k": "code",
+         "lines": [
+          "Repository name",
+          [
+           "task-manager",
+           "hl"
+          ],
+          "",
+          "Visibility   (•) Public   ( ) Private"
+         ],
+         "x": 34,
+         "y": 40,
+         "w": 42,
+         "title": "GitHub · New repository"
+        }
+       }
+      },
+      {
+       "say": "Pushing an existing local history? Do not initialize the remote with extra files.",
+       "actors": {
+        "form": {
+         "lines": [
+          "Repository name",
+          [
+           "task-manager",
+           "hl"
+          ],
+          "",
+          "Visibility   (•) Public   ( ) Private",
+          "",
+          "Initialize this repository with:",
+          [
+           "[ ] Add a README",
+           "cur"
+          ],
+          [
+           "[ ] Add .gitignore",
+           "cur"
+          ],
+          [
+           "[ ] Choose a license",
+           "cur"
+          ]
+         ]
+        },
+        "hint": {
+         "k": "pill",
+         "text": "Leave these unchecked",
+         "x": 82,
+         "y": 62,
+         "tone": "ok",
+         "ic": "✓"
+        }
+       }
+      },
+      {
+       "say": "Create the repository and copy its URL.",
+       "actors": {
+        "hint": null,
+        "form": {
+         "y": 36
+        },
+        "url": {
+         "k": "box",
+         "text": "https://github.com/YOUR-USERNAME/task-manager.git",
+         "x": 50,
+         "y": 88,
+         "w": 62,
+         "tone": "brand",
+         "ic": "⧉",
+         "sub": "copy this URL"
+        },
+        "btn": {
+         "k": "box",
+         "text": "Create repository",
+         "x": 82,
+         "y": 40,
+         "w": 20,
+         "tone": "brand"
+        }
+       },
+       "edges": [
+        [
+         "btn",
+         "url",
+         "",
+         "ok"
+        ]
+       ]
+      },
+      {
+       "say": "You will use this URL to connect your local repository to GitHub.",
+       "actors": {
+        "pill": {
+         "k": "pill",
+         "text": "Next: connect your local repository",
+         "x": 50,
+         "y": 72,
+         "tone": "soft"
+        }
+       }
+      }
+     ]
+    },
+    {
+     "id": "03.3",
+     "title": "Connect Your Local Repository",
+     "steps": [
+      {
+       "say": "Your local repository has commits; the GitHub repository is empty.",
+       "actors": {
+        "zl": {
+         "k": "zone",
+         "text": "Your computer",
+         "x": 22,
+         "y": 50,
+         "w": 38,
+         "h": 86
+        },
+        "zr": {
+         "k": "zone",
+         "text": "GitHub",
+         "x": 78,
+         "y": 50,
+         "w": 38,
+         "h": 86,
+         "tone": "brand"
+        },
+        "loc": {
+         "k": "box",
+         "text": "task-manager",
+         "x": 22,
+         "y": 30,
+         "w": 20,
+         "sub": "local repository"
+        },
+        "c1": {
+         "k": "commit",
+         "text": "C1",
+         "x": 10,
+         "y": 66,
+         "tone": "soft"
+        },
+        "c2": {
+         "k": "commit",
+         "text": "C2",
+         "x": 22,
+         "y": 66,
+         "tone": "soft"
+        },
+        "c3": {
+         "k": "commit",
+         "text": "C3",
+         "x": 34,
+         "y": 66,
+         "tone": "soft"
+        },
+        "rem": {
+         "k": "box",
+         "text": "task-manager",
+         "x": 78,
+         "y": 30,
+         "w": 20,
+         "tone": "dim",
+         "sub": "empty"
+        }
+       },
+       "edges": [
+        [
+         "c1",
+         "c2"
+        ],
+        [
+         "c2",
+         "c3"
+        ]
+       ]
+      },
+      {
+       "say": "Add the remote and give it a name.",
+       "actors": {
+        "rem": {
+         "tone": "plain"
+        }
+       },
+       "term": [
+        "$ git remote add origin https://github.com/YOUR-USERNAME/task-manager.git"
+       ],
+       "edges": [
+        [
+         "c1",
+         "c2"
+        ],
+        [
+         "c2",
+         "c3"
+        ],
+        [
+         "loc",
+         "rem",
+         "origin",
+         "ok"
+        ]
+       ]
+      },
+      {
+       "say": "origin is a conventional alias for the remote URL — not a special command. Another name works too.",
+       "actors": {
+        "al": {
+         "k": "pill",
+         "text": "origin = https://github.com/YOUR-USERNAME/task-manager.git",
+         "x": 50,
+         "y": 90,
+         "tone": "soft"
+        }
+       },
+       "term": [
+        "$ git remote -v",
+        "origin  https://github.com/YOUR-USERNAME/task-manager.git (fetch)",
+        "origin  https://github.com/YOUR-USERNAME/task-manager.git (push)"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "03.4",
+     "title": "Push Your Code to GitHub",
+     "steps": [
+      {
+       "say": "For this example, assume the branch is named main.",
+       "actors": {
+        "zl": {
+         "k": "zone",
+         "text": "Your computer",
+         "x": 24,
+         "y": 50,
+         "w": 44,
+         "h": 88
+        },
+        "zr": {
+         "k": "zone",
+         "text": "GitHub",
+         "x": 76,
+         "y": 50,
+         "w": 44,
+         "h": 88,
+         "tone": "brand"
+        },
+        "c1": {
+         "k": "commit",
+         "text": "C1",
+         "x": 8,
+         "y": 62,
+         "tone": "soft"
+        },
+        "c2": {
+         "k": "commit",
+         "text": "C2",
+         "x": 23,
+         "y": 62,
+         "tone": "soft"
+        },
+        "c3": {
+         "k": "commit",
+         "text": "C3",
+         "x": 38,
+         "y": 62,
+         "tone": "soft"
+        },
+        "mn": {
+         "k": "pill",
+         "text": "main",
+         "x": 38,
+         "y": 44,
+         "tone": "brand"
+        }
+       },
+       "term": [
+        "$ git branch --show-current",
+        "main"
+       ],
+       "edges": [
+        [
+         "c1",
+         "c2"
+        ],
+        [
+         "c2",
+         "c3"
+        ]
+       ]
+      },
+      {
+       "say": "git push uploads your commits to the remote.",
+       "actors": {
+        "r1": {
+         "k": "commit",
+         "text": "C1",
+         "x": 62,
+         "y": 62,
+         "tone": "soft",
+         "delay": 0
+        },
+        "r2": {
+         "k": "commit",
+         "text": "C2",
+         "x": 76,
+         "y": 62,
+         "tone": "soft",
+         "delay": 350
+        },
+        "r3": {
+         "k": "commit",
+         "text": "C3",
+         "x": 90,
+         "y": 62,
+         "tone": "soft",
+         "delay": 700
+        }
+       },
+       "term": [
+        "$ git push -u origin main",
+        "Writing objects: 100% (9/9), done.",
+        "+branch 'main' set up to track 'origin/main'."
+       ],
+       "edges": [
+        [
+         "c1",
+         "c2"
+        ],
+        [
+         "c2",
+         "c3"
+        ],
+        [
+         "r1",
+         "r2"
+        ],
+        [
+         "r2",
+         "r3"
+        ],
+        [
+         "c3",
+         "r1",
+         "push",
+         "ok"
+        ]
+       ]
+      },
+      {
+       "say": "-u links your local branch to the remote branch, so later pushes and pulls are simpler.",
+       "actors": {
+        "om": {
+         "k": "pill",
+         "text": "origin/main",
+         "x": 90,
+         "y": 44,
+         "tone": "brand"
+        }
+       },
+       "edges": [
+        [
+         "c1",
+         "c2"
+        ],
+        [
+         "c2",
+         "c3"
+        ],
+        [
+         "r1",
+         "r2"
+        ],
+        [
+         "r2",
+         "r3"
+        ],
+        [
+         "mn",
+         "om",
+         "upstream",
+         "dash"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "03.5",
+     "title": "Clone an Existing Repository",
+     "steps": [
+      {
+       "say": "A teammate shares a repository you want to work on.",
+       "actors": {
+        "zr": {
+         "k": "zone",
+         "text": "GitHub · TEAM-NAME",
+         "x": 25,
+         "y": 50,
+         "w": 44,
+         "h": 88,
+         "tone": "brand"
+        },
+        "zl": {
+         "k": "zone",
+         "text": "Your computer",
+         "x": 75,
+         "y": 50,
+         "w": 44,
+         "h": 88
+        },
+        "rem": {
+         "k": "box",
+         "text": "task-manager",
+         "x": 25,
+         "y": 30,
+         "w": 22,
+         "sub": "remote repository"
+        },
+        "r1": {
+         "k": "commit",
+         "text": "C1",
+         "x": 10,
+         "y": 64,
+         "tone": "soft"
+        },
+        "r2": {
+         "k": "commit",
+         "text": "C2",
+         "x": 25,
+         "y": 64,
+         "tone": "soft"
+        },
+        "r3": {
+         "k": "commit",
+         "text": "C3",
+         "x": 40,
+         "y": 64,
+         "tone": "soft"
+        }
+       },
+       "edges": [
+        [
+         "r1",
+         "r2"
+        ],
+        [
+         "r2",
+         "r3"
+        ]
+       ]
+      },
+      {
+       "say": "git clone downloads the repository.",
+       "actors": {
+        "loc": {
+         "k": "box",
+         "text": "task-manager/",
+         "x": 75,
+         "y": 30,
+         "w": 22,
+         "tone": "soft",
+         "sub": "new working directory"
+        }
+       },
+       "term": [
+        "$ git clone https://github.com/TEAM-NAME/task-manager.git",
+        "Cloning into 'task-manager'...",
+        "Receiving objects: 100% (9/9), done."
+       ],
+       "edges": [
+        [
+         "r1",
+         "r2"
+        ],
+        [
+         "r2",
+         "r3"
+        ],
+        [
+         "rem",
+         "loc",
+         "clone",
+         "ok"
+        ]
+       ]
+      },
+      {
+       "say": "You get a local working directory with the files and the available history.",
+       "actors": {
+        "l1": {
+         "k": "commit",
+         "text": "C1",
+         "x": 60,
+         "y": 64,
+         "tone": "soft",
+         "delay": 0
+        },
+        "l2": {
+         "k": "commit",
+         "text": "C2",
+         "x": 75,
+         "y": 64,
+         "tone": "soft",
+         "delay": 350
+        },
+        "l3": {
+         "k": "commit",
+         "text": "C3",
+         "x": 90,
+         "y": 64,
+         "tone": "soft",
+         "delay": 700
+        },
+        "org": {
+         "k": "pill",
+         "text": "origin set up automatically",
+         "x": 75,
+         "y": 84,
+         "tone": "ok"
+        }
+       },
+       "edges": [
+        [
+         "r1",
+         "r2"
+        ],
+        [
+         "r2",
+         "r3"
+        ],
+        [
+         "l1",
+         "l2"
+        ],
+        [
+         "l2",
+         "l3"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "03.6",
+     "title": "Pull Remote Changes",
+     "steps": [
+      {
+       "say": "Local main and the remote are in sync.",
+       "actors": {
+        "zl": {
+         "k": "zone",
+         "text": "Your computer",
+         "x": 24,
+         "y": 50,
+         "w": 44,
+         "h": 88
+        },
+        "zr": {
+         "k": "zone",
+         "text": "GitHub",
+         "x": 76,
+         "y": 50,
+         "w": 44,
+         "h": 88,
+         "tone": "brand"
+        },
+        "l1": {
+         "k": "commit",
+         "text": "C1",
+         "x": 8,
+         "y": 62,
+         "tone": "soft"
+        },
+        "l2": {
+         "k": "commit",
+         "text": "C2",
+         "x": 19,
+         "y": 62,
+         "tone": "soft"
+        },
+        "l3": {
+         "k": "commit",
+         "text": "C3",
+         "x": 30,
+         "y": 62,
+         "tone": "soft"
+        },
+        "r1": {
+         "k": "commit",
+         "text": "C1",
+         "x": 58,
+         "y": 62,
+         "tone": "soft"
+        },
+        "r2": {
+         "k": "commit",
+         "text": "C2",
+         "x": 68,
+         "y": 62,
+         "tone": "soft"
+        },
+        "r3": {
+         "k": "commit",
+         "text": "C3",
+         "x": 78,
+         "y": 62,
+         "tone": "soft"
+        }
+       },
+       "edges": [
+        [
+         "l1",
+         "l2"
+        ],
+        [
+         "l2",
+         "l3"
+        ],
+        [
+         "r1",
+         "r2"
+        ],
+        [
+         "r2",
+         "r3"
+        ]
+       ]
+      },
+      {
+       "say": "Teammates push new commits to the shared repository.",
+       "actors": {
+        "tm": {
+         "k": "pill",
+         "text": "Teammate pushed",
+         "x": 76,
+         "y": 36,
+         "tone": "brand"
+        },
+        "r4": {
+         "k": "commit",
+         "text": "C4",
+         "x": 88,
+         "y": 62,
+         "tone": "brand",
+         "sub": "new"
+        },
+        "beh": {
+         "k": "pill",
+         "text": "behind by 1 commit",
+         "x": 24,
+         "y": 84,
+         "tone": "warn"
+        }
+       },
+       "edges": [
+        [
+         "l1",
+         "l2"
+        ],
+        [
+         "l2",
+         "l3"
+        ],
+        [
+         "r1",
+         "r2"
+        ],
+        [
+         "r2",
+         "r3"
+        ],
+        [
+         "r3",
+         "r4"
+        ]
+       ]
+      },
+      {
+       "say": "git pull brings the latest commits into your local branch.",
+       "actors": {
+        "l4": {
+         "k": "commit",
+         "text": "C4",
+         "x": 41,
+         "y": 62,
+         "tone": "brand",
+         "sub": "pulled"
+        }
+       },
+       "term": [
+        "$ git switch main",
+        "$ git pull",
+        "Updating a1b2c3d..e4f5a6b",
+        "+Fast-forward"
+       ],
+       "edges": [
+        [
+         "l1",
+         "l2"
+        ],
+        [
+         "l2",
+         "l3"
+        ],
+        [
+         "l3",
+         "l4"
+        ],
+        [
+         "r1",
+         "r2"
+        ],
+        [
+         "r2",
+         "r3"
+        ],
+        [
+         "r3",
+         "r4"
+        ],
+        [
+         "r4",
+         "l4",
+         "pull",
+         "ok"
+        ]
+       ]
+      },
+      {
+       "say": "Up to date. This assumes local main tracks the correct remote branch.",
+       "actors": {
+        "beh": {
+         "text": "up to date",
+         "tone": "ok",
+         "ic": "✓"
+        },
+        "tm": null
+       },
+       "edges": [
+        [
+         "l1",
+         "l2"
+        ],
+        [
+         "l2",
+         "l3"
+        ],
+        [
+         "l3",
+         "l4"
+        ],
+        [
+         "r1",
+         "r2"
+        ],
+        [
+         "r2",
+         "r3"
+        ],
+        [
+         "r3",
+         "r4"
+        ]
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "04",
+   "title": "Branching, Merging & Conflict Resolution",
+   "subtopics": [
+    {
+     "id": "04.1",
+     "title": "Why Do Developers Use Branches?",
+     "steps": [
+      {
+       "say": "One developer improves authentication while another builds a dashboard.",
+       "actors": {
+        "c1": {
+         "k": "commit",
+         "text": "C1",
+         "x": 18,
+         "y": 50,
+         "tone": "soft"
+        },
+        "c2": {
+         "k": "commit",
+         "text": "C2",
+         "x": 32,
+         "y": 50,
+         "tone": "soft"
+        },
+        "mn": {
+         "k": "pill",
+         "text": "main",
+         "x": 32,
+         "y": 32,
+         "tone": "brand"
+        },
+        "da": {
+         "k": "box",
+         "text": "Dev A",
+         "x": 88,
+         "y": 16,
+         "w": 14,
+         "sub": "authentication"
+        },
+        "db": {
+         "k": "box",
+         "text": "Dev B",
+         "x": 88,
+         "y": 84,
+         "w": 14,
+         "sub": "dashboard"
+        }
+       },
+       "edges": [
+        [
+         "c1",
+         "c2"
+        ]
+       ]
+      },
+      {
+       "say": "Everything on main gets mixed together — harder to review and maintain.",
+       "actors": {
+        "m1": {
+         "k": "commit",
+         "text": "auth",
+         "x": 46,
+         "y": 50,
+         "tone": "warn"
+        },
+        "m2": {
+         "k": "commit",
+         "text": "dash",
+         "x": 58,
+         "y": 50,
+         "tone": "warn"
+        },
+        "m3": {
+         "k": "commit",
+         "text": "auth",
+         "x": 70,
+         "y": 50,
+         "tone": "warn"
+        },
+        "m4": {
+         "k": "commit",
+         "text": "dash",
+         "x": 82,
+         "y": 50,
+         "tone": "warn"
+        },
+        "mix": {
+         "k": "pill",
+         "text": "hard to review · working version at risk",
+         "x": 50,
+         "y": 84,
+         "tone": "bad"
+        }
+       },
+       "edges": [
+        [
+         "c1",
+         "c2"
+        ],
+        [
+         "c2",
+         "m1"
+        ],
+        [
+         "m1",
+         "m2"
+        ],
+        [
+         "m2",
+         "m3"
+        ],
+        [
+         "m3",
+         "m4"
+        ]
+       ]
+      },
+      {
+       "say": "Branches give each line of work its own lane in the same repository.",
+       "actors": {
+        "m1": null,
+        "m2": null,
+        "m3": null,
+        "m4": null,
+        "mix": null,
+        "da": null,
+        "db": null,
+        "c1": {
+         "y": 28
+        },
+        "c2": {
+         "y": 28
+        },
+        "mn": {
+         "y": 12
+        },
+        "a1": {
+         "k": "commit",
+         "text": "a1",
+         "x": 42,
+         "y": 56,
+         "tone": "brand"
+        },
+        "a2": {
+         "k": "commit",
+         "text": "a2",
+         "x": 56,
+         "y": 56,
+         "tone": "brand"
+        },
+        "d1": {
+         "k": "commit",
+         "text": "d1",
+         "x": 42,
+         "y": 82,
+         "tone": "soft"
+        },
+        "d2": {
+         "k": "commit",
+         "text": "d2",
+         "x": 56,
+         "y": 82,
+         "tone": "soft"
+        },
+        "pa": {
+         "k": "pill",
+         "text": "feature/auth",
+         "x": 72,
+         "y": 56,
+         "tone": "brand"
+        },
+        "pd": {
+         "k": "pill",
+         "text": "feature/dashboard",
+         "x": 76,
+         "y": 82,
+         "tone": "soft"
+        }
+       },
+       "edges": [
+        [
+         "c1",
+         "c2"
+        ],
+        [
+         "c2",
+         "a1"
+        ],
+        [
+         "a1",
+         "a2"
+        ],
+        [
+         "c2",
+         "d1"
+        ],
+        [
+         "d1",
+         "d2"
+        ]
+       ]
+      },
+      {
+       "say": "The team controls when each change joins the shared codebase.",
+       "actors": {
+        "mg": {
+         "k": "commit",
+         "text": "M",
+         "x": 84,
+         "y": 28,
+         "tone": "ok",
+         "sub": "merged"
+        }
+       },
+       "edges": [
+        [
+         "c1",
+         "c2"
+        ],
+        [
+         "c2",
+         "a1"
+        ],
+        [
+         "a1",
+         "a2"
+        ],
+        [
+         "c2",
+         "d1"
+        ],
+        [
+         "d1",
+         "d2"
+        ],
+        [
+         "c2",
+         "mg"
+        ],
+        [
+         "a2",
+         "mg",
+         "",
+         "ok"
+        ],
+        [
+         "d2",
+         "mg",
+         "",
+         "ok"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "04.2",
+     "title": "Create a Feature Branch",
+     "steps": [
+      {
+       "say": "Start from the correct base branch, with the latest shared changes.",
+       "actors": {
+        "c1": {
+         "k": "commit",
+         "text": "C1",
+         "x": 12,
+         "y": 30,
+         "tone": "soft"
+        },
+        "c2": {
+         "k": "commit",
+         "text": "C2",
+         "x": 29,
+         "y": 30,
+         "tone": "soft"
+        },
+        "c3": {
+         "k": "commit",
+         "text": "C3",
+         "x": 46,
+         "y": 30,
+         "tone": "soft"
+        },
+        "mn": {
+         "k": "pill",
+         "text": "main",
+         "x": 46,
+         "y": 12,
+         "tone": "brand"
+        },
+        "hd": {
+         "k": "pill",
+         "text": "HEAD",
+         "x": 88,
+         "y": 50,
+         "tone": "soft"
+        }
+       },
+       "edges": [
+        [
+         "c1",
+         "c2"
+        ],
+        [
+         "c2",
+         "c3"
+        ],
+        [
+         "hd",
+         "mn",
+         "",
+         "dash"
+        ]
+       ]
+      },
+      {
+       "say": "This creates the branch and switches your working directory to it.",
+       "actors": {
+        "fb": {
+         "k": "pill",
+         "text": "feature/google-login",
+         "x": 46,
+         "y": 88,
+         "tone": "brand"
+        }
+       },
+       "term": [
+        "$ git switch -c feature/google-login",
+        "Switched to a new branch 'feature/google-login'"
+       ],
+       "edges": [
+        [
+         "c1",
+         "c2"
+        ],
+        [
+         "c2",
+         "c3"
+        ],
+        [
+         "fb",
+         "c3",
+         "",
+         "dash"
+        ],
+        [
+         "hd",
+         "fb",
+         "",
+         "dash"
+        ]
+       ]
+      },
+      {
+       "say": "Now implement Google sign-in and commit it on the feature branch.",
+       "actors": {
+        "f1": {
+         "k": "commit",
+         "text": "F1",
+         "x": 63,
+         "y": 70,
+         "tone": "brand",
+         "sub": "Add Google sign-in"
+        },
+        "f2": {
+         "k": "commit",
+         "text": "F2",
+         "x": 80,
+         "y": 70,
+         "tone": "brand",
+         "sub": "Handle callback"
+        },
+        "fb": {
+         "x": 80,
+         "y": 90
+        }
+       },
+       "edges": [
+        [
+         "c1",
+         "c2"
+        ],
+        [
+         "c2",
+         "c3"
+        ],
+        [
+         "c3",
+         "f1"
+        ],
+        [
+         "f1",
+         "f2"
+        ],
+        [
+         "fb",
+         "f2",
+         "",
+         "dash"
+        ],
+        [
+         "hd",
+         "fb",
+         "",
+         "dash"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "04.3",
+     "title": "Commit Your Feature",
+     "steps": [
+      {
+       "say": "Before committing, review the staged files.",
+       "actors": {
+        "zs": {
+         "k": "zone",
+         "text": "Staging area",
+         "x": 22,
+         "y": 50,
+         "w": 42,
+         "h": 88
+        },
+        "g": {
+         "k": "file",
+         "text": "google.js",
+         "x": 12,
+         "y": 32,
+         "tone": "ok",
+         "sub": "staged"
+        },
+        "e": {
+         "k": "file",
+         "text": ".env.local",
+         "x": 32,
+         "y": 32,
+         "tone": "warn",
+         "sub": "local config"
+        },
+        "d": {
+         "k": "file",
+         "text": "dist/bundle.js",
+         "x": 22,
+         "y": 68,
+         "tone": "warn",
+         "sub": "generated"
+        }
+       },
+       "term": [
+        "$ git status",
+        "$ git diff"
+       ]
+      },
+      {
+       "say": "Keep local configuration and generated files out of the commit.",
+       "actors": {
+        "e": {
+         "tone": "bad",
+         "ic": "✕",
+         "sub": "do not commit"
+        },
+        "d": {
+         "tone": "bad",
+         "ic": "✕",
+         "sub": "do not commit"
+        }
+       }
+      },
+      {
+       "say": "Commit the relevant files.",
+       "actors": {
+        "e": {
+         "x": 72,
+         "y": 88,
+         "tone": "dim"
+        },
+        "d": {
+         "x": 90,
+         "y": 88,
+         "tone": "dim"
+        },
+        "g": {
+         "x": 60,
+         "y": 62
+        },
+        "c3": {
+         "k": "commit",
+         "text": "C3",
+         "x": 60,
+         "y": 36,
+         "tone": "soft"
+        },
+        "fb": {
+         "k": "pill",
+         "text": "feature/google-login",
+         "x": 82,
+         "y": 18,
+         "tone": "brand"
+        },
+        "f1": {
+         "k": "commit",
+         "text": "F1",
+         "x": 80,
+         "y": 36,
+         "tone": "brand",
+         "sub": "Add Google sign-in"
+        }
+       },
+       "term": [
+        "$ git add src/google.js",
+        "$ git commit -m \"Add Google sign-in\""
+       ],
+       "edges": [
+        [
+         "c3",
+         "f1"
+        ],
+        [
+         "fb",
+         "f1",
+         "",
+         "dash"
+        ]
+       ]
+      },
+      {
+       "say": "The feature now has its own commit history on the branch.",
+       "actors": {
+        "g": null,
+        "e": null,
+        "d": null,
+        "h": {
+         "k": "pill",
+         "text": "main stays untouched",
+         "x": 70,
+         "y": 76,
+         "tone": "ok",
+         "ic": "✓"
+        }
+       },
+       "edges": [
+        [
+         "c3",
+         "f1"
+        ],
+        [
+         "fb",
+         "f1",
+         "",
+         "dash"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "04.4",
+     "title": "Merge the Feature into Main",
+     "steps": [
+      {
+       "say": "The feature is ready — its changes must be integrated into main.",
+       "actors": {
+        "c1": {
+         "k": "commit",
+         "text": "C1",
+         "x": 10,
+         "y": 30,
+         "tone": "soft"
+        },
+        "c2": {
+         "k": "commit",
+         "text": "C2",
+         "x": 24,
+         "y": 30,
+         "tone": "soft"
+        },
+        "c3": {
+         "k": "commit",
+         "text": "C3",
+         "x": 38,
+         "y": 30,
+         "tone": "soft"
+        },
+        "f1": {
+         "k": "commit",
+         "text": "F1",
+         "x": 38,
+         "y": 70,
+         "tone": "brand"
+        },
+        "f2": {
+         "k": "commit",
+         "text": "F2",
+         "x": 52,
+         "y": 70,
+         "tone": "brand"
+        },
+        "mn": {
+         "k": "pill",
+         "text": "main",
+         "x": 38,
+         "y": 12,
+         "tone": "soft"
+        },
+        "fb": {
+         "k": "pill",
+         "text": "feature/google-login",
+         "x": 52,
+         "y": 90,
+         "tone": "brand"
+        },
+        "hd": {
+         "k": "pill",
+         "text": "HEAD",
+         "x": 88,
+         "y": 50,
+         "tone": "soft"
+        }
+       },
+       "edges": [
+        [
+         "c1",
+         "c2"
+        ],
+        [
+         "c2",
+         "c3"
+        ],
+        [
+         "c2",
+         "f1"
+        ],
+        [
+         "f1",
+         "f2"
+        ],
+        [
+         "hd",
+         "fb",
+         "",
+         "dash"
+        ]
+       ]
+      },
+      {
+       "say": "Switch to the destination branch first.",
+       "actors": {},
+       "term": [
+        "$ git switch main",
+        "Switched to branch 'main'"
+       ],
+       "edges": [
+        [
+         "c1",
+         "c2"
+        ],
+        [
+         "c2",
+         "c3"
+        ],
+        [
+         "c2",
+         "f1"
+        ],
+        [
+         "f1",
+         "f2"
+        ],
+        [
+         "hd",
+         "mn",
+         "",
+         "dash"
+        ]
+       ]
+      },
+      {
+       "say": "Git integrates the feature branch’s changes into main — here, with a merge commit.",
+       "actors": {
+        "m": {
+         "k": "commit",
+         "text": "M",
+         "x": 68,
+         "y": 30,
+         "tone": "ok",
+         "sub": "merge commit"
+        },
+        "mn": {
+         "x": 68
+        }
+       },
+       "term": [
+        "$ git merge feature/google-login",
+        "Merge made by the 'ort' strategy."
+       ],
+       "edges": [
+        [
+         "c1",
+         "c2"
+        ],
+        [
+         "c2",
+         "c3"
+        ],
+        [
+         "c3",
+         "m"
+        ],
+        [
+         "c2",
+         "f1"
+        ],
+        [
+         "f1",
+         "f2"
+        ],
+        [
+         "f2",
+         "m",
+         "",
+         "ok"
+        ],
+        [
+         "hd",
+         "mn",
+         "",
+         "dash"
+        ]
+       ]
+      },
+      {
+       "say": "Depending on history and strategy, Git may instead just move the branch pointer forward.",
+       "actors": {
+        "ff": {
+         "k": "box",
+         "text": "Fast-forward",
+         "x": 86,
+         "y": 72,
+         "w": 22,
+         "tone": "soft",
+         "sub": "no new commit · pointer moves"
+        }
+       },
+       "edges": [
+        [
+         "c1",
+         "c2"
+        ],
+        [
+         "c2",
+         "c3"
+        ],
+        [
+         "c3",
+         "m"
+        ],
+        [
+         "c2",
+         "f1"
+        ],
+        [
+         "f1",
+         "f2"
+        ],
+        [
+         "f2",
+         "m",
+         "",
+         "ok"
+        ],
+        [
+         "hd",
+         "mn",
+         "",
+         "dash"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "04.5",
+     "title": "Understand Merge Conflicts",
+     "steps": [
+      {
+       "say": "Two developers edit the same lines in a backend authentication file.",
+       "actors": {
+        "k1": {
+         "k": "code",
+         "lines": [
+          "return res.status(401).json({ message: \"Invalid credentials\" });"
+         ],
+         "x": 25,
+         "y": 38,
+         "w": 46,
+         "title": "main · server/routes/auth.js"
+        },
+        "k2": {
+         "k": "code",
+         "lines": [
+          "return res.status(400).json({ message: \"Check your login details\" });"
+         ],
+         "x": 75,
+         "y": 38,
+         "w": 46,
+         "title": "feature/login-validation · auth.js"
+        },
+        "p1": {
+         "k": "pill",
+         "text": "Dev A changes the error response",
+         "x": 25,
+         "y": 62,
+         "tone": "soft"
+        },
+        "p2": {
+         "k": "pill",
+         "text": "Dev B changes the validation logic",
+         "x": 75,
+         "y": 62,
+         "tone": "soft"
+        }
+       }
+      },
+      {
+       "say": "Git cannot tell which version should win, so the merge stops.",
+       "actors": {
+        "bad": {
+         "k": "box",
+         "text": "CONFLICT",
+         "x": 50,
+         "y": 88,
+         "w": 20,
+         "tone": "bad",
+         "ic": "⚡"
+        }
+       },
+       "term": [
+        "$ git merge feature/login-validation",
+        "Auto-merging server/routes/auth.js",
+        "!CONFLICT (content): Merge conflict in server/routes/auth.js",
+        "!Automatic merge failed; fix conflicts and commit the result."
+       ],
+       "edges": [
+        [
+         "k1",
+         "bad",
+         "",
+         "warn"
+        ],
+        [
+         "k2",
+         "bad",
+         "",
+         "warn"
+        ]
+       ]
+      },
+      {
+       "say": "Git writes both versions into the file between conflict markers.",
+       "actors": {
+        "k1": null,
+        "k2": null,
+        "p1": null,
+        "p2": null,
+        "bad": null,
+        "k3": {
+         "k": "code",
+         "lines": [
+          [
+           "<<<<<<< HEAD",
+           "mark"
+          ],
+          [
+           "return res.status(401).json({ message: \"Invalid credentials\" });",
+           "cur"
+          ],
+          [
+           "=======",
+           "mark"
+          ],
+          [
+           "return res.status(400).json({ message: \"Check your login details\" });",
+           "inc"
+          ],
+          [
+           ">>>>>>> feature/login-validation",
+           "mark"
+          ]
+         ],
+         "x": 50,
+         "y": 38,
+         "w": 74,
+         "title": "server/routes/auth.js"
+        },
+        "a": {
+         "k": "pill",
+         "text": "above =======  → current branch’s version",
+         "x": 28,
+         "y": 70,
+         "tone": "soft"
+        },
+        "b": {
+         "k": "pill",
+         "text": "below =======  → incoming changes",
+         "x": 72,
+         "y": 70,
+         "tone": "soft"
+        }
+       }
+      },
+      {
+       "say": "The exact labels can vary depending on the operation.",
+       "actors": {
+        "c": {
+         "k": "pill",
+         "text": "Labels can vary by operation",
+         "x": 50,
+         "y": 88,
+         "tone": "warn"
+        }
+       }
+      }
+     ]
+    },
+    {
+     "id": "04.6",
+     "title": "Resolve a Conflict",
+     "steps": [
+      {
+       "say": "Open the conflicted file and inspect both versions.",
+       "actors": {
+        "k": {
+         "k": "code",
+         "lines": [
+          [
+           "<<<<<<< HEAD",
+           "mark"
+          ],
+          [
+           "return res.status(401).json({ message: \"Invalid credentials\" });",
+           "cur"
+          ],
+          [
+           "=======",
+           "mark"
+          ],
+          [
+           "return res.status(400).json({ message: \"Check your login details\" });",
+           "inc"
+          ],
+          [
+           ">>>>>>> feature/login-validation",
+           "mark"
+          ]
+         ],
+         "x": 38,
+         "y": 42,
+         "w": 72,
+         "title": "server/routes/auth.js · conflicted"
+        }
+       }
+      },
+      {
+       "say": "Decide the intended behavior: keep one version, combine both, or write something new.",
+       "actors": {
+        "o1": {
+         "k": "box",
+         "text": "Keep one version",
+         "x": 86,
+         "y": 26,
+         "w": 22
+        },
+        "o2": {
+         "k": "box",
+         "text": "Combine both",
+         "x": 86,
+         "y": 50,
+         "w": 22
+        },
+        "o3": {
+         "k": "box",
+         "text": "Write new logic",
+         "x": 86,
+         "y": 74,
+         "w": 22
+        },
+        "k": {
+         "x": 34,
+         "w": 64
+        }
+       }
+      },
+      {
+       "say": "Edit the code so the final logic is correct, and remove every conflict marker.",
+       "actors": {
+        "k": {
+         "title": "server/routes/auth.js · resolved",
+         "lines": [
+          [
+           "return res.status(401).json({",
+           "add"
+          ],
+          [
+           "  message: \"Invalid credentials. Check your login details\"",
+           "add"
+          ],
+          [
+           "});",
+           "add"
+          ]
+         ]
+        },
+        "o2": {
+         "tone": "brand",
+         "glow": true
+        }
+       }
+      },
+      {
+       "say": "Stage the resolved file, then complete the merge.",
+       "actors": {
+        "o1": null,
+        "o2": null,
+        "o3": null,
+        "done": {
+         "k": "commit",
+         "text": "M",
+         "x": 86,
+         "y": 40,
+         "tone": "ok",
+         "sub": "merge commit"
+        },
+        "ok": {
+         "k": "pill",
+         "text": "Conflict resolved",
+         "x": 86,
+         "y": 66,
+         "tone": "ok",
+         "ic": "✓"
+        }
+       },
+       "term": [
+        "$ git add server/routes/auth.js",
+        "$ git commit",
+        "[main c9d0e1f] Merge branch 'feature/login-validation'"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "05",
+   "title": "Git History & Undoing Mistakes",
+   "subtopics": [
+    {
+     "id": "05.1",
+     "title": "Inspect Your Commit History",
+     "steps": [
+      {
+       "say": "A feature worked yesterday but no longer behaves as expected.",
+       "actors": {
+        "c1": {
+         "k": "commit",
+         "text": "7a6b5c4",
+         "x": 12,
+         "y": 24,
+         "tone": "soft",
+         "sub": "Add login form"
+        },
+        "c2": {
+         "k": "commit",
+         "text": "2d1e0f9",
+         "x": 31,
+         "y": 24,
+         "tone": "soft",
+         "sub": "Style navbar"
+        },
+        "c3": {
+         "k": "commit",
+         "text": "5c4b3a2",
+         "x": 50,
+         "y": 24,
+         "tone": "soft",
+         "sub": "Refactor dashboard"
+        },
+        "c4": {
+         "k": "commit",
+         "text": "9f8e7d6",
+         "x": 69,
+         "y": 24,
+         "tone": "soft",
+         "sub": "Fix typo"
+        },
+        "c5": {
+         "k": "commit",
+         "text": "a1b2c3d",
+         "x": 88,
+         "y": 24,
+         "tone": "soft",
+         "sub": "Add task filters"
+        },
+        "ok": {
+         "k": "pill",
+         "text": "worked yesterday",
+         "x": 20,
+         "y": 52,
+         "tone": "ok"
+        },
+        "bad": {
+         "k": "pill",
+         "text": "broken now",
+         "x": 80,
+         "y": 52,
+         "tone": "bad"
+        }
+       },
+       "edges": [
+        [
+         "c1",
+         "c2"
+        ],
+        [
+         "c2",
+         "c3"
+        ],
+        [
+         "c3",
+         "c4"
+        ],
+        [
+         "c4",
+         "c5"
+        ]
+       ]
+      },
+      {
+       "say": "Before rewriting code, inspect the history. Each entry has an identifier and a message.",
+       "actors": {
+        "log": {
+         "k": "code",
+         "lines": [
+          "commit a1b2c3d (HEAD -> main)",
+          "Author: Your Name <you@example.com>",
+          "Date:   Thu Oct 29 22:10",
+          "",
+          "    Add task filters"
+         ],
+         "x": 50,
+         "y": 76,
+         "w": 52,
+         "title": "git log"
+        }
+       },
+       "term": [
+        "$ git log"
+       ],
+       "edges": [
+        [
+         "c1",
+         "c2"
+        ],
+        [
+         "c2",
+         "c3"
+        ],
+        [
+         "c3",
+         "c4"
+        ],
+        [
+         "c4",
+         "c5"
+        ]
+       ]
+      },
+      {
+       "say": "A shorter, one-line view makes the history easy to scan.",
+       "actors": {
+        "log": {
+         "title": "git log --oneline",
+         "lines": [
+          "a1b2c3d Add task filters",
+          "9f8e7d6 Fix typo",
+          [
+           "5c4b3a2 Refactor dashboard",
+           "hl"
+          ],
+          "2d1e0f9 Style navbar",
+          "7a6b5c4 Add login form"
+         ]
+        },
+        "c3": {
+         "tone": "warn",
+         "glow": true
+        }
+       },
+       "term": [
+        "$ git log --oneline"
+       ],
+       "edges": [
+        [
+         "c1",
+         "c2"
+        ],
+        [
+         "c2",
+         "c3"
+        ],
+        [
+         "c3",
+         "c4"
+        ],
+        [
+         "c4",
+         "c5"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "05.2",
+     "title": "Inspect a Specific Commit",
+     "steps": [
+      {
+       "say": "Pick a commit identifier from your history.",
+       "actors": {
+        "c1": {
+         "k": "commit",
+         "text": "7a6b5c4",
+         "x": 12,
+         "y": 24,
+         "tone": "soft",
+         "sub": "Add login form"
+        },
+        "c2": {
+         "k": "commit",
+         "text": "2d1e0f9",
+         "x": 31,
+         "y": 24,
+         "tone": "soft",
+         "sub": "Style navbar"
+        },
+        "c3": {
+         "k": "commit",
+         "text": "5c4b3a2",
+         "x": 50,
+         "y": 24,
+         "tone": "brand",
+         "sub": "Refactor dashboard",
+         "glow": true
+        },
+        "c4": {
+         "k": "commit",
+         "text": "9f8e7d6",
+         "x": 69,
+         "y": 24,
+         "tone": "soft",
+         "sub": "Fix typo"
+        },
+        "c5": {
+         "k": "commit",
+         "text": "a1b2c3d",
+         "x": 88,
+         "y": 24,
+         "tone": "soft",
+         "sub": "Add task filters"
+        },
+        "id": {
+         "k": "pill",
+         "text": "COMMIT_HASH → 5c4b3a2",
+         "x": 50,
+         "y": 50,
+         "tone": "warn"
+        }
+       },
+       "edges": [
+        [
+         "c1",
+         "c2"
+        ],
+        [
+         "c2",
+         "c3"
+        ],
+        [
+         "c3",
+         "c4"
+        ],
+        [
+         "c4",
+         "c5"
+        ]
+       ]
+      },
+      {
+       "say": "git show displays the commit’s metadata…",
+       "actors": {
+        "meta": {
+         "k": "code",
+         "lines": [
+          [
+           "commit 5c4b3a2",
+           "mark"
+          ],
+          "Author: Your Name <you@example.com>",
+          "Date:   Wed Oct 28 18:02",
+          "",
+          "    Refactor dashboard"
+         ],
+         "x": 27,
+         "y": 76,
+         "w": 50,
+         "title": "git show 5c4b3a2"
+        }
+       },
+       "term": [
+        "$ git show 5c4b3a2"
+       ],
+       "edges": [
+        [
+         "c1",
+         "c2"
+        ],
+        [
+         "c2",
+         "c3"
+        ],
+        [
+         "c3",
+         "c4"
+        ],
+        [
+         "c4",
+         "c5"
+        ]
+       ]
+      },
+      {
+       "say": "…and the changes it introduced. (git diff, by contrast, shows unstaged changes.)",
+       "actors": {
+        "diff": {
+         "k": "code",
+         "lines": [
+          "src/Dashboard.jsx",
+          [
+           "-  const tasks = props.tasks;",
+           "del"
+          ],
+          [
+           "+  const tasks = props.tasks ?? [];",
+           "add"
+          ],
+          [
+           "+  if (!tasks.length) return <Empty />;",
+           "add"
+          ]
+         ],
+         "x": 77,
+         "y": 76,
+         "w": 44,
+         "title": "changes in this commit"
+        }
+       },
+       "edges": [
+        [
+         "c1",
+         "c2"
+        ],
+        [
+         "c2",
+         "c3"
+        ],
+        [
+         "c3",
+         "c4"
+        ],
+        [
+         "c4",
+         "c5"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "05.3",
+     "title": "Discard Unstaged Changes",
+     "steps": [
+      {
+       "say": "You edited src/App.jsx, but the edits are not working out.",
+       "actors": {
+        "zw": {
+         "k": "zone",
+         "text": "Working directory",
+         "x": 25,
+         "y": 50,
+         "w": 44,
+         "h": 88
+        },
+        "zr": {
+         "k": "zone",
+         "text": "Last commit",
+         "x": 75,
+         "y": 50,
+         "w": 44,
+         "h": 88,
+         "tone": "brand"
+        },
+        "wf": {
+         "k": "file",
+         "text": "src/App.jsx",
+         "x": 25,
+         "y": 30,
+         "tone": "warn",
+         "sub": "modified",
+         "w": 13
+        },
+        "rf": {
+         "k": "file",
+         "text": "src/App.jsx",
+         "x": 75,
+         "y": 30,
+         "tone": "plain",
+         "sub": "committed version",
+         "w": 13
+        },
+        "ed": {
+         "k": "code",
+         "lines": [
+          [
+           "-  <h1>Tasks</h1>",
+           "del"
+          ],
+          [
+           "+  <h1>My Tasks (WIP)</h1>",
+           "add"
+          ],
+          [
+           "+  console.log(debug);",
+           "add"
+          ]
+         ],
+         "x": 25,
+         "y": 70,
+         "w": 38,
+         "title": "unsaved edits"
+        }
+       }
+      },
+      {
+       "say": "Be careful: unstaged work that is not saved elsewhere may be impossible to recover.",
+       "actors": {
+        "w": {
+         "k": "pill",
+         "text": "This cannot be undone easily",
+         "x": 50,
+         "y": 92,
+         "tone": "bad",
+         "ic": "!"
+        }
+       }
+      },
+      {
+       "say": "git restore discards the unstaged changes to that file.",
+       "actors": {
+        "w": null,
+        "wf": {
+         "tone": "ok",
+         "sub": "matches last commit",
+         "ic": "✓"
+        },
+        "ed": {
+         "title": "unsaved edits",
+         "lines": [
+          [
+           "(edits discarded)",
+           "dim"
+          ]
+         ]
+        }
+       },
+       "term": [
+        "$ git restore src/App.jsx"
+       ],
+       "edges": [
+        [
+         "rf",
+         "wf",
+         "restored from",
+         "ok"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "05.4",
+     "title": "Unstage a File",
+     "steps": [
+      {
+       "say": "You staged a local config file alongside your intended code.",
+       "actors": {
+        "zw": {
+         "k": "zone",
+         "text": "Working directory",
+         "x": 22,
+         "y": 50,
+         "w": 38,
+         "h": 88
+        },
+        "zs": {
+         "k": "zone",
+         "text": "Staging area",
+         "x": 74,
+         "y": 50,
+         "w": 40,
+         "h": 88
+        },
+        "a": {
+         "k": "file",
+         "text": "src/App.jsx",
+         "x": 74,
+         "y": 30,
+         "tone": "ok",
+         "sub": "staged"
+        },
+        "e": {
+         "k": "file",
+         "text": ".env",
+         "x": 74,
+         "y": 66,
+         "tone": "bad",
+         "sub": "by mistake"
+        }
+       }
+      },
+      {
+       "say": "git restore --staged removes it from the staging area.",
+       "actors": {
+        "e": {
+         "x": 22,
+         "tone": "soft",
+         "sub": "back in working dir"
+        }
+       },
+       "term": [
+        "$ git restore --staged .env"
+       ]
+      },
+      {
+       "say": "The file is not deleted, and its contents are not discarded.",
+       "actors": {
+        "ok": {
+         "k": "pill",
+         "text": "contents intact",
+         "x": 22,
+         "y": 88,
+         "tone": "ok",
+         "ic": "✓"
+        }
+       }
+      }
+     ]
+    },
+    {
+     "id": "05.5",
+     "title": "Correct Your Most Recent Commit",
+     "steps": [
+      {
+       "say": "You committed, then realized a related file is missing.",
+       "actors": {
+        "c1": {
+         "k": "commit",
+         "text": "C1",
+         "x": 12,
+         "y": 38,
+         "tone": "soft"
+        },
+        "c2": {
+         "k": "commit",
+         "text": "C2",
+         "x": 28,
+         "y": 38,
+         "tone": "soft"
+        },
+        "c3": {
+         "k": "commit",
+         "text": "c3a91f0",
+         "x": 44,
+         "y": 38,
+         "tone": "brand",
+         "sub": "Add login form"
+        },
+        "loc": {
+         "k": "pill",
+         "text": "local only · not pushed",
+         "x": 44,
+         "y": 16,
+         "tone": "ok"
+        },
+        "r": {
+         "k": "file",
+         "text": "README.md",
+         "x": 78,
+         "y": 72,
+         "tone": "warn",
+         "sub": "forgotten"
+        }
+       },
+       "edges": [
+        [
+         "c1",
+         "c2"
+        ],
+        [
+         "c2",
+         "c3"
+        ]
+       ]
+      },
+      {
+       "say": "Stage the forgotten file.",
+       "actors": {
+        "r": {
+         "x": 62,
+         "tone": "ok",
+         "sub": "staged"
+        }
+       },
+       "term": [
+        "$ git add README.md"
+       ]
+      },
+      {
+       "say": "Amend replaces the previous commit with a new one that holds the updated snapshot.",
+       "actors": {
+        "r": null,
+        "c3": {
+         "tone": "dim",
+         "sub": "replaced"
+        },
+        "n": {
+         "k": "commit",
+         "text": "c9d8e7f",
+         "x": 44,
+         "y": 74,
+         "tone": "ok",
+         "sub": "Add login + README"
+        }
+       },
+       "term": [
+        "$ git commit --amend --no-edit"
+       ],
+       "edges": [
+        [
+         "c1",
+         "c2"
+        ],
+        [
+         "c2",
+         "c3",
+         "",
+         "dash"
+        ],
+        [
+         "c2",
+         "n",
+         "",
+         "ok"
+        ]
+       ]
+      },
+      {
+       "say": "Only amend commits you have not shared — amending rewrites history.",
+       "actors": {
+        "w": {
+         "k": "pill",
+         "text": "Already pushed? Use git revert instead",
+         "x": 80,
+         "y": 52,
+         "tone": "warn"
+        }
+       },
+       "edges": [
+        [
+         "c1",
+         "c2"
+        ],
+        [
+         "c2",
+         "c3",
+         "",
+         "dash"
+        ],
+        [
+         "c2",
+         "n",
+         "",
+         "ok"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "05.6",
+     "title": "Revert a Shared Commit",
+     "steps": [
+      {
+       "say": "An incorrect commit has already been pushed to a shared branch.",
+       "actors": {
+        "c1": {
+         "k": "commit",
+         "text": "C1",
+         "x": 12,
+         "y": 36,
+         "tone": "soft"
+        },
+        "c2": {
+         "k": "commit",
+         "text": "C2",
+         "x": 30,
+         "y": 36,
+         "tone": "soft"
+        },
+        "c3": {
+         "k": "commit",
+         "text": "3f2a1b0",
+         "x": 48,
+         "y": 36,
+         "tone": "bad",
+         "sub": "bad change"
+        },
+        "sh": {
+         "k": "pill",
+         "text": "already pushed · shared",
+         "x": 48,
+         "y": 14,
+         "tone": "warn"
+        }
+       },
+       "edges": [
+        [
+         "c1",
+         "c2"
+        ],
+        [
+         "c2",
+         "c3"
+        ]
+       ]
+      },
+      {
+       "say": "Rewriting shared history would disrupt teammates, so add a new commit instead.",
+       "actors": {
+        "rv": {
+         "k": "commit",
+         "text": "R",
+         "x": 68,
+         "y": 36,
+         "tone": "ok",
+         "sub": "Revert “bad change”"
+        },
+        "un": {
+         "k": "box",
+         "text": "Reverses the bad commit’s changes",
+         "x": 68,
+         "y": 72,
+         "w": 34,
+         "tone": "soft"
+        }
+       },
+       "term": [
+        "$ git revert 3f2a1b0"
+       ],
+       "edges": [
+        [
+         "c1",
+         "c2"
+        ],
+        [
+         "c2",
+         "c3"
+        ],
+        [
+         "c3",
+         "rv",
+         "undone by",
+         "ok"
+        ],
+        [
+         "rv",
+         "un",
+         "",
+         "dash"
+        ]
+       ]
+      },
+      {
+       "say": "History stays intact: both the bad commit and its reversal are visible.",
+       "actors": {
+        "keep": {
+         "k": "pill",
+         "text": "Safe for shared branches",
+         "x": 84,
+         "y": 36,
+         "tone": "ok",
+         "ic": "✓"
+        }
+       },
+       "edges": [
+        [
+         "c1",
+         "c2"
+        ],
+        [
+         "c2",
+         "c3"
+        ],
+        [
+         "c3",
+         "rv",
+         "undone by",
+         "ok"
+        ],
+        [
+         "rv",
+         "un",
+         "",
+         "dash"
+        ]
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "06",
+   "title": "Team Collaboration & Repository Management",
+   "subtopics": [
+    {
+     "id": "06.1",
+     "title": "Understand the Team Workflow",
+     "steps": [
+      {
+       "say": "Three developers, three tasks: password reset, a dashboard, a backend bug.",
+       "actors": {
+        "a": {
+         "k": "box",
+         "text": "Dev A",
+         "x": 14,
+         "y": 20,
+         "w": 15,
+         "sub": "password reset"
+        },
+        "b": {
+         "k": "box",
+         "text": "Dev B",
+         "x": 14,
+         "y": 50,
+         "w": 15,
+         "sub": "dashboard"
+        },
+        "c": {
+         "k": "box",
+         "text": "Dev C",
+         "x": 14,
+         "y": 80,
+         "w": 15,
+         "sub": "backend bug"
+        }
+       }
+      },
+      {
+       "say": "Each developer works independently on a feature branch.",
+       "actors": {
+        "ba": {
+         "k": "pill",
+         "text": "feature/password-reset",
+         "x": 42,
+         "y": 20,
+         "tone": "brand"
+        },
+        "bb": {
+         "k": "pill",
+         "text": "feature/dashboard",
+         "x": 42,
+         "y": 50,
+         "tone": "brand"
+        },
+        "bc": {
+         "k": "pill",
+         "text": "fix/backend-bug",
+         "x": 42,
+         "y": 80,
+         "tone": "brand"
+        }
+       },
+       "edges": [
+        [
+         "a",
+         "ba"
+        ],
+        [
+         "b",
+         "bb"
+        ],
+        [
+         "c",
+         "bc"
+        ]
+       ]
+      },
+      {
+       "say": "When a change is ready, publish the branch and open a pull request for review.",
+       "actors": {
+        "pa": {
+         "k": "box",
+         "text": "Pull request",
+         "x": 68,
+         "y": 20,
+         "w": 14
+        },
+        "pb": {
+         "k": "box",
+         "text": "Pull request",
+         "x": 68,
+         "y": 50,
+         "w": 14
+        },
+        "pc": {
+         "k": "box",
+         "text": "Pull request",
+         "x": 68,
+         "y": 80,
+         "w": 14
+        }
+       },
+       "edges": [
+        [
+         "a",
+         "ba"
+        ],
+        [
+         "b",
+         "bb"
+        ],
+        [
+         "c",
+         "bc"
+        ],
+        [
+         "ba",
+         "pa",
+         "push"
+        ],
+        [
+         "bb",
+         "pb",
+         "push"
+        ],
+        [
+         "bc",
+         "pc",
+         "push"
+        ]
+       ]
+      },
+      {
+       "say": "After review and approval, each change merges into main.",
+       "actors": {
+        "pa": {
+         "tone": "ok",
+         "sub": "approved",
+         "ic": "✓"
+        },
+        "pb": {
+         "tone": "ok",
+         "sub": "approved",
+         "ic": "✓"
+        },
+        "pc": {
+         "tone": "ok",
+         "sub": "approved",
+         "ic": "✓"
+        },
+        "mn": {
+         "k": "box",
+         "text": "main",
+         "x": 91,
+         "y": 50,
+         "w": 12,
+         "tone": "brand",
+         "sub": "shared"
+        }
+       },
+       "edges": [
+        [
+         "pa",
+         "mn",
+         "",
+         "ok"
+        ],
+        [
+         "pb",
+         "mn",
+         "",
+         "ok"
+        ],
+        [
+         "pc",
+         "mn",
+         "",
+         "ok"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "06.2",
+     "title": "Push a Feature Branch",
+     "steps": [
+      {
+       "say": "Start from an up-to-date main.",
+       "actors": {
+        "zl": {
+         "k": "zone",
+         "text": "Your computer",
+         "x": 22,
+         "y": 50,
+         "w": 40,
+         "h": 90
+        },
+        "zr": {
+         "k": "zone",
+         "text": "GitHub",
+         "x": 78,
+         "y": 50,
+         "w": 40,
+         "h": 90,
+         "tone": "brand"
+        },
+        "c1": {
+         "k": "commit",
+         "text": "C1",
+         "x": 8,
+         "y": 34,
+         "tone": "soft"
+        },
+        "c2": {
+         "k": "commit",
+         "text": "C2",
+         "x": 20,
+         "y": 34,
+         "tone": "soft"
+        },
+        "c3": {
+         "k": "commit",
+         "text": "C3",
+         "x": 32,
+         "y": 34,
+         "tone": "soft"
+        },
+        "r1": {
+         "k": "commit",
+         "text": "C1",
+         "x": 64,
+         "y": 34,
+         "tone": "soft"
+        },
+        "r2": {
+         "k": "commit",
+         "text": "C2",
+         "x": 76,
+         "y": 34,
+         "tone": "soft"
+        },
+        "r3": {
+         "k": "commit",
+         "text": "C3",
+         "x": 88,
+         "y": 34,
+         "tone": "soft"
+        }
+       },
+       "term": [
+        "$ git switch main",
+        "$ git pull"
+       ],
+       "edges": [
+        [
+         "c1",
+         "c2"
+        ],
+        [
+         "c2",
+         "c3"
+        ],
+        [
+         "r1",
+         "r2"
+        ],
+        [
+         "r2",
+         "r3"
+        ]
+       ]
+      },
+      {
+       "say": "Create a branch for the new feature and commit your work.",
+       "actors": {
+        "fb": {
+         "k": "pill",
+         "text": "feature/password-reset",
+         "x": 14,
+         "y": 76,
+         "tone": "brand"
+        },
+        "f1": {
+         "k": "commit",
+         "text": "F1",
+         "x": 36,
+         "y": 76,
+         "tone": "brand"
+        }
+       },
+       "term": [
+        "$ git switch -c feature/password-reset"
+       ],
+       "edges": [
+        [
+         "c1",
+         "c2"
+        ],
+        [
+         "c2",
+         "c3"
+        ],
+        [
+         "r1",
+         "r2"
+        ],
+        [
+         "r2",
+         "r3"
+        ],
+        [
+         "c3",
+         "f1"
+        ],
+        [
+         "fb",
+         "f1",
+         "",
+         "dash"
+        ]
+       ]
+      },
+      {
+       "say": "Publish the branch. It is now available for teammates to review.",
+       "actors": {
+        "ob": {
+         "k": "pill",
+         "text": "origin/feature/password-reset",
+         "x": 70,
+         "y": 76,
+         "tone": "brand"
+        },
+        "rf": {
+         "k": "commit",
+         "text": "F1",
+         "x": 92,
+         "y": 76,
+         "tone": "brand"
+        }
+       },
+       "term": [
+        "$ git push -u origin feature/password-reset"
+       ],
+       "edges": [
+        [
+         "c1",
+         "c2"
+        ],
+        [
+         "c2",
+         "c3"
+        ],
+        [
+         "r1",
+         "r2"
+        ],
+        [
+         "r2",
+         "r3"
+        ],
+        [
+         "c3",
+         "f1"
+        ],
+        [
+         "fb",
+         "f1",
+         "",
+         "dash"
+        ],
+        [
+         "r3",
+         "rf"
+        ],
+        [
+         "f1",
+         "rf",
+         "push",
+         "ok"
+        ],
+        [
+         "ob",
+         "rf",
+         "",
+         "dash"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "06.3",
+     "title": "Create a Pull Request",
+     "steps": [
+      {
+       "say": "Open the repository on GitHub and create a pull request from the feature branch into main.",
+       "actors": {
+        "pr": {
+         "k": "code",
+         "lines": [
+          "base: main   ←   compare: feature/password-reset"
+         ],
+         "x": 38,
+         "y": 46,
+         "w": 64,
+         "title": "GitHub · Open a pull request"
+        }
+       }
+      },
+      {
+       "say": "Give it a clear title.",
+       "actors": {
+        "pr": {
+         "lines": [
+          "base: main   ←   compare: feature/password-reset",
+          "",
+          "Title",
+          [
+           "Add password reset endpoint",
+           "hl"
+          ]
+         ]
+        }
+       }
+      },
+      {
+       "say": "A good description explains what changed, why, and how it was tested.",
+       "actors": {
+        "pr": {
+         "lines": [
+          "base: main   ←   compare: feature/password-reset",
+          [
+           "Add password reset endpoint",
+           "hl"
+          ],
+          "",
+          "What changed",
+          "  • New password reset endpoint",
+          "  • Expired reset tokens are rejected",
+          "Why",
+          "  • Users need a way to recover access",
+          "How it was tested",
+          "  • Automated tests cover success and failure cases"
+         ]
+        },
+        "t1": {
+         "k": "pill",
+         "text": "What changed",
+         "x": 88,
+         "y": 34,
+         "tone": "ok",
+         "ic": "✓"
+        },
+        "t2": {
+         "k": "pill",
+         "text": "Why",
+         "x": 88,
+         "y": 50,
+         "tone": "ok",
+         "ic": "✓"
+        },
+        "t3": {
+         "k": "pill",
+         "text": "How tested",
+         "x": 88,
+         "y": 66,
+         "tone": "ok",
+         "ic": "✓"
+        }
+       }
+      },
+      {
+       "say": "Teammates review the changes, discuss, and approve before merging.",
+       "actors": {
+        "rv": {
+         "k": "box",
+         "text": "Review: approved",
+         "x": 50,
+         "y": 90,
+         "w": 24,
+         "tone": "ok",
+         "ic": "✓"
+        }
+       }
+      }
+     ]
+    },
+    {
+     "id": "06.4",
+     "title": "Understand Forks",
+     "steps": [
+      {
+       "say": "You do not own the project, so you cannot create branches in the original repository.",
+       "actors": {
+        "orig": {
+         "k": "box",
+         "text": "Original repository",
+         "x": 50,
+         "y": 14,
+         "w": 24,
+         "tone": "brand",
+         "sub": "owner/task-manager"
+        },
+        "fk": {
+         "k": "box",
+         "text": "You",
+         "x": 20,
+         "y": 62,
+         "w": 16,
+         "sub": "no write access"
+        }
+       },
+       "edges": [
+        [
+         "fk",
+         "orig",
+         "cannot push",
+         "warn"
+        ]
+       ]
+      },
+      {
+       "say": "A fork creates a copy of the repository under your GitHub account.",
+       "actors": {
+        "fk": {
+         "text": "Your fork",
+         "tone": "brand",
+         "sub": "you/task-manager"
+        }
+       },
+       "edges": [
+        [
+         "orig",
+         "fk",
+         "fork",
+         "ok"
+        ]
+       ]
+      },
+      {
+       "say": "Clone your fork to your computer.",
+       "actors": {
+        "loc": {
+         "k": "box",
+         "text": "Local clone",
+         "x": 80,
+         "y": 62,
+         "w": 18,
+         "sub": "on your computer"
+        }
+       },
+       "term": [
+        "$ git clone https://github.com/YOU/task-manager.git"
+       ],
+       "edges": [
+        [
+         "orig",
+         "fk",
+         "fork",
+         "ok"
+        ],
+        [
+         "fk",
+         "loc",
+         "clone",
+         "ok"
+        ]
+       ]
+      },
+      {
+       "say": "Make changes on a branch and push them to your fork.",
+       "actors": {
+        "br": {
+         "k": "pill",
+         "text": "feature/fix-typo",
+         "x": 80,
+         "y": 86,
+         "tone": "brand"
+        }
+       },
+       "term": [
+        "$ git push -u origin feature/fix-typo"
+       ],
+       "edges": [
+        [
+         "orig",
+         "fk"
+        ],
+        [
+         "fk",
+         "loc"
+        ],
+        [
+         "loc",
+         "fk",
+         "push",
+         "ok"
+        ],
+        [
+         "br",
+         "loc",
+         "",
+         "dash"
+        ]
+       ]
+      },
+      {
+       "say": "Submit a pull request back to the original project.",
+       "actors": {
+        "orig": {
+         "sub": "maintainer reviews",
+         "glow": true
+        }
+       },
+       "edges": [
+        [
+         "orig",
+         "fk"
+        ],
+        [
+         "fk",
+         "loc"
+        ],
+        [
+         "loc",
+         "fk"
+        ],
+        [
+         "br",
+         "loc",
+         "",
+         "dash"
+        ],
+        [
+         "fk",
+         "orig",
+         "pull request",
+         "ok"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "06.5",
+     "title": "Manage Tasks with GitHub Issues",
+     "steps": [
+      {
+       "say": "A user reports that the dashboard crashes when there are no tasks.",
+       "actors": {
+        "st": {
+         "k": "pill",
+         "text": "Open",
+         "x": 90,
+         "y": 10,
+         "tone": "ok"
+        },
+        "is": {
+         "k": "code",
+         "lines": [
+          [
+           "Dashboard crashes when there are no tasks",
+           "hl"
+          ]
+         ],
+         "x": 38,
+         "y": 36,
+         "w": 62,
+         "title": "GitHub · Issue #7"
+        }
+       }
+      },
+      {
+       "say": "Describe the problem with reproduction steps and the expected behavior.",
+       "actors": {
+        "is": {
+         "lines": [
+          [
+           "Dashboard crashes when there are no tasks",
+           "hl"
+          ],
+          "",
+          "Steps to reproduce",
+          "  1. Sign in with a new account",
+          "  2. Open the dashboard (no tasks yet)",
+          "Expected: a friendly empty state",
+          [
+           "Actual:   the page crashes",
+           "del"
+          ]
+         ]
+        }
+       }
+      },
+      {
+       "say": "Labels and assignees keep bugs and requests organized.",
+       "actors": {
+        "l1": {
+         "k": "pill",
+         "text": "bug",
+         "x": 90,
+         "y": 30,
+         "tone": "bad"
+        },
+        "l2": {
+         "k": "pill",
+         "text": "dashboard",
+         "x": 90,
+         "y": 44,
+         "tone": "soft"
+        },
+        "l3": {
+         "k": "pill",
+         "text": "assigned: @you",
+         "x": 90,
+         "y": 58,
+         "tone": "brand"
+        }
+       }
+      },
+      {
+       "say": "When the fix ships, the issue is closed — and stays searchable for the team.",
+       "actors": {
+        "st": {
+         "text": "Closed",
+         "tone": "brand",
+         "ic": "✓"
+        },
+        "fx": {
+         "k": "box",
+         "text": "Fix merged",
+         "x": 50,
+         "y": 88,
+         "w": 20,
+         "tone": "ok",
+         "ic": "✓"
+        }
+       },
+       "edges": [
+        [
+         "fx",
+         "is",
+         "",
+         "ok"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "06.6",
+     "title": "Write a Useful README",
+     "steps": [
+      {
+       "say": "Start with what the application does.",
+       "actors": {
+        "r": {
+         "k": "code",
+         "lines": [
+          [
+           "# Task Manager",
+           "hl"
+          ],
+          "",
+          "A task management application with",
+          "a frontend and a backend API."
+         ],
+         "x": 27,
+         "y": 40,
+         "w": 48,
+         "title": "README.md"
+        },
+        "t1": {
+         "k": "pill",
+         "text": "What the app does",
+         "x": 80,
+         "y": 14,
+         "tone": "ok",
+         "ic": "✓"
+        }
+       }
+      },
+      {
+       "say": "Explain how to install and start the project.",
+       "actors": {
+        "r": {
+         "lines": [
+          [
+           "# Task Manager",
+           "hl"
+          ],
+          "",
+          "A task management application with",
+          "a frontend and a backend API.",
+          "",
+          [
+           "## Getting Started",
+           "hl"
+          ],
+          "",
+          "1. Clone the repository.",
+          "2. Install the frontend dependencies.",
+          "3. Install the backend dependencies.",
+          "4. Configure the required environment variables.",
+          "5. Start both services."
+         ],
+         "y": 48
+        },
+        "t2": {
+         "k": "pill",
+         "text": "How to install and start",
+         "x": 80,
+         "y": 28,
+         "tone": "ok",
+         "ic": "✓"
+        }
+       }
+      },
+      {
+       "say": "Point to the configuration that is required locally.",
+       "actors": {
+        "cf": {
+         "k": "code",
+         "lines": [
+          [
+           "## Configuration",
+           "hl"
+          ],
+          "",
+          "See the environment configuration",
+          "documentation for required",
+          "local settings."
+         ],
+         "x": 77,
+         "y": 66,
+         "w": 40,
+         "title": "README.md (continued)"
+        },
+        "t3": {
+         "k": "pill",
+         "text": "How to configure",
+         "x": 80,
+         "y": 42,
+         "tone": "ok",
+         "ic": "✓"
+        }
+       }
+      },
+      {
+       "say": "Adapt it to your real project. Wrong setup commands are worse than none.",
+       "actors": {
+        "w": {
+         "k": "pill",
+         "text": "Verify every command you document",
+         "x": 50,
+         "y": 92,
+         "tone": "warn"
+        }
+       }
+      }
+     ]
+    },
+    {
+     "id": "06.7",
+     "title": "Use .gitignore",
+     "steps": [
+      {
+       "say": "Projects contain files that should not be committed.",
+       "actors": {
+        "z": {
+         "k": "zone",
+         "text": "Project folder",
+         "x": 22,
+         "y": 50,
+         "w": 42,
+         "h": 90
+        },
+        "nm": {
+         "k": "file",
+         "text": "node_modules/",
+         "x": 12,
+         "y": 25,
+         "tone": "plain",
+         "w": 12,
+         "sub": "dependencies"
+        },
+        "di": {
+         "k": "file",
+         "text": "dist/",
+         "x": 32,
+         "y": 25,
+         "tone": "plain",
+         "w": 12,
+         "sub": "output"
+        },
+        "bu": {
+         "k": "file",
+         "text": "build/",
+         "x": 12,
+         "y": 45,
+         "tone": "plain",
+         "w": 12,
+         "sub": "output"
+        },
+        "lg": {
+         "k": "file",
+         "text": "server.log",
+         "x": 32,
+         "y": 45,
+         "tone": "plain",
+         "w": 12,
+         "sub": "logs"
+        },
+        "ev": {
+         "k": "file",
+         "text": ".env",
+         "x": 12,
+         "y": 65,
+         "tone": "plain",
+         "w": 12,
+         "sub": "local secrets"
+        },
+        "el": {
+         "k": "file",
+         "text": ".env.local",
+         "x": 32,
+         "y": 65,
+         "tone": "plain",
+         "w": 12,
+         "sub": "local settings"
+        },
+        "ex": {
+         "k": "file",
+         "text": ".env.example",
+         "x": 12,
+         "y": 85,
+         "tone": "plain",
+         "w": 12,
+         "sub": "template"
+        },
+        "sr": {
+         "k": "file",
+         "text": "src/",
+         "x": 32,
+         "y": 85,
+         "tone": "plain",
+         "w": 12,
+         "sub": "source code"
+        }
+       }
+      },
+      {
+       "say": "Add rules for dependencies, generated output and logs.",
+       "actors": {
+        "gi": {
+         "k": "code",
+         "lines": [
+          "node_modules/",
+          "dist/",
+          "build/",
+          "*.log"
+         ],
+         "x": 76,
+         "y": 36,
+         "w": 40,
+         "title": ".gitignore"
+        },
+        "nm": {
+         "tone": "dim",
+         "ic": "✕",
+         "sub": "ignored"
+        },
+        "di": {
+         "tone": "dim",
+         "ic": "✕",
+         "sub": "ignored"
+        },
+        "bu": {
+         "tone": "dim",
+         "ic": "✕",
+         "sub": "ignored"
+        },
+        "lg": {
+         "tone": "dim",
+         "ic": "✕",
+         "sub": "ignored"
+        }
+       }
+      },
+      {
+       "say": "Exclude local environment files.",
+       "actors": {
+        "gi": {
+         "lines": [
+          "node_modules/",
+          "dist/",
+          "build/",
+          "*.log",
+          [
+           ".env",
+           "hl"
+          ],
+          [
+           ".env.*",
+           "hl"
+          ]
+         ]
+        },
+        "ev": {
+         "tone": "dim",
+         "ic": "✕",
+         "sub": "ignored"
+        },
+        "el": {
+         "tone": "dim",
+         "ic": "✕",
+         "sub": "ignored"
+        },
+        "ex": {
+         "tone": "dim",
+         "ic": "✕",
+         "sub": "ignored by .env.*"
+        }
+       }
+      },
+      {
+       "say": "The ! rule keeps a deliberately prepared template tracked.",
+       "actors": {
+        "gi": {
+         "lines": [
+          "node_modules/",
+          "dist/",
+          "build/",
+          "*.log",
+          ".env",
+          ".env.*",
+          [
+           "!.env.example",
+           "add"
+          ]
+         ]
+        },
+        "ex": {
+         "tone": "ok",
+         "ic": "✓",
+         "sub": "tracked"
+        },
+        "sr": {
+         "tone": "ok",
+         "ic": "✓",
+         "sub": "tracked"
+        }
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "07",
+   "title": "Git in a Real DevOps Workflow",
+   "subtopics": [
+    {
+     "id": "07.1",
+     "title": "Connect Git to the DevOps Lifecycle",
+     "steps": [
+      {
+       "say": "Your work starts on your machine: develop, commit, push.",
+       "actors": {
+        "n0": {
+         "k": "box",
+         "text": "Develop",
+         "x": 8,
+         "y": 42,
+         "w": 12,
+         "sub": "your machine"
+        },
+        "n1": {
+         "k": "box",
+         "text": "Commit",
+         "x": 22,
+         "y": 42,
+         "w": 12,
+         "sub": "git commit"
+        },
+        "n2": {
+         "k": "box",
+         "text": "Push",
+         "x": 36,
+         "y": 42,
+         "w": 12,
+         "sub": "to GitHub",
+         "tone": "soft"
+        }
+       },
+       "edges": [
+        [
+         "n0",
+         "n1"
+        ],
+        [
+         "n1",
+         "n2"
+        ]
+       ]
+      },
+      {
+       "say": "GitHub hosts the repository and coordinates review.",
+       "actors": {
+        "n3": {
+         "k": "box",
+         "text": "Review",
+         "x": 50,
+         "y": 42,
+         "w": 12,
+         "sub": "pull request",
+         "tone": "soft"
+        },
+        "gh": {
+         "k": "pill",
+         "text": "GitHub hosts the repo · coordinates collaboration",
+         "x": 36,
+         "y": 76,
+         "tone": "brand"
+        }
+       },
+       "edges": [
+        [
+         "n0",
+         "n1"
+        ],
+        [
+         "n1",
+         "n2"
+        ],
+        [
+         "n2",
+         "n3"
+        ],
+        [
+         "gh",
+         "n2",
+         "",
+         "dash"
+        ]
+       ]
+      },
+      {
+       "say": "Then automation takes over: test, build and deploy — without repeating every step by hand.",
+       "actors": {
+        "n4": {
+         "k": "box",
+         "text": "Test",
+         "x": 64,
+         "y": 42,
+         "w": 12,
+         "sub": "automated",
+         "tone": "brand"
+        },
+        "n5": {
+         "k": "box",
+         "text": "Build",
+         "x": 78,
+         "y": 42,
+         "w": 12,
+         "sub": "automated",
+         "tone": "brand"
+        },
+        "n6": {
+         "k": "box",
+         "text": "Deploy",
+         "x": 92,
+         "y": 42,
+         "w": 12,
+         "sub": "release",
+         "tone": "brand"
+        },
+        "ci": {
+         "k": "pill",
+         "text": "Automated checks and delivery",
+         "x": 78,
+         "y": 76,
+         "tone": "brand"
+        }
+       },
+       "edges": [
+        [
+         "n0",
+         "n1"
+        ],
+        [
+         "n1",
+         "n2"
+        ],
+        [
+         "n2",
+         "n3"
+        ],
+        [
+         "n3",
+         "n4"
+        ],
+        [
+         "n4",
+         "n5"
+        ],
+        [
+         "n5",
+         "n6"
+        ],
+        [
+         "gh",
+         "n2",
+         "",
+         "dash"
+        ]
+       ]
+      },
+      {
+       "say": "Every change travels the same reliable path.",
+       "actors": {
+        "rp": {
+         "k": "pill",
+         "text": "Repeat for the next change ↻",
+         "x": 50,
+         "y": 14,
+         "tone": "ok"
+        }
+       },
+       "edges": [
+        [
+         "n0",
+         "n1"
+        ],
+        [
+         "n1",
+         "n2"
+        ],
+        [
+         "n2",
+         "n3"
+        ],
+        [
+         "n3",
+         "n4"
+        ],
+        [
+         "n4",
+         "n5"
+        ],
+        [
+         "n5",
+         "n6"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "07.2",
+     "title": "Develop and Commit Changes",
+     "steps": [
+      {
+       "say": "Make your change, then review what Git sees.",
+       "actors": {
+        "zs": {
+         "k": "zone",
+         "text": "Changed files",
+         "x": 24,
+         "y": 50,
+         "w": 44,
+         "h": 90
+        },
+        "a": {
+         "k": "file",
+         "text": "TaskFilter.jsx",
+         "x": 14,
+         "y": 32,
+         "tone": "ok",
+         "w": 11,
+         "sub": "new feature"
+        },
+        "b": {
+         "k": "file",
+         "text": "TaskFilter.test.js",
+         "x": 34,
+         "y": 32,
+         "tone": "ok",
+         "w": 11,
+         "sub": "tests"
+        },
+        "c": {
+         "k": "file",
+         "text": ".env",
+         "x": 14,
+         "y": 70,
+         "tone": "warn",
+         "w": 11,
+         "sub": "secrets"
+        },
+        "d": {
+         "k": "file",
+         "text": "dist/",
+         "x": 34,
+         "y": 70,
+         "tone": "warn",
+         "w": 11,
+         "sub": "generated"
+        }
+       },
+       "term": [
+        "$ git status",
+        "$ git diff"
+       ]
+      },
+      {
+       "say": "Leave out unrelated changes, generated files and sensitive configuration.",
+       "actors": {
+        "c": {
+         "tone": "bad",
+         "ic": "✕",
+         "sub": "keep out"
+        },
+        "d": {
+         "tone": "bad",
+         "ic": "✕",
+         "sub": "keep out"
+        }
+       }
+      },
+      {
+       "say": "Commit the relevant files. This records the change in the repository’s history.",
+       "actors": {
+        "a": {
+         "x": 60,
+         "y": 64
+        },
+        "b": {
+         "x": 74,
+         "y": 64
+        },
+        "br": {
+         "k": "pill",
+         "text": "feature/task-filtering",
+         "x": 80,
+         "y": 18,
+         "tone": "brand"
+        },
+        "cm": {
+         "k": "commit",
+         "text": "e4f5a6b",
+         "x": 80,
+         "y": 40,
+         "tone": "brand",
+         "sub": "Add task filtering"
+        }
+       },
+       "term": [
+        "$ git add src/TaskFilter.jsx src/TaskFilter.test.js",
+        "$ git commit -m \"Add task filtering\""
+       ],
+       "edges": [
+        [
+         "br",
+         "cm",
+         "",
+         "dash"
+        ],
+        [
+         "a",
+         "cm",
+         "",
+         "ok"
+        ],
+        [
+         "b",
+         "cm",
+         "",
+         "ok"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "07.3",
+     "title": "Push Changes to GitHub",
+     "steps": [
+      {
+       "say": "Your commit exists only on your computer.",
+       "actors": {
+        "zl": {
+         "k": "zone",
+         "text": "Your computer",
+         "x": 22,
+         "y": 50,
+         "w": 40,
+         "h": 90
+        },
+        "zr": {
+         "k": "zone",
+         "text": "GitHub",
+         "x": 78,
+         "y": 50,
+         "w": 40,
+         "h": 90,
+         "tone": "brand"
+        },
+        "cm": {
+         "k": "commit",
+         "text": "e4f5a6b",
+         "x": 22,
+         "y": 40,
+         "tone": "brand",
+         "sub": "Add task filtering"
+        },
+        "br": {
+         "k": "pill",
+         "text": "feature/task-filtering",
+         "x": 22,
+         "y": 16,
+         "tone": "brand"
+        }
+       }
+      },
+      {
+       "say": "Push the branch and set its upstream.",
+       "actors": {
+        "rc": {
+         "k": "commit",
+         "text": "e4f5a6b",
+         "x": 78,
+         "y": 40,
+         "tone": "brand",
+         "sub": "Add task filtering"
+        },
+        "rb": {
+         "k": "pill",
+         "text": "origin/feature/task-filtering",
+         "x": 78,
+         "y": 16,
+         "tone": "brand"
+        }
+       },
+       "term": [
+        "$ git push -u origin feature/task-filtering",
+        "+branch 'feature/task-filtering' set up to track 'origin/feature/task-filtering'."
+       ],
+       "edges": [
+        [
+         "cm",
+         "rc",
+         "push",
+         "ok"
+        ]
+       ]
+      },
+      {
+       "say": "Your teammates can now access the branch. Open a pull request to propose the change.",
+       "actors": {
+        "pr": {
+         "k": "box",
+         "text": "Pull request",
+         "x": 78,
+         "y": 70,
+         "w": 24,
+         "tone": "soft",
+         "sub": "merge into main?"
+        }
+       },
+       "edges": [
+        [
+         "cm",
+         "rc",
+         "push",
+         "ok"
+        ],
+        [
+         "rc",
+         "pr",
+         "open",
+         "ok"
+        ]
+       ]
+      },
+      {
+       "say": "The team inspects the changes, discusses the implementation, and checks that required checks passed.",
+       "actors": {
+        "pr": {
+         "tone": "ok",
+         "ic": "✓",
+         "sub": "reviewed · checks passed"
+        }
+       },
+       "edges": [
+        [
+         "cm",
+         "rc",
+         "push",
+         "ok"
+        ],
+        [
+         "rc",
+         "pr",
+         "open",
+         "ok"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "07.4",
+     "title": "Understand Continuous Integration",
+     "steps": [
+      {
+       "say": "A GitHub Actions workflow can run when a pull request is opened.",
+       "actors": {
+        "pr": {
+         "k": "box",
+         "text": "Pull request",
+         "x": 11,
+         "y": 50,
+         "w": 15,
+         "tone": "brand",
+         "sub": "opened"
+        },
+        "zw": {
+         "k": "zone",
+         "text": "CI workflow",
+         "x": 58,
+         "y": 50,
+         "w": 80,
+         "h": 74
+        },
+        "s1": {
+         "k": "box",
+         "text": "Install dependencies",
+         "x": 30,
+         "y": 50,
+         "w": 15,
+         "sub": "waiting"
+        },
+        "s2": {
+         "k": "box",
+         "text": "Run automated tests",
+         "x": 46,
+         "y": 50,
+         "w": 15,
+         "sub": "waiting"
+        },
+        "s3": {
+         "k": "box",
+         "text": "Build frontend",
+         "x": 62,
+         "y": 50,
+         "w": 15,
+         "sub": "waiting"
+        },
+        "s4": {
+         "k": "box",
+         "text": "Build backend",
+         "x": 78,
+         "y": 50,
+         "w": 15,
+         "sub": "waiting"
+        }
+       },
+       "edges": [
+        [
+         "pr",
+         "s1",
+         "triggers",
+         "ok"
+        ],
+        [
+         "s1",
+         "s2"
+        ],
+        [
+         "s2",
+         "s3"
+        ],
+        [
+         "s3",
+         "s4"
+        ]
+       ]
+      },
+      {
+       "say": "It installs dependencies…",
+       "actors": {
+        "s1": {
+         "tone": "ok",
+         "bar": 100,
+         "ic": "✓",
+         "sub": "done"
+        }
+       }
+      },
+      {
+       "say": "…executes automated tests…",
+       "actors": {
+        "s2": {
+         "tone": "ok",
+         "bar": 100,
+         "ic": "✓",
+         "sub": "passed"
+        }
+       }
+      },
+      {
+       "say": "…and builds the frontend and the backend.",
+       "actors": {
+        "s3": {
+         "tone": "ok",
+         "bar": 100,
+         "ic": "✓",
+         "sub": "built"
+        },
+        "s4": {
+         "tone": "ok",
+         "bar": 100,
+         "ic": "✓",
+         "sub": "built"
+        }
+       }
+      },
+      {
+       "say": "CI keeps checking that the software stays in a working state.",
+       "actors": {
+        "ok": {
+         "k": "pill",
+         "text": "All checks passed",
+         "x": 58,
+         "y": 88,
+         "tone": "ok",
+         "ic": "✓"
+        }
+       }
+      }
+     ]
+    },
+    {
+     "id": "07.5",
+     "title": "Understand Continuous Delivery and Deployment",
+     "steps": [
+      {
+       "say": "After the required checks pass, the next stage is preparing or releasing the application.",
+       "actors": {
+        "ck": {
+         "k": "box",
+         "text": "Checks passed",
+         "x": 11,
+         "y": 50,
+         "w": 15,
+         "tone": "ok",
+         "ic": "✓"
+        }
+       }
+      },
+      {
+       "say": "Continuous Delivery keeps the application releasable. Production may still need an approval.",
+       "actors": {
+        "l1": {
+         "k": "pill",
+         "text": "Continuous Delivery",
+         "x": 40,
+         "y": 10,
+         "tone": "brand"
+        },
+        "d1": {
+         "k": "box",
+         "text": "Releasable build",
+         "x": 34,
+         "y": 28,
+         "w": 16
+        },
+        "d2": {
+         "k": "box",
+         "text": "Manual approval",
+         "x": 59,
+         "y": 28,
+         "w": 16,
+         "tone": "warn",
+         "ic": "✋"
+        },
+        "d3": {
+         "k": "box",
+         "text": "Production",
+         "x": 84,
+         "y": 28,
+         "w": 16,
+         "tone": "brand"
+        }
+       },
+       "edges": [
+        [
+         "ck",
+         "d1"
+        ],
+        [
+         "d1",
+         "d2"
+        ],
+        [
+         "d2",
+         "d3",
+         "approved",
+         "ok"
+        ]
+       ]
+      },
+      {
+       "say": "Continuous Deployment releases to production automatically after the checks pass.",
+       "actors": {
+        "l2": {
+         "k": "pill",
+         "text": "Continuous Deployment",
+         "x": 40,
+         "y": 90,
+         "tone": "brand"
+        },
+        "e1": {
+         "k": "box",
+         "text": "Releasable build",
+         "x": 34,
+         "y": 72,
+         "w": 16
+        },
+        "e2": {
+         "k": "box",
+         "text": "Production",
+         "x": 84,
+         "y": 72,
+         "w": 16,
+         "tone": "brand"
+        }
+       },
+       "edges": [
+        [
+         "ck",
+         "d1"
+        ],
+        [
+         "d1",
+         "d2"
+        ],
+        [
+         "d2",
+         "d3",
+         "approved",
+         "ok"
+        ],
+        [
+         "ck",
+         "e1"
+        ],
+        [
+         "e1",
+         "e2",
+         "automatic",
+         "ok"
+        ]
+       ]
+      },
+      {
+       "say": "The right approach depends on test coverage, operational needs and tolerance for risk.",
+       "actors": {
+        "both": {
+         "k": "pill",
+         "text": "Both make releases more consistent and less manual",
+         "x": 62,
+         "y": 50,
+         "tone": "ok"
+        }
+       },
+       "edges": [
+        [
+         "ck",
+         "d1"
+        ],
+        [
+         "d1",
+         "d2"
+        ],
+        [
+         "d2",
+         "d3",
+         "approved",
+         "ok"
+        ],
+        [
+         "ck",
+         "e1"
+        ],
+        [
+         "e1",
+         "e2",
+         "automatic",
+         "ok"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "07.6",
+     "title": "Explore GitHub Actions",
+     "steps": [
+      {
+       "say": "Workflows are YAML files stored in the repository, commonly under .github/workflows/.",
+       "actors": {
+        "y": {
+         "k": "code",
+         "lines": [
+          "name: CI",
+          "on: pull_request",
+          "jobs:",
+          "  test:",
+          "    runs-on: ubuntu-latest",
+          "    steps:",
+          "      - run: npm test"
+         ],
+         "x": 30,
+         "y": 46,
+         "w": 50,
+         "title": ".github/workflows/ci.yml  (example)"
+        }
+       }
+      },
+      {
+       "say": "A workflow runs in response to events: a pull request, a push to a branch, or a manual trigger.",
+       "actors": {
+        "ev1": {
+         "k": "pill",
+         "text": "pull request",
+         "x": 84,
+         "y": 22,
+         "tone": "soft"
+        },
+        "ev2": {
+         "k": "pill",
+         "text": "push to a branch",
+         "x": 84,
+         "y": 46,
+         "tone": "soft"
+        },
+        "ev3": {
+         "k": "pill",
+         "text": "manual trigger",
+         "x": 84,
+         "y": 70,
+         "tone": "soft"
+        }
+       },
+       "edges": [
+        [
+         "ev1",
+         "y",
+         "",
+         "dash"
+        ],
+        [
+         "ev2",
+         "y",
+         "",
+         "dash"
+        ],
+        [
+         "ev3",
+         "y",
+         "",
+         "dash"
+        ]
+       ]
+      },
+      {
+       "say": "For example, this workflow runs tests whenever a pull request is opened.",
+       "actors": {
+        "y": {
+         "lines": [
+          "name: CI",
+          [
+           "on: pull_request",
+           "hl"
+          ],
+          "jobs:",
+          "  test:",
+          "    runs-on: ubuntu-latest",
+          "    steps:",
+          "      - run: npm test"
+         ]
+        },
+        "ev1": {
+         "tone": "brand",
+         "glow": true
+        },
+        "ev2": {
+         "tone": "dim"
+        },
+        "ev3": {
+         "tone": "dim"
+        },
+        "run": {
+         "k": "box",
+         "text": "Runner executes npm test",
+         "x": 30,
+         "y": 88,
+         "w": 30,
+         "tone": "soft",
+         "bar": 60
+        }
+       },
+       "edges": [
+        [
+         "ev1",
+         "y",
+         "",
+         "ok"
+        ],
+        [
+         "y",
+         "run",
+         "",
+         "ok"
+        ]
+       ]
+      },
+      {
+       "say": "Tests pass — and nobody had to run them by hand.",
+       "actors": {
+        "run": {
+         "tone": "ok",
+         "ic": "✓",
+         "bar": 100,
+         "text": "Tests passed"
+        }
+       }
+      }
+     ]
+    },
+    {
+     "id": "07.7",
+     "title": "Follow a Change from Development to Deployment",
+     "steps": [
+      {
+       "say": "A pull request is opened.",
+       "actors": {
+        "n1": {
+         "k": "box",
+         "text": "Pull request",
+         "x": 11,
+         "y": 40,
+         "w": 15,
+         "sub": "opened"
+        }
+       }
+      },
+      {
+       "say": "Teammates review the code while automated checks run.",
+       "actors": {
+        "n2": {
+         "k": "box",
+         "text": "Review + checks",
+         "x": 29,
+         "y": 40,
+         "w": 15,
+         "sub": "run in parallel"
+        }
+       },
+       "edges": [
+        [
+         "n1",
+         "n2"
+        ]
+       ]
+      },
+      {
+       "say": "After approval, the change is merged.",
+       "actors": {
+        "n3": {
+         "k": "box",
+         "text": "Approved & merged",
+         "x": 47,
+         "y": 40,
+         "w": 15,
+         "tone": "ok",
+         "ic": "✓",
+         "sub": "into main"
+        }
+       },
+       "edges": [
+        [
+         "n1",
+         "n2"
+        ],
+        [
+         "n2",
+         "n3"
+        ]
+       ]
+      },
+      {
+       "say": "The deployment workflow builds the application…",
+       "actors": {
+        "n4": {
+         "k": "box",
+         "text": "Deploy workflow",
+         "x": 65,
+         "y": 40,
+         "w": 15,
+         "tone": "brand",
+         "sub": "build the app"
+        }
+       },
+       "edges": [
+        [
+         "n1",
+         "n2"
+        ],
+        [
+         "n2",
+         "n3"
+        ],
+        [
+         "n3",
+         "n4"
+        ]
+       ]
+      },
+      {
+       "say": "…and publishes it to the hosting platform.",
+       "actors": {
+        "n5": {
+         "k": "box",
+         "text": "Hosting platform",
+         "x": 83,
+         "y": 40,
+         "w": 15,
+         "tone": "brand",
+         "sub": "release is live"
+        }
+       },
+       "edges": [
+        [
+         "n1",
+         "n2"
+        ],
+        [
+         "n2",
+         "n3"
+        ],
+        [
+         "n3",
+         "n4"
+        ],
+        [
+         "n4",
+         "n5"
+        ]
+       ]
+      },
+      {
+       "say": "The team can trace the release back to the code changes, review and automated checks.",
+       "actors": {
+        "tr": {
+         "k": "box",
+         "text": "Traceable release",
+         "x": 47,
+         "y": 82,
+         "w": 28,
+         "tone": "ok",
+         "sub": "code changes · review · checks"
+        }
+       },
+       "edges": [
+        [
+         "n1",
+         "n2"
+        ],
+        [
+         "n2",
+         "n3"
+        ],
+        [
+         "n3",
+         "n4"
+        ],
+        [
+         "n4",
+         "n5"
+        ],
+        [
+         "n5",
+         "tr",
+         "",
+         "ok"
+        ],
+        [
+         "tr",
+         "n1",
+         "trace back",
+         "dash"
+        ],
+        [
+         "tr",
+         "n2",
+         "",
+         "dash"
+        ]
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

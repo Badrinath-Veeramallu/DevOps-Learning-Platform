@@ -80,6 +80,24 @@ void main() {
       expect(json['isEmailVerified'], isTrue);
     });
 
+    test('parses and serializes createdAt correctly', () {
+      final json = {
+        'id': 'usr_time_1',
+        'name': 'Time Traveler',
+        'email': 'time@example.com',
+        'createdAt': '2026-10-25T14:30:00.000Z',
+      };
+
+      final user = UserModel.fromJson(json);
+      expect(user.createdAt, DateTime.parse('2026-10-25T14:30:00.000Z'));
+
+      final serialized = user.toJson();
+      expect(serialized['createdAt'], '2026-10-25T14:30:00.000Z');
+
+      final copied = user.copyWith(createdAt: DateTime.parse('2026-10-26T00:00:00.000Z'));
+      expect(copied.createdAt, DateTime.parse('2026-10-26T00:00:00.000Z'));
+    });
+
     test('copyWith creates modified clone', () {
       const user = UserModel(
         id: 'usr_1',

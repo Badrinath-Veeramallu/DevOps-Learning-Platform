@@ -20,8 +20,8 @@ class ApiClient {
            Dio(
              BaseOptions(
                baseUrl: baseUrl ?? AppConfig.defaultBaseUrl,
-               connectTimeout: const Duration(seconds: 10),
-               receiveTimeout: const Duration(seconds: 10),
+               connectTimeout: const Duration(seconds: 45),
+               receiveTimeout: const Duration(seconds: 30),
                headers: {
                  'Content-Type': 'application/json',
                  'Accept': 'application/json',
@@ -163,6 +163,24 @@ class ApiClient {
       debugPrint(
         '[ApiClient] POST /auth/google DioException: status=${e.response?.statusCode}, data=${e.response?.data}',
       );
+      throw ApiException.fromDioException(e);
+    }
+  }
+
+  /// Update the authenticated user's profile name.
+  ///
+  /// Calls `PUT /api/auth/profile`.
+  /// Returns the updated [UserModel].
+  Future<UserModel> updateProfile({required String name}) async {
+    try {
+      final response = await _dio.put(
+        '/auth/profile',
+        data: {'name': name.trim()},
+      );
+      final data = response.data as Map<String, dynamic>;
+      final userJson = data['user'] as Map<String, dynamic>;
+      return UserModel.fromJson(userJson);
+    } on DioException catch (e) {
       throw ApiException.fromDioException(e);
     }
   }

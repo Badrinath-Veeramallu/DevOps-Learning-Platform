@@ -19,8 +19,14 @@ import 'providers/auth_provider.dart';
 class DevOpsLearningApp extends StatefulWidget {
   final ISecureStorageService? storageService;
   final ApiClient? apiClient;
+  final AuthProvider? authProvider;
 
-  const DevOpsLearningApp({super.key, this.storageService, this.apiClient});
+  const DevOpsLearningApp({
+    super.key,
+    this.storageService,
+    this.apiClient,
+    this.authProvider,
+  });
 
   @override
   State<DevOpsLearningApp> createState() => _DevOpsLearningAppState();
@@ -37,15 +43,18 @@ class _DevOpsLearningAppState extends State<DevOpsLearningApp> {
     super.initState();
     _storageService = widget.storageService ?? SecureStorageService();
     _apiClient = widget.apiClient ?? ApiClient(storageService: _storageService);
-    _authProvider = AuthProvider(
-      apiClient: _apiClient,
-      storageService: _storageService,
-    );
+    _authProvider = widget.authProvider ??
+        AuthProvider(
+          apiClient: _apiClient,
+          storageService: _storageService,
+        );
     _router = AppRouter.createRouter(_authProvider);
 
     // Asynchronously restore previous session if token exists in KeyStore
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _authProvider.checkAuthStatus();
+      if (!_authProvider.isInitialized) {
+        _authProvider.checkAuthStatus();
+      }
     });
   }
 

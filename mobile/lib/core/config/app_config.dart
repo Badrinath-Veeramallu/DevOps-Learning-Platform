@@ -1,21 +1,23 @@
 /// Configuration for backend API connectivity across mobile environments.
 ///
-/// Physical Device Networking:
-/// - When running on a physical Android device over Wi-Fi, the app must connect to
-///   your Mac's reachable local network (LAN) IP address.
-/// - The default development URL is configured with your Mac's LAN IP (`172.16.4.29:5000`).
-/// - You can override this at compile-time using:
+/// Networking & Base URLs:
+/// - Default production deployed backend: `https://devops-learning-platform-a4yy.onrender.com/api`
+/// - You can override this at compile-time for local development using:
 ///   `flutter run -d <DEVICE_ID> --dart-define=API_URL=http://<YOUR_IP>:5000/api`
 class AppConfig {
   AppConfig._();
 
-  /// Mac LAN IP default for physical Android device testing on local Wi-Fi
+  /// Production deployed backend URL on Render
+  static const String defaultProductionUrl =
+      'https://devops-learning-platform-a4yy.onrender.com/api';
+
+  /// Legacy local development LAN URL fallback
   static const String defaultLanBaseUrl = 'http://172.16.4.29:5000/api';
 
   /// Compile-time environment override using `--dart-define=API_URL=http://.../api`
   static const String _envApiUrl = String.fromEnvironment(
     'API_URL',
-    defaultValue: defaultLanBaseUrl,
+    defaultValue: defaultProductionUrl,
   );
 
   /// Resolves the active API base URL
@@ -23,7 +25,7 @@ class AppConfig {
     if (_envApiUrl.isNotEmpty) {
       return _envApiUrl;
     }
-    return defaultLanBaseUrl;
+    return defaultProductionUrl;
   }
 
   /// App name identifier
