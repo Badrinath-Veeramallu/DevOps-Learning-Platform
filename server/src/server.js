@@ -1,10 +1,11 @@
-
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 
 const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
+const progressRoutes = require("./routes/progressRoutes");
+const activityRoutes = require("./routes/activityRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -14,6 +15,8 @@ app.use(express.json());
 
 // Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/progress", progressRoutes);
+app.use("/api/activity", activityRoutes);
 
 app.get("/api/health", (req, res) => {
   res.status(200).json({

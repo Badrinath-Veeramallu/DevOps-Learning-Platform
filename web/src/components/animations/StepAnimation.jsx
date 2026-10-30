@@ -126,8 +126,16 @@ function Terminal({ frame, step }) {
  *   autoPlay  : start playing on mount (default true, skipped when the user prefers reduced motion)
  *   stepMs    : base time each step stays on screen (default 3400)
  *   showTitle : show the card header (default true)
+ *   onFinish  : callback fired when the animation completes the last step
  */
-export default function StepAnimation({ animation, autoPlay = true, stepMs = 3400, showTitle = true, className = "" }) {
+export default function StepAnimation({
+  animation,
+  autoPlay = true,
+  stepMs = 3400,
+  showTitle = true,
+  className = "",
+  onFinish,
+}) {
   const uid = useId().replace(/:/g, "");
   const frames = useMemo(() => buildFrames(animation?.steps || []), [animation?.steps]);
   const hasTerm = frames.some((f) => f.term.length);
@@ -136,6 +144,7 @@ export default function StepAnimation({ animation, autoPlay = true, stepMs = 340
   const reduced = typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
   const [i, setI] = useState(0);
   const [playing, setPlaying] = useState(autoPlay && !reduced);
+  const finishedFiredRef = useRef(false);
 
   // If subtopic animation ID changes, reset state during render
   const [prevAnimId, setPrevAnimId] = useState(animation?.id);
@@ -143,7 +152,12 @@ export default function StepAnimation({ animation, autoPlay = true, stepMs = 340
     setPrevAnimId(animation?.id);
     setI(0);
     setPlaying(autoPlay && !reduced);
+    finishedFiredRef.current = false;
   }
+
+  useEffect(() => {
+    finishedFiredRef.current = false;
+  }, [animation?.id]);
 
   useEffect(() => {
     if (!playing) return;
@@ -165,6 +179,16 @@ export default function StepAnimation({ animation, autoPlay = true, stepMs = 340
 
   const safeI = Math.max(0, Math.min(last, i));
   const frame = frames[safeI] || frames[0] || { actors: {}, edges: [], term: [], say: "" };
+
+  // Trigger onFinish when reaching the last step
+  useEffect(() => {
+    if (safeI === last && last > 0 && !finishedFiredRef.current) {
+      finishedFiredRef.current = true;
+      if (typeof onFinish === "function") {
+        onFinish();
+      }
+    }
+  }, [safeI, last, onFinish]);
 
   return (
     <section className={`sa ${className}`} tabIndex={0} onKeyDown={onKey} aria-label={`Animation: ${animation?.title || "Step Animation"}`}>

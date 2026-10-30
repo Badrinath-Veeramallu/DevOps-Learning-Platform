@@ -120,3 +120,28 @@ export const authAPI = {
     }),
 };
 
+export const activityAPI = {
+  getActivity: (tz = "UTC") =>
+    request(`/activity?tz=${encodeURIComponent(tz)}`, {
+      method: "GET",
+    }),
+
+  logActivity: ({ type, pathwayId = "git", stopSlug }) =>
+    request("/activity/log", {
+      method: "POST",
+      body: JSON.stringify({ type, pathwayId, stopSlug }),
+    }),
+};
+
+export const progressAPI = {
+  getProgress: (pathwayId = "git") =>
+    request(`/progress/${encodeURIComponent(pathwayId)}`, {
+      method: "GET",
+    }),
+
+  toggleProgress: (pathwayId = "git", moduleId) =>
+    request(`/progress/${encodeURIComponent(pathwayId)}/toggle`, {
+      method: "POST",
+      body: JSON.stringify({ moduleId }),
+    }),
+};

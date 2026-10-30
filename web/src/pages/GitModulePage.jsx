@@ -6,6 +6,7 @@ import {
   isModuleCompleted,
   toggleModuleCompletion,
 } from "../services/progressService";
+import { activityAPI } from "../services/api";
 import GitAnimation from "../components/animations/GitAnimation";
 
 export const GitModulePage = () => {
@@ -29,6 +30,53 @@ export const GitModulePage = () => {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [currentModule.id]);
+
+  // Record lesson_viewed activity event for authenticated user (at most once per user per lesson per day)
+  useEffect(() => {
+    if (user && currentModule?.id) {
+      activityAPI
+        .logActivity({
+          type: "lesson_viewed",
+          pathwayId: "git",
+          stopSlug: currentModule.id,
+        })
+        .then((res) => {
+          if (res && res.logged) {
+            window.dispatchEvent(
+              new CustomEvent("devops_activity_updated", {
+                detail: { type: "lesson_viewed", stopSlug: currentModule.id },
+              })
+            );
+          }
+        })
+        .catch((err) => {
+          console.warn("Could not record lesson view activity:", err.message);
+        });
+    }
+  }, [user, currentModule?.id]);
+
+  const handleAnimationFinish = () => {
+    if (user && currentModule?.id) {
+      activityAPI
+        .logActivity({
+          type: "animation_finished",
+          pathwayId: "git",
+          stopSlug: currentModule.id,
+        })
+        .then((res) => {
+          if (res && res.logged) {
+            window.dispatchEvent(
+              new CustomEvent("devops_activity_updated", {
+                detail: { type: "animation_finished", stopSlug: currentModule.id },
+              })
+            );
+          }
+        })
+        .catch((err) => {
+          console.warn("Could not record animation finished activity:", err.message);
+        });
+    }
+  };
 
   // Synchronize if progress is updated in another tab or window
   useEffect(() => {
@@ -348,6 +396,7 @@ export const GitModulePage = () => {
                         ? section.title.replace(/^\d+\.\s*/, "")
                         : undefined
                     }
+                    onFinish={handleAnimationFinish}
                   />
                 </div>
               </section>

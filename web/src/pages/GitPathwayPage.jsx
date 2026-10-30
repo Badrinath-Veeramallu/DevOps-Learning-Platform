@@ -3,23 +3,28 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 import { GitPathwayMap } from "../components/pathway/GitPathwayMap";
 import { gitCurriculum } from "../data/gitCurriculum";
-import { getCompletedModules } from "../services/progressService";
+import { getCompletedModules, fetchUserProgress } from "../services/progressService";
 
 export const GitPathwayPage = () => {
   const { user } = useAuth();
+  const userId = user?._id || user?.id || user?.email || "guest";
   const [completedIds, setCompletedIds] = useState(() =>
-    getCompletedModules(user?.id || user?.email || "guest", "git")
+    getCompletedModules(userId, "git")
   );
 
-  // Sync state if module is marked completed in another tab or component
+  // Sync state from server on mount and if module is marked completed anywhere
   useEffect(() => {
+    fetchUserProgress(userId, "git").then((ids) => {
+      if (Array.isArray(ids)) setCompletedIds(ids);
+    });
+
     const handleProgressUpdate = () => {
-      setCompletedIds(getCompletedModules(user?.id || user?.email || "guest", "git"));
+      setCompletedIds(getCompletedModules(userId, "git"));
     };
 
     window.addEventListener("devops_progress_updated", handleProgressUpdate);
     return () => window.removeEventListener("devops_progress_updated", handleProgressUpdate);
-  }, [user]);
+  }, [userId]);
 
   const totalModules = gitCurriculum.length;
   const completedCount = completedIds.length;
@@ -48,16 +53,16 @@ export const GitPathwayPage = () => {
 
         {/* Pathway Hero Header */}
         <header className="pathway-header-card">
-          <div className="pathway-header-meta">
-            <div className="pathway-badge-row">
-              <span className="badge-pill badge-foundational">Foundational Pathway</span>
-              <span className="pathway-track-badge">7 Interactive Stops</span>
-            </div>
-            <h1 className="pathway-main-title">Git & GitHub Learning Pathway</h1>
-            <p className="pathway-main-desc">
-              A structured, visual journey from fundamental version control commands to team collaboration, conflict resolution, and automated DevOps delivery pipelines.
-            </p>
+          <div className="pathway-badge-row">
+            <span className="badge-pill badge-foundational">Foundational Pathway</span>
+            <span className="badge-pill badge-modules">{totalModules} Stops</span>
           </div>
+
+          <h1 className="pathway-title">Git & GitHub Pathway</h1>
+          <p className="pathway-description">
+            A progressive, step-by-step interactive map guiding you through professional
+            version control, collaborative workflows, and DevOps pipeline integration.
+          </p>
 
           {/* Progress Overview Meter */}
           <div className="pathway-progress-panel">
@@ -85,28 +90,22 @@ export const GitPathwayPage = () => {
             <div className="progress-panel-foot">
               <span className="progress-hint">
                 {completedCount === totalModules
-                  ? "🎉 You've completed all 7 Git & GitHub stops!"
-                  : `Next: Stop ${
-                      gitCurriculum.findIndex((m) => !completedIds.includes(m.id)) + 1
-                    } · ${
-                      gitCurriculum.find((m) => !completedIds.includes(m.id))?.shortTitle || ""
-                    }`}
+                  ? "🎉 You have completed all stops in this pathway! Excellent work."
+                  : completedCount === 0
+                  ? "Click on Stop 1 below to start your journey."
+                  : `Next up: Stop ${completedCount + 1}`}
               </span>
             </div>
           </div>
         </header>
 
-        {/* Winding Pathway Journey Map */}
-        <main className="pathway-map-section">
-          <div className="pathway-section-header">
-            <h2 className="pathway-section-heading">Learning Journey</h2>
-            <p className="pathway-section-sub">
-              Click any stop along the path to open its complete educational module, commands, and interactive visual slots.
-            </p>
-          </div>
-
-          <GitPathwayMap completedModuleIds={completedIds} />
-        </main>
+        {/* Interactive Road / Pathway Visualization */}
+        <section aria-label="Learning Pathway Interactive Map">
+          <GitPathwayMap
+            modules={gitCurriculum}
+            completedIds={completedIds}
+          />
+        </section>
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
+import { ActivityHeatmap } from "../components/ActivityHeatmap";
 
 export const Dashboard = () => {
   const { user } = useAuth();
@@ -138,6 +139,11 @@ export const Dashboard = () => {
               </a>
             </div>
           )}
+        </section>
+
+        {/* Learning Activity Heatmap */}
+        <section className="dashboard-activity-section" aria-label="Learning Activity">
+          <ActivityHeatmap />
         </section>
 
         {/* Available Learning Paths */}

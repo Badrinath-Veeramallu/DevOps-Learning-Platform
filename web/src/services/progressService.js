@@ -2,8 +2,10 @@
  * Progress Service for DevOps Learning Platform
  *
  * Scopes learning module progress per authenticated user.
- * Built to be easily swapped with or backed by a future REST API (e.g. GET/POST /api/progress).
+ * Seamlessly backed by REST API (/api/progress) with instant localStorage caching.
  */
+
+import { progressAPI, tokenStorage } from "./api";
 
 const STORAGE_PREFIX = "devops_progress_";
 
@@ -16,7 +18,7 @@ const getStorageKey = (userId = "guest", pathway = "git") => {
 };
 
 /**
- * Get completed module IDs for a user and pathway
+ * Get completed module IDs for a user and pathway synchronously from local cache
  * @param {string} userId
  * @param {string} pathway
  * @returns {string[]} array of completed module IDs (e.g. ['git-01', 'git-02'])
@@ -42,57 +44,92 @@ export const isModuleCompleted = (userId = "guest", pathway = "git", moduleId) =
 };
 
 /**
- * Toggle completion status of a module
+ * Fetch latest progress from backend API and sync with local cache
+ */
+export const fetchUserProgress = async (userId = "guest", pathway = "git") => {
+  const token = tokenStorage.get();
+  if (!token) return getCompletedModules(userId, pathway);
+
+  try {
+    const res = await progressAPI.getProgress(pathway);
+    if (res && res.success && Array.isArray(res.completedModules)) {
+      localStorage.setItem(getStorageKey(userId, pathway), JSON.stringify(res.completedModules));
+      window.dispatchEvent(
+        new CustomEvent("devops_progress_updated", {
+          detail: { userId, pathway, allCompleted: res.completedModules },
+        })
+      );
+      return res.completedModules;
+    }
+  } catch (err) {
+    console.error("Error syncing progress with server:", err);
+  }
+  return getCompletedModules(userId, pathway);
+};
+
+/**
+ * Toggle completion status of a module.
+ * Optimistically updates cache and commits to backend /api/progress/:pathwayId/toggle,
+ * which logs stop_completed on the server.
+ *
  * @param {string} userId
  * @param {string} pathway
  * @param {string} moduleId
- * @returns {boolean} new completed status
+ * @returns {Promise<boolean>|boolean} new completed status
  */
-export const toggleModuleCompletion = (userId = "guest", pathway = "git", moduleId) => {
+export const toggleModuleCompletion = async (userId = "guest", pathway = "git", moduleId) => {
   try {
     const current = getCompletedModules(userId, pathway);
-    let updated;
     const isNowCompleted = !current.includes(moduleId);
 
-    if (isNowCompleted) {
-      updated = [...current, moduleId];
-    } else {
-      updated = current.filter((id) => id !== moduleId);
-    }
+    const updated = isNowCompleted
+      ? [...current, moduleId]
+      : current.filter((id) => id !== moduleId);
 
+    // Optimistically update localStorage
     localStorage.setItem(getStorageKey(userId, pathway), JSON.stringify(updated));
+
     // Dispatch custom event so pathway and module pages update reactively
     window.dispatchEvent(
       new CustomEvent("devops_progress_updated", {
         detail: { userId, pathway, moduleId, isCompleted: isNowCompleted, allCompleted: updated },
       })
     );
+
+    // Also notify activity consumers (like the heat map) to refresh
+    window.dispatchEvent(
+      new CustomEvent("devops_activity_updated", {
+        detail: { userId, type: "stop_completed", stopSlug: moduleId },
+      })
+    );
+
+    // If authenticated, persist to server
+    const token = tokenStorage.get();
+    if (token) {
+      try {
+        const res = await progressAPI.toggleProgress(pathway, moduleId);
+        if (res && res.success && Array.isArray(res.completedModules)) {
+          localStorage.setItem(getStorageKey(userId, pathway), JSON.stringify(res.completedModules));
+          window.dispatchEvent(
+            new CustomEvent("devops_progress_updated", {
+              detail: { userId, pathway, moduleId, isCompleted: res.isCompleted, allCompleted: res.completedModules },
+            })
+          );
+          window.dispatchEvent(
+            new CustomEvent("devops_activity_updated", {
+              detail: { userId, type: "stop_completed", stopSlug: moduleId },
+            })
+          );
+          return res.isCompleted;
+        }
+      } catch (apiErr) {
+        console.error("Server progress toggle failed:", apiErr);
+      }
+    }
+
     return isNowCompleted;
   } catch (err) {
     console.error("Error updating module progress:", err);
-    return false;
-  }
-};
-
-/**
- * Set completion status of a module explicitly
- */
-export const setModuleCompleted = (userId = "guest", pathway = "git", moduleId, completed = true) => {
-  try {
-    const current = getCompletedModules(userId, pathway);
-    const has = current.includes(moduleId);
-    if ((completed && has) || (!completed && !has)) return completed;
-
-    const updated = completed ? [...current, moduleId] : current.filter((id) => id !== moduleId);
-    localStorage.setItem(getStorageKey(userId, pathway), JSON.stringify(updated));
-    window.dispatchEvent(
-      new CustomEvent("devops_progress_updated", {
-        detail: { userId, pathway, moduleId, isCompleted: completed, allCompleted: updated },
-      })
-    );
-    return completed;
-  } catch (err) {
-    console.error("Error setting module progress:", err);
     return false;
   }
 };

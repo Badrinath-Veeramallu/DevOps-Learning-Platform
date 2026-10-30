@@ -246,10 +246,7 @@ export const Profile = () => {
         </div>
 
         {/* Section 6: Learning Activity Heatmap (GitHub/LeetCode style) */}
-        <ActivityHeatmap
-          userSeed={user?.email || user?.id || "devops-learner"}
-          isMock={true}
-        />
+        <ActivityHeatmap />
       </div>
     </div>
   );
