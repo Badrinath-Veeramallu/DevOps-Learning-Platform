@@ -4,6 +4,8 @@ import '../core/api/api_client.dart';
 import '../core/api/api_exceptions.dart';
 import '../core/auth/google_auth_service.dart';
 import '../core/storage/secure_storage_service.dart';
+import '../features/pathway/data/activity_service.dart';
+import '../features/pathway/data/progress_service.dart';
 import '../models/user_model.dart';
 
 /// Central state manager for authentication and user sessions.
@@ -234,12 +236,14 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  /// Log out by wiping the token from secure storage and resetting state.
+  /// Log out by wiping the token from secure storage, clearing caches, and resetting state.
   Future<void> logout() async {
     await storageService.deleteToken();
     try {
       await googleAuthService.signOut();
     } catch (_) {}
+    ProgressService().clearCache();
+    ActivityService().clearCache();
     _user = null;
     _errorMessage = null;
     _isInitialized = true;

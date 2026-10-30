@@ -80,7 +80,7 @@ class _GitPathwayScreenState extends State<GitPathwayScreen> {
       final userId = authProvider.user?.id ?? 'guest';
       final modules = await GitCurriculumRepository.loadCurriculum();
       final completed = widget.initialCompletedIds ??
-          await ProgressService().getCompletedModules(userId);
+          await ProgressService().fetchUserProgress(userId);
 
       if (mounted) {
         setState(() {

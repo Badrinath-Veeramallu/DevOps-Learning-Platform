@@ -9,6 +9,7 @@ import 'package:devops_learning_app/providers/auth_provider.dart';
 /// In-memory implementation of [ISecureStorageService] for fast, deterministic unit testing.
 class MockSecureStorageService implements ISecureStorageService {
   String? _storedToken;
+  final Map<String, String> _storage = {};
 
   @override
   Future<String?> getToken() async => _storedToken;
@@ -26,6 +27,19 @@ class MockSecureStorageService implements ISecureStorageService {
   @override
   Future<bool> hasToken() async =>
       _storedToken != null && _storedToken!.isNotEmpty;
+
+  @override
+  Future<String?> read(String key) async => _storage[key];
+
+  @override
+  Future<void> write(String key, String value) async {
+    _storage[key] = value;
+  }
+
+  @override
+  Future<void> delete(String key) async {
+    _storage.remove(key);
+  }
 }
 
 /// Mock Google Authentication Service for deterministic unit tests.

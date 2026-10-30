@@ -7,6 +7,8 @@ import 'core/config/app_config.dart';
 import 'core/router/app_router.dart';
 import 'core/storage/secure_storage_service.dart';
 import 'core/theme/app_theme.dart';
+import 'features/pathway/data/activity_service.dart';
+import 'features/pathway/data/progress_service.dart';
 import 'providers/auth_provider.dart';
 
 /// Root application widget.
@@ -43,6 +45,11 @@ class _DevOpsLearningAppState extends State<DevOpsLearningApp> {
     super.initState();
     _storageService = widget.storageService ?? SecureStorageService();
     _apiClient = widget.apiClient ?? ApiClient(storageService: _storageService);
+    ProgressService().init(
+      apiClient: _apiClient,
+      storageService: _storageService,
+    );
+    ActivityService().init(apiClient: _apiClient);
     _authProvider = widget.authProvider ??
         AuthProvider(
           apiClient: _apiClient,

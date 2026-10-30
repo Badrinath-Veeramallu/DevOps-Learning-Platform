@@ -44,15 +44,18 @@ class ProgressModel {
         ? rawModules.map((e) => e.toString()).toSet()
         : {};
 
+    final pathway = (json['pathwayId'] ?? json['pathway'] ?? 'git').toString();
+    final bool isSynced = json['isSynced'] == true || json['success'] == true;
+
     return ProgressModel(
-      pathway: (json['pathway'] ?? 'git').toString(),
+      pathway: pathway,
       completedModules: modules,
       activeTrack: (json['activeTrack'] ?? 'git').toString(),
       lastAccessedModule: json['lastAccessedModule']?.toString(),
       updatedAt: json['updatedAt'] != null
           ? DateTime.tryParse(json['updatedAt'].toString())
           : null,
-      isSynced: json['isSynced'] == true,
+      isSynced: isSynced,
     );
   }
 
