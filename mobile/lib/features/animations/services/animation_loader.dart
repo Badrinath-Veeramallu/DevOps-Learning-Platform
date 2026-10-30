@@ -73,5 +73,11 @@ class AnimationLoader {
     _idIndex = null;
     _normalizedTitleIndex = null;
   }
+
+  /// Sets cached modules and builds index directly (useful for tests).
+  static void setCachedModules(List<AnimationModule> modules) {
+    _cachedModules = modules;
+    _buildIndex(modules);
+  }
 }
 
