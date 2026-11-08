@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
-import { buildFrames, edgeGeometry, DEFAULT_W, STAGE } from "./stepEngine";
+import { buildFrames, edgeGeometry, DEFAULT_W, DEFAULT_W_MOBILE, STAGE } from "./stepEngine";
 import "./StepAnimation.css";
 
 /* ---------- small renderers ---------- */
 
-function Actor({ a }) {
-  const w = a.w ?? DEFAULT_W[a.k];
+function Actor({ a, compact }) {
+  const w = a.w ?? (compact ? DEFAULT_W_MOBILE : DEFAULT_W)[a.k];
   const style = {
     left: `${a.x}%`,
     top: `${a.y}%`,
@@ -16,6 +16,7 @@ function Actor({ a }) {
   const cls = ["sa-a", `sa-${a.k}`, `t-${a.tone || (a.k === "zone" ? "soft" : "plain")}`];
   if (a.hide) cls.push("is-hidden");
   if (a.glow) cls.push("is-glow");
+  if (compact && a.k === "commit") cls.push(`side-${a.side || "r"}`);
 
   if (a.k === "code") {
     return (
@@ -51,13 +52,13 @@ function Actor({ a }) {
   );
 }
 
-function Edges({ frame, uid }) {
+function Edges({ frame, uid, stage }) {
   if (!frame || !frame.edges || !frame.actors) return null;
   const out = [];
   frame.edges.forEach(([from, to, label, style]) => {
     const a = frame.actors[from], b = frame.actors[to];
     if (!a || !b || a.hide || b.hide) return;
-    const g = edgeGeometry(a, b);
+    const g = edgeGeometry(a, b, stage);
     if (!g) return;
     const kind = style || "base";
     out.push(
@@ -73,7 +74,7 @@ function Edges({ frame, uid }) {
     </marker>
   );
   return (
-    <svg className="sa-edges" viewBox={`0 0 ${STAGE.w} ${STAGE.h}`} aria-hidden="true">
+    <svg className="sa-edges" viewBox={`0 0 ${stage.w} ${stage.h}`} aria-hidden="true">
       <defs>
         {marker("base", "var(--sa-rose)")}
         {marker("dash", "var(--sa-rose)")}
@@ -85,34 +86,41 @@ function Edges({ frame, uid }) {
   );
 }
 
+function getTerminalLines(term, termStart) {
+  let delay = 0;
+  return term.map((line, i) => {
+    const isNew = i >= termStart;
+    const isCmd = line.startsWith("$ ");
+    const tone = !isCmd && /^[+~!]/.test(line) ? line[0] : "";
+    const text = tone ? line.slice(1) : line;
+    let style;
+    if (isNew) {
+      const ms = isCmd ? Math.min(text.length * 26, 1500) : 180;
+      style = isCmd
+        ? { "--n": text.length - 2, "--d": `${ms}ms`, "--delay": `${delay}ms` }
+        : { "--delay": `${delay}ms` };
+      delay += ms + 150;
+    }
+    return { key: `${i}-${text}`, isCmd, tone, isNew, text, style };
+  });
+}
+
 function Terminal({ frame, step }) {
   const ref = useRef(null);
   useEffect(() => { if (ref.current) ref.current.scrollTop = ref.current.scrollHeight; }, [step]);
   if (!frame || !frame.term) return null;
-  let t = 0; // running delay so each new command "types" before its output appears
+
+  const renderedLines = getTerminalLines(frame.term, frame.termStart);
+
   return (
     <div className="sa-term" role="log" aria-label="Terminal">
       <div className="sa-term-bar"><i /><i /><i /><span>terminal</span></div>
       <div className="sa-term-body" ref={ref}>
-        {frame.term.map((line, i) => {
-          const isNew = i >= frame.termStart;
-          const isCmd = line.startsWith("$ ");
-          const tone = !isCmd && /^[+~!]/.test(line) ? line[0] : "";
-          const text = tone ? line.slice(1) : line;
-          let style;
-          if (isNew) {
-            const ms = isCmd ? Math.min(text.length * 26, 1500) : 180;
-            style = isCmd
-              ? { "--n": text.length - 2, "--d": `${ms}ms`, "--delay": `${t}ms` }
-              : { "--delay": `${t}ms` };
-            t += ms + 150;
-          }
-          return (
-            <div key={`${i}-${text}`} className={`sa-tl ${isCmd ? "cmd" : "out"} ${tone ? "tn" + tone : ""} ${isNew ? "new" : ""}`} style={style}>
-              {isCmd ? (<><span className="sa-prompt">$</span><span className="sa-typed">{text.slice(2)}</span></>) : text}
-            </div>
-          );
-        })}
+        {renderedLines.map((l) => (
+          <div key={l.key} className={`sa-tl ${l.isCmd ? "cmd" : "out"} ${l.tone ? "tn" + l.tone : ""} ${l.isNew ? "new" : ""}`} style={l.style}>
+            {l.isCmd ? (<><span className="sa-prompt">$</span><span className="sa-typed">{l.text.slice(2)}</span></>) : l.text}
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -120,24 +128,50 @@ function Terminal({ frame, step }) {
 
 /* ---------- player ---------- */
 
+/** true while the component is narrower than `breakpoint` px (container-based, so it also works in narrow side panels) */
+function useCompact(ref, breakpoint) {
+  const [compact, setCompact] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const measure = () => setCompact(el.getBoundingClientRect().width < breakpoint);
+    measure();
+    if (typeof ResizeObserver === "undefined") { window.addEventListener("resize", measure); return () => window.removeEventListener("resize", measure); }
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [ref, breakpoint]);
+  return compact;
+}
+
 /**
- * <StepAnimation animation={...} />
- *   animation : one subtopic object from git-animations.json  ({ id, title, steps })
- *   autoPlay  : start playing on mount (default true, skipped when the user prefers reduced motion)
- *   stepMs    : base time each step stays on screen (default 3400)
- *   showTitle : show the card header (default true)
- *   onFinish  : callback fired when the animation completes the last step
+ * <StepAnimation animation={...} mobileAnimation={...} />
+ *   animation       : one subtopic object from docker-animations.json (desktop layout)
+ *   mobileAnimation : the same subtopic from docker-animations.mobile.json (portrait layout, optional)
+ *   autoPlay        : start playing on mount (default true, skipped when the user prefers reduced motion)
+ *   stepMs          : base time each step stays on screen (default 3400)
+ *   showTitle       : show the card header (default true)
+ *   breakpoint      : below this width (px) the phone layout is used (default 640)
+ *   onFinish        : callback fired when the animation completes the last step
  */
 export default function StepAnimation({
   animation,
-  autoPlay = true,
+  mobileAnimation,
+  autoPlay = false,
   stepMs = 3400,
   showTitle = true,
   className = "",
+  breakpoint = 640,
   onFinish,
 }) {
   const uid = useId().replace(/:/g, "");
-  const frames = useMemo(() => buildFrames(animation?.steps || []), [animation?.steps]);
+  const root = useRef(null);
+  const compactWidth = useCompact(root, breakpoint);
+  const compact = compactWidth && !!mobileAnimation;
+  const active = compact ? mobileAnimation : animation;
+  const stage = active?.stage || STAGE;
+
+  const frames = useMemo(() => buildFrames(active?.steps || []), [active?.steps]);
   const hasTerm = frames.some((f) => f.term.length);
   const last = Math.max(0, frames.length - 1);
 
@@ -146,13 +180,12 @@ export default function StepAnimation({
   const [playing, setPlaying] = useState(autoPlay && !reduced);
   const finishedFiredRef = useRef(false);
 
-  // If subtopic animation ID changes, reset state during render
+  // If subtopic animation ID changes, restart
   const [prevAnimId, setPrevAnimId] = useState(animation?.id);
   if (animation?.id !== prevAnimId) {
     setPrevAnimId(animation?.id);
     setI(0);
     setPlaying(autoPlay && !reduced);
-    finishedFiredRef.current = false;
   }
 
   useEffect(() => {
@@ -169,15 +202,8 @@ export default function StepAnimation({
     return () => clearTimeout(id);
   }, [playing, i, last, frames, stepMs]);
 
-  const go = useCallback((n) => { setPlaying(false); setI(Math.max(0, Math.min(last, n))); }, [last]);
-  const togglePlay = () => { if (playing) return setPlaying(false); if (i >= last) setI(0); setPlaying(true); };
-  const onKey = (e) => {
-    if (e.key === "ArrowRight") go(i + 1);
-    if (e.key === "ArrowLeft") go(i - 1);
-    if (e.key === " ") { e.preventDefault(); togglePlay(); }
-  };
-
   const safeI = Math.max(0, Math.min(last, i));
+  const isAtEnd = last > 0 && safeI >= last;
   const frame = frames[safeI] || frames[0] || { actors: {}, edges: [], term: [], say: "" };
 
   // Trigger onFinish when reaching the last step
@@ -190,8 +216,42 @@ export default function StepAnimation({
     }
   }, [safeI, last, onFinish]);
 
+  const go = useCallback((n) => {
+    setPlaying(false);
+    const target = Math.max(0, Math.min(last, n));
+    setI(target);
+    if (target < last) {
+      finishedFiredRef.current = false;
+    }
+  }, [last]);
+
+  const togglePlay = () => {
+    if (playing) return setPlaying(false);
+    if (isAtEnd) {
+      setI(0);
+      finishedFiredRef.current = false;
+    }
+    setPlaying(true);
+  };
+  const onKey = (e) => {
+    if (e.key === "ArrowRight") go(safeI + 1);
+    if (e.key === "ArrowLeft") go(safeI - 1);
+    if (e.key === " ") { e.preventDefault(); togglePlay(); }
+  };
+
+  // swipe left / right on the stage = next / previous step (vertical scrolling is left alone)
+  const touch = useRef(null);
+  const onTouchStart = (e) => { const t = e.touches[0]; touch.current = [t.clientX, t.clientY]; };
+  const onTouchEnd = (e) => {
+    if (!touch.current) return;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - touch.current[0], dy = t.clientY - touch.current[1];
+    touch.current = null;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) go(safeI + (dx < 0 ? 1 : -1));
+  };
+
   return (
-    <section className={`sa ${className}`} tabIndex={0} onKeyDown={onKey} aria-label={`Animation: ${animation?.title || "Step Animation"}`}>
+    <section ref={root} className={`sa ${compact ? "is-compact" : ""} ${className}`} tabIndex={0} onKeyDown={onKey} aria-label={`Animation: ${animation?.title || "Step Animation"}`}>
       {showTitle && (
         <header className="sa-head">
           <div>
@@ -203,27 +263,28 @@ export default function StepAnimation({
       )}
 
       <div className="sa-scroll">
-        <div className="sa-stage">
-          <Edges frame={frame} uid={uid} />
-          {Object.entries(frame.actors).map(([id, a]) => <Actor key={id} a={a} />)}
+        <div className="sa-stage" style={{ aspectRatio: `${stage.w} / ${stage.h}` }} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+          <Edges frame={frame} uid={uid} stage={stage} />
+          {Object.entries(frame.actors).map(([id, a]) => <Actor key={id} a={a} compact={compact} />)}
         </div>
       </div>
 
       {hasTerm && <Terminal frame={frame} step={safeI} />}
 
-      <p className="sa-say" aria-live="polite" key={safeI}>{frame.say}</p>
-
-      <footer className="sa-ctrl">
-        <button onClick={() => go(0)} aria-label="Restart" title="Restart">↺</button>
-        <button onClick={() => go(safeI - 1)} disabled={safeI === 0} aria-label="Previous step">‹</button>
-        <button className="primary" onClick={togglePlay} aria-label={playing ? "Pause" : "Play"}>{playing ? "❚❚ Pause" : safeI >= last ? "↻ Replay" : "▶ Play"}</button>
-        <button onClick={() => go(safeI + 1)} disabled={safeI === last} aria-label="Next step">›</button>
-        <div className="sa-dots">
-          {frames.map((_, n) => (
-            <button key={n} className={n === safeI ? "on" : n < safeI ? "done" : ""} onClick={() => go(n)} aria-label={`Go to step ${n + 1}`} />
-          ))}
-        </div>
-      </footer>
+      <div className="sa-dock">
+        <p className="sa-say" aria-live="polite" key={safeI}>{frame.say}</p>
+        <footer className="sa-ctrl">
+          <button onClick={() => go(0)} aria-label="Restart" title="Restart">↺</button>
+          <button onClick={() => go(safeI - 1)} disabled={safeI === 0} aria-label="Previous step">‹</button>
+          <button className="primary" onClick={togglePlay} aria-label={playing ? "Pause" : isAtEnd ? "Replay" : "Play"}>{playing ? "❚❚ Pause" : isAtEnd ? "↻ Replay" : "▶ Play"}</button>
+          <button onClick={() => go(safeI + 1)} disabled={safeI === last} aria-label="Next step">›</button>
+          <div className="sa-dots">
+            {frames.map((_, n) => (
+              <button key={n} className={n === safeI ? "on" : n < safeI ? "done" : ""} onClick={() => go(n)} aria-label={`Go to step ${n + 1}`} />
+            ))}
+          </div>
+        </footer>
+      </div>
     </section>
   );
 }
