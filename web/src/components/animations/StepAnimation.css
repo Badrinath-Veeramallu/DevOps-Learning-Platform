@@ -23,6 +23,7 @@
   border-radius: 20px;
   box-shadow: 0 14px 40px -24px rgba(59, 28, 34, .45);
   overflow: hidden;
+  overflow: clip; /* clip (not hidden) keeps the sticky caption bar working on phones */
   outline: none;
 }
 .sa:focus-visible { box-shadow: 0 0 0 3px rgba(168, 101, 122, .35); }
@@ -87,6 +88,13 @@
 .sa-bar i { display: block; height: 100%; background: currentColor; border-radius: inherit; transition: width .9s ease; }
 .t-brand .sa-bar { background: rgba(255, 255, 255, .25); }
 
+/* layer bars (image layers, stack levels) and storage cylinders (volumes) */
+.sa-layer { padding: .5em .8em; border-radius: .55em; font-size: max(8.5px, 1.15cqw); box-shadow: 0 4px 10px -8px rgba(59, 28, 34, .5); }
+.sa-layer .sa-text { font-weight: 700; }
+.sa-vol { padding: 1.5em .6em .8em; border-radius: 45% / 16%; box-shadow: 0 6px 14px -8px rgba(59, 28, 34, .55); }
+.sa-vol::before { content: ""; position: absolute; left: -1.5px; right: -1.5px; top: -1.5px; height: 34%; border: 1.5px solid currentColor; border-radius: 50%; background: rgba(255, 255, 255, .45); opacity: .55; }
+.sa-vol .sa-text { position: relative; }
+
 /* code panels (diffs, YAML, README, conflict markers…) */
 .sa-code { background: #2a1419; color: #f3e4e7; border-radius: .9em; overflow: hidden; text-align: left; box-shadow: 0 10px 24px -14px rgba(59, 28, 34, .8); }
 .sa-code-bar { display: flex; align-items: center; gap: .4em; padding: .55em .9em; background: var(--sa-maroon); font-size: .8em; color: #e6cfd4; }
@@ -116,7 +124,7 @@
 .sa-tl.new { opacity: 0; animation: sa-fade .01s var(--delay, 0ms) forwards; }
 .sa-tl.new .sa-typed { overflow: hidden; width: 0; animation: sa-type var(--d, 600ms) steps(var(--n, 1), end) var(--delay, 0ms) forwards; }
 
-/* caption + controls */
+/* caption + controls — wrapped in sa-dock so phone layout can make them sticky */
 .sa-say { margin: 0; padding: 16px 22px 8px; min-height: 3.2em; font-size: 1.02rem; line-height: 1.5; color: var(--sa-ink); animation: sa-rise .4s ease both; }
 .sa-ctrl { display: flex; align-items: center; gap: 8px; padding: 10px 18px 18px; flex-wrap: wrap; }
 .sa-ctrl button { font: 600 .85rem "Plus Jakarta Sans", system-ui, sans-serif; cursor: pointer; border: 1px solid var(--sa-line); background: #fff; color: var(--sa-maroon); border-radius: 12px; padding: 8px 14px; transition: background .2s, transform .1s; }
@@ -130,6 +138,7 @@
 .sa-dots button.done { background: var(--sa-rose); }
 .sa-dots button.on { background: var(--sa-maroon); transform: scale(1.35); }
 
+@keyframes sa-wipe { to { clip-path: inset(0 0 0 0); } }
 @keyframes sa-fade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes sa-rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 @keyframes sa-ln { from { opacity: 0; transform: translateX(-6px); } to { opacity: 1; transform: none; } }
@@ -140,4 +149,52 @@
 @media (prefers-reduced-motion: reduce) {
   .sa *, .sa *::before { transition: none !important; animation: none !important; }
   .sa-tl.new { opacity: 1; } .sa-tl.new .sa-typed { width: auto; }
+}
+
+/* ======================================================================
+   PHONE LAYOUT  (.is-compact is set by the component when it is < 640px wide,
+   so it also works inside narrow panels, split-screen and small tablets)
+   Stage = 360 x N portrait canvas; flows run top -> bottom.
+   ====================================================================== */
+.sa.is-compact { border-radius: 16px; }
+.sa.is-compact .sa-head { padding: 12px 14px; }
+.sa.is-compact .sa-head h3 { font-size: 1rem; line-height: 1.25; }
+.sa.is-compact .sa-scroll { overflow: visible; }
+.sa.is-compact .sa-stage { min-width: 0; max-width: 440px; margin: 0 auto; background-size: 8cqw 8cqw; touch-action: pan-y; }
+
+.sa.is-compact .sa-a { font-size: max(10px, 2.9cqw); }
+.sa.is-compact .sa-box { padding: .7em .8em; }
+.sa.is-compact .sa-file { font-size: max(9.5px, 2.65cqw); padding: .6em .4em .55em; }
+.sa.is-compact .sa-pill { font-size: max(9.5px, 2.8cqw); white-space: normal; max-width: 92%; text-align: center; line-height: 1.25; padding: .4em .9em; }
+.sa.is-compact .sa-pill .sa-text { display: inline; }
+.sa.is-compact .sa-commit { font-size: max(8px, 2.3cqw); }
+.sa.is-compact .sa-commit .sa-sub { font-size: max(9px, 2.6cqw); margin: 0; top: 50%; transform: translateY(-50%); white-space: nowrap; }
+.sa.is-compact .sa-commit.side-r .sa-sub { left: 100%; margin-left: .5em; text-align: left; }
+.sa.is-compact .sa-commit.side-l .sa-sub { left: auto; right: 100%; margin-right: .5em; text-align: right; }
+.sa.is-compact .sa-zone-label { font-size: .75em; top: .6em; left: .9em; }
+
+/* code panels: full width, wrap long lines instead of clipping */
+.sa.is-compact .sa-code-body { font-size: max(8.5px, 2.45cqw); line-height: 1.5; }
+.sa.is-compact .sa-code-bar { font-size: max(8.5px, 2.4cqw); }
+.sa.is-compact .sa-ln { white-space: pre-wrap; overflow-wrap: anywhere; }
+
+.sa.is-compact .sa-edge text { font-size: 11px; stroke-width: 4; }
+.sa.is-compact .sa-edge line { stroke-width: 2; }
+
+/* terminal: wrap long commands; "typing" becomes a left-to-right reveal */
+.sa.is-compact .sa-term { margin: 0 10px 6px; }
+.sa.is-compact .sa-term-body { height: 7.4rem; font-size: .7rem; padding: 8px 10px; }
+.sa.is-compact .sa-tl { white-space: pre-wrap; word-break: break-all; }
+.sa.is-compact .sa-tl.new .sa-typed { display: inline-block; max-width: calc(100% - 2ch); width: auto; overflow: visible; clip-path: inset(0 100% 0 0); animation: sa-wipe var(--d, 600ms) steps(var(--n, 1), end) var(--delay, 0ms) forwards; }
+
+/* caption + controls dock to the bottom of the screen while the stage scrolls */
+.sa.is-compact .sa-dock { position: sticky; bottom: 0; z-index: 5; background: rgba(255, 255, 255, .96); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border-top: 1px solid var(--sa-line); padding-bottom: env(safe-area-inset-bottom, 0px); }
+.sa.is-compact .sa-say { padding: 10px 14px 4px; min-height: 0; font-size: .92rem; line-height: 1.45; }
+.sa.is-compact .sa-ctrl { padding: 6px 12px 12px; gap: 8px; flex-wrap: nowrap; }
+.sa.is-compact .sa-ctrl button { min-width: 44px; min-height: 44px; padding: 0 12px; font-size: 1rem; border-radius: 14px; }
+.sa.is-compact .sa-ctrl button.primary { flex: 1; font-size: .9rem; }
+.sa.is-compact .sa-dots { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .sa.is-compact .sa-tl.new .sa-typed { clip-path: none; }
 }

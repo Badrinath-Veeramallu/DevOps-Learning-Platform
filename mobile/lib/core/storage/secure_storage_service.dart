@@ -10,6 +10,11 @@ abstract class ISecureStorageService {
   Future<void> saveToken(String token);
   Future<void> deleteToken();
   Future<bool> hasToken();
+
+  // Generic key-value storage methods (with default fallbacks for mocks)
+  Future<String?> read(String key) async => null;
+  Future<void> write(String key, String value) async {}
+  Future<void> delete(String key) async {}
 }
 
 /// Production implementation of [ISecureStorageService] using [FlutterSecureStorage].
@@ -51,5 +56,28 @@ class SecureStorageService implements ISecureStorageService {
   Future<bool> hasToken() async {
     final token = await getToken();
     return token != null && token.isNotEmpty;
+  }
+
+  @override
+  Future<String?> read(String key) async {
+    try {
+      return await _storage.read(key: key);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  @override
+  Future<void> write(String key, String value) async {
+    try {
+      await _storage.write(key: key, value: value);
+    } catch (_) {}
+  }
+
+  @override
+  Future<void> delete(String key) async {
+    try {
+      await _storage.delete(key: key);
+    } catch (_) {}
   }
 }

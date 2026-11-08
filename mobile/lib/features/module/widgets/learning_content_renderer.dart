@@ -13,11 +13,13 @@ import 'subtopic_animation_card.dart';
 class LearningContentRenderer extends StatelessWidget {
   final CurriculumSection section;
   final String moduleNumber;
+  final VoidCallback? onAnimationFinish;
 
   const LearningContentRenderer({
     super.key,
     required this.section,
     required this.moduleNumber,
+    this.onAnimationFinish,
   });
 
   void _handleCopyLink(BuildContext context, String url) {
@@ -213,6 +215,7 @@ class LearningContentRenderer extends StatelessWidget {
           SubtopicAnimationCard(
             animationKey: '$moduleNumber.${section.number}',
             fallbackTitle: section.title,
+            onFinish: onAnimationFinish,
           ),
         ],
       ),

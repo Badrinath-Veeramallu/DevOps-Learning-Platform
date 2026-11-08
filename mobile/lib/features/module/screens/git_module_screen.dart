@@ -10,6 +10,7 @@ import '../../../core/widgets/app_header_bar.dart';
 import '../../../models/curriculum_model.dart';
 import '../../../providers/auth_provider.dart';
 import '../../animations/services/animation_loader.dart';
+import '../../pathway/data/activity_service.dart';
 import '../../pathway/data/git_curriculum_repository.dart';
 import '../../pathway/data/progress_service.dart';
 import '../widgets/learning_content_renderer.dart';
@@ -69,6 +70,7 @@ class _GitModuleScreenState extends State<GitModuleScreen> {
       _resolveCurrentModule();
       _selectedSubtopicIndex = 0;
       _updateCompletionStatus();
+      _logLessonViewed();
     }
   }
 
@@ -93,6 +95,26 @@ class _GitModuleScreenState extends State<GitModuleScreen> {
     setState(() => _isCompleted = isDone);
   }
 
+  void _logLessonViewed() {
+    if (_currentModule == null) return;
+    final authProvider = context.read<AuthProvider>();
+    final userId = authProvider.user?.id ?? 'guest';
+    ActivityService().logLessonViewed(
+      userId: userId,
+      stopSlug: _currentModule!.id,
+    );
+  }
+
+  void _handleAnimationFinish() {
+    if (_currentModule == null) return;
+    final authProvider = context.read<AuthProvider>();
+    final userId = authProvider.user?.id ?? 'guest';
+    ActivityService().logAnimationFinished(
+      userId: userId,
+      stopSlug: _currentModule!.id,
+    );
+  }
+
   Future<void> _loadData() async {
     if (widget.initialModules != null) {
       _modules = widget.initialModules!;
@@ -101,6 +123,7 @@ class _GitModuleScreenState extends State<GitModuleScreen> {
         _isCompleted = widget.initialCompletedIds!.contains(_currentModule!.id);
       }
       setState(() => _isLoading = false);
+      _logLessonViewed();
       return;
     }
 
@@ -108,11 +131,11 @@ class _GitModuleScreenState extends State<GitModuleScreen> {
       final authProvider = context.read<AuthProvider>();
       final userId = authProvider.user?.id ?? 'guest';
 
-      // Load curriculum and animations in parallel
+      // Load curriculum and animations in parallel, syncing user progress
       final results = await Future.wait([
         GitCurriculumRepository.loadCurriculum(),
         AnimationLoader.loadAnimations(),
-        ProgressService().getCompletedModules(userId),
+        ProgressService().fetchUserProgress(userId),
       ]);
 
       final loadedModules = results[0] as List<CurriculumModule>;
@@ -127,6 +150,7 @@ class _GitModuleScreenState extends State<GitModuleScreen> {
           }
           _isLoading = false;
         });
+        _logLessonViewed();
       }
     } catch (e) {
       if (mounted) {
@@ -187,12 +211,14 @@ class _GitModuleScreenState extends State<GitModuleScreen> {
 
     if (mounted) {
       setState(() => _isCompleted = isNowDone);
+      final isSynced = ProgressService().isSynced(userId);
+      final syncSuffix = isSynced ? '' : ' (Saved locally)';
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
             isNowDone
-                ? 'Module ${_currentModule!.order} marked as completed!'
-                : 'Module ${_currentModule!.order} marked as incomplete.',
+                ? 'Module ${_currentModule!.order} marked as completed!$syncSuffix'
+                : 'Module ${_currentModule!.order} marked as incomplete.$syncSuffix',
           ),
           backgroundColor: isNowDone ? AppColors.success : AppColors.surfaceElevated,
           duration: const Duration(seconds: 2),
@@ -327,6 +353,7 @@ class _GitModuleScreenState extends State<GitModuleScreen> {
             LearningContentRenderer(
               section: currentSection,
               moduleNumber: module.number,
+              onAnimationFinish: _handleAnimationFinish,
             ),
 
           // 5. Navigation & Completion Footer

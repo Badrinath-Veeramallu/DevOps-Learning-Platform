@@ -8,6 +8,8 @@ import '../../../core/theme/app_typography.dart';
 import '../../../core/widgets/app_bottom_nav_bar.dart';
 import '../../../core/widgets/app_header_bar.dart';
 import '../../../providers/auth_provider.dart';
+import '../../pathway/data/progress_service.dart';
+import '../../profile/widgets/activity_heatmap.dart';
 import '../models/learning_path_track.dart';
 import '../widgets/continue_learning_card.dart';
 import '../widgets/learning_track_card.dart';
@@ -22,6 +24,16 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   String _activeTrackId = 'git';
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final authProvider = context.read<AuthProvider>();
+      final userId = authProvider.user?.id ?? 'guest';
+      ProgressService().fetchUserProgress(userId);
+    });
+  }
 
   String _resolveDisplayName(String? fullName) {
     if (fullName == null || fullName.trim().isEmpty) {
@@ -129,6 +141,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 track: activeTrack,
                 onContinue: () => _handleContinue(activeTrack),
               ),
+              const SizedBox(height: 24),
+
+              // Activity Heatmap
+              ActivityHeatmap(apiClient: authProvider.apiClient),
               const SizedBox(height: 32),
 
               // Available Learning Paths Section

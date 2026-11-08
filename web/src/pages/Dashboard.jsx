@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
-import { ActivityHeatmap } from "../components/ActivityHeatmap";
 
 export const Dashboard = () => {
   const { user } = useAuth();
@@ -24,21 +23,21 @@ export const Dashboard = () => {
       hasPathway: true,
     },
     {
+      id: "docker",
+      title: "Docker & Container Engineering",
+      level: "Intermediate",
+      modules: "7 Modules · Interactive Pathway",
+      description:
+        "Container isolation, multi-stage Dockerfile architecture, layer caching, container networking, and security best practices.",
+      hasPathway: true,
+    },
+    {
       id: "linux",
       title: "Linux Systems & Automation",
       level: "Foundational",
       modules: "8 Modules",
       description:
         "Linux kernel fundamentals, process management, permissions, systemd services, and bash shell automation.",
-      hasPathway: false,
-    },
-    {
-      id: "docker",
-      title: "Docker & Container Engineering",
-      level: "Intermediate",
-      modules: "8 Modules",
-      description:
-        "Container isolation, multi-stage Dockerfile architecture, layer caching, container networking, and security best practices.",
       hasPathway: false,
     },
     {
@@ -75,12 +74,16 @@ export const Dashboard = () => {
     localStorage.setItem("devops_active_track", trackId);
     if (trackId === "git") {
       navigate("/pathways/git");
+    } else if (trackId === "docker") {
+      navigate("/pathways/docker");
     }
   };
 
   const handleContinue = (path) => {
     if (path.id === "git") {
       navigate("/pathways/git");
+    } else if (path.id === "docker") {
+      navigate("/pathways/docker");
     } else {
       alert(`Continuing ${path.title}`);
     }
@@ -111,7 +114,7 @@ export const Dashboard = () => {
                     {activePath.level}
                   </span>
                   <span className="continue-module-label">
-                    {activePath.id === "git" ? "Interactive Pathway Active" : "Module in progress"}
+                    {activePath.hasPathway ? "Interactive Pathway Active" : "Module in progress"}
                   </span>
                 </div>
                 <h3 className="continue-track-title">{activePath.title}</h3>
@@ -124,7 +127,7 @@ export const Dashboard = () => {
                   className="btn-continue-primary"
                   onClick={() => handleContinue(activePath)}
                 >
-                  <span>{activePath.id === "git" ? "Open Pathway" : "Continue"}</span>
+                  <span>{activePath.hasPathway ? "Open Pathway" : "Continue"}</span>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
                     <polyline points="9 18 15 12 9 6" />
                   </svg>
@@ -141,11 +144,6 @@ export const Dashboard = () => {
           )}
         </section>
 
-        {/* Learning Activity Heatmap */}
-        <section className="dashboard-activity-section" aria-label="Learning Activity">
-          <ActivityHeatmap />
-        </section>
-
         {/* Available Learning Paths */}
         <section className="dashboard-tracks-section" id="available-paths" aria-label="Available Learning Paths">
           <div className="tracks-header">
@@ -158,7 +156,7 @@ export const Dashboard = () => {
           <div className="dashboard-paths-grid">
             {learningPaths.map((path) => {
               const isActive = path.id === activeTrackId;
-              const isGit = path.id === "git";
+              const hasPathway = Boolean(path.hasPathway);
 
               return (
                 <div key={path.id} className={`dashboard-path-card ${isActive ? "active-path-card" : ""}`}>
@@ -186,10 +184,10 @@ export const Dashboard = () => {
                     <button
                       type="button"
                       onClick={() => handleSelectTrack(path.id)}
-                      className={`btn-path-action ${isGit ? "btn-path-highlight" : ""} ${isActive ? "btn-active-track" : ""}`}
+                      className={`btn-path-action ${hasPathway ? "btn-path-highlight" : ""} ${isActive ? "btn-active-track" : ""}`}
                     >
                       <span>
-                        {isGit ? "View Pathway" : isActive ? "Active Path" : "Start Learning"}
+                        {hasPathway ? "View Pathway" : isActive ? "Active Path" : "Start Learning"}
                       </span>
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                         <polyline points="9 18 15 12 9 6" />

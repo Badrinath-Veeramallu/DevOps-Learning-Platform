@@ -184,4 +184,82 @@ class ApiClient {
       throw ApiException.fromDioException(e);
     }
   }
+
+  /// Fetch learning pathway progress for the authenticated user.
+  ///
+  /// Calls `GET /api/progress/:pathwayId`.
+  /// Returns `{ "success": true, "pathwayId": "git", "completedModules": [...] }`.
+  Future<Map<String, dynamic>> getProgress({String pathwayId = 'git'}) async {
+    try {
+      final response = await _dio.get(
+        '/progress/${Uri.encodeComponent(pathwayId)}',
+      );
+      return response.data as Map<String, dynamic>;
+    } on DioException catch (e) {
+      throw ApiException.fromDioException(e);
+    }
+  }
+
+  /// Toggle completion of a module on the backend.
+  ///
+  /// Calls `POST /api/progress/:pathwayId/toggle`.
+  /// Returns `{ "success": true, "pathwayId": "git", "moduleId": "...", "isCompleted": bool, "completedModules": [...] }`.
+  Future<Map<String, dynamic>> toggleProgress({
+    required String moduleId,
+    String pathwayId = 'git',
+  }) async {
+    try {
+      final response = await _dio.post(
+        '/progress/${Uri.encodeComponent(pathwayId)}/toggle',
+        data: {'moduleId': moduleId},
+      );
+      return response.data as Map<String, dynamic>;
+    } on DioException catch (e) {
+      throw ApiException.fromDioException(e);
+    }
+  }
+
+  /// Log client activity event (e.g. lesson_viewed or animation_finished).
+  ///
+  /// Calls `POST /api/activity/log`.
+  /// Returns `{ "success": true, "logged": bool }`.
+  Future<Map<String, dynamic>> logActivity({
+    required String type,
+    required String stopSlug,
+    String pathwayId = 'git',
+  }) async {
+    try {
+      final response = await _dio.post(
+        '/activity/log',
+        data: {
+          'type': type,
+          'pathwayId': pathwayId,
+          'stopSlug': stopSlug,
+        },
+      );
+      return response.data as Map<String, dynamic>;
+    } on DioException catch (e) {
+      throw ApiException.fromDioException(e);
+    }
+  }
+
+  /// Fetch aggregated daily activity counts over the last 365 days ending today.
+  ///
+  /// Calls `GET /api/activity?tz=...`.
+  /// Returns `{ "total": int, "days": [{ "date": "YYYY-MM-DD", "count": int }] }`.
+  Future<Map<String, dynamic>> getActivity({String? tz}) async {
+    try {
+      final queryParams = <String, dynamic>{};
+      if (tz != null && tz.isNotEmpty) {
+        queryParams['tz'] = tz;
+      }
+      final response = await _dio.get(
+        '/activity',
+        queryParameters: queryParams,
+      );
+      return response.data as Map<String, dynamic>;
+    } on DioException catch (e) {
+      throw ApiException.fromDioException(e);
+    }
+  }
 }

@@ -9,7 +9,7 @@ import '../../features/module/screens/git_module_screen.dart';
 import '../../features/onboarding/screens/splash_screen.dart';
 import '../../features/onboarding/screens/welcome_screen.dart';
 import '../../features/pathway/screens/git_pathway_screen.dart';
-import '../../core/widgets/phase_placeholder_screen.dart';
+import '../../features/profile/screens/profile_screen.dart';
 import '../../providers/auth_provider.dart';
 import 'route_names.dart';
 
@@ -138,13 +138,7 @@ class AppRouter {
           path: RouteNames.profile,
           name: 'profile',
           builder: (BuildContext context, GoRouterState state) {
-            return const PhasePlaceholderScreen(
-              title: 'My Profile',
-              phaseDescription:
-                  'Account management and 52-week activity heatmap.',
-              comingInPhase: 'Phase 6',
-              icon: Icons.person_rounded,
-            );
+            return const ProfileScreen();
           },
         ),
       ],

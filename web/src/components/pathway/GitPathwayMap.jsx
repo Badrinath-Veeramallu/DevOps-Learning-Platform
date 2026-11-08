@@ -11,19 +11,19 @@ import { gitCurriculum } from "../../data/gitCurriculum";
  */
 export const GitPathwayMap = ({
   modules = gitCurriculum,
-  completedIds,
   completedModuleIds,
+  completedIds,
 }) => {
   const pathwayModules = Array.isArray(modules) && modules.length > 0 ? modules : gitCurriculum;
-  const activeCompletedIds = Array.isArray(completedIds)
-    ? completedIds
-    : Array.isArray(completedModuleIds)
+  const effectiveCompletedIds = Array.isArray(completedModuleIds)
     ? completedModuleIds
+    : Array.isArray(completedIds)
+    ? completedIds
     : [];
 
   // Determine current active stop (the first non-completed module, or the last one if all are done)
   const currentStopIndex = pathwayModules.findIndex(
-    (mod) => !activeCompletedIds.includes(mod.id)
+    (mod) => !effectiveCompletedIds.includes(mod.id)
   );
   const activeIndex = currentStopIndex === -1 ? pathwayModules.length - 1 : currentStopIndex;
 
@@ -87,7 +87,7 @@ export const GitPathwayMap = ({
         {/* 7 Pathway Stops */}
         <div className="pathway-stops-list">
           {pathwayModules.map((module, idx) => {
-            const isCompleted = activeCompletedIds.includes(module.id);
+            const isCompleted = effectiveCompletedIds.includes(module.id);
             const isCurrent = idx === activeIndex && !isCompleted;
             const isUpcoming = !isCompleted && !isCurrent;
             const isEven = idx % 2 === 0;
@@ -224,7 +224,7 @@ export const GitPathwayMap = ({
           <div className="pathway-endpoint-anchor">
             <div
               className={`pathway-endpoint-monument finish-monument ${
-                activeCompletedIds.length === pathwayModules.length ? "is-completed-all" : ""
+                effectiveCompletedIds.length === pathwayModules.length ? "is-completed-all" : ""
               }`}
             >
               <div className="endpoint-icon-circle finish-circle" title="Pathway Finish">
