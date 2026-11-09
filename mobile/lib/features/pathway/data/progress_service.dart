@@ -21,16 +21,31 @@ enum SyncStatus {
   localOnly,
 }
 
+/// Representation of an operation waiting in the serial FIFO mutation queue.
+class _QueuedMutation<T> {
+  final Future<T> Function() action;
+  final Completer<T> completer;
+  final int sessionGeneration;
+  final String userId;
+
+  _QueuedMutation({
+    required this.action,
+    required this.completer,
+    required this.sessionGeneration,
+    required this.userId,
+  });
+}
+
 /// Service responsible for managing pathway module completion progress and
 /// synchronizing with the backend REST API (`/api/progress/:pathwayId`).
 ///
 /// Features:
 /// - User-scoped caching matching Web's `devops_progress_${userId}_${pathway}`
 /// - Explicit pending local progress change tracking (`devops_pending_${userId}_${pathway}`)
-/// - Strictly serialized mutation queue to prevent concurrent race conditions
-/// - Offline progress preservation without destructive server overrides or blind unions
-/// - Safe GET reconciliation on network uncertainty (never blindly retrying toggle)
-/// - Explicit SyncStatus distinguishing synced, pending, offline, and localOnly
+/// - Strictly serialized FIFO asynchronous queue with session-generation invalidation
+/// - Safe GET-first reconciliation on connectivity recovery and offline sync
+/// - Protection against stale responses and cross-account mutation leakages
+/// - Never blindly retries toggles; verifies server state via safe GET
 class ProgressService extends ChangeNotifier {
   static final ProgressService _instance = ProgressService._internal();
   factory ProgressService() => _instance;
@@ -49,9 +64,26 @@ class ProgressService extends ChangeNotifier {
   // Track sync status keyed by "${userId}_${pathway}"
   final Map<String, SyncStatus> _status = {};
 
-  // Serialized mutation chain to strictly serialize all toggle and set operations
-  Future<void> _lastMutation = Future.value();
-  bool _isMutating = false;
+  // Session generation counter incremented on logout/clearCache to invalidate prior operations
+  int _currentSessionGeneration = 0;
+
+  // FIFO async mutation queue and processing state per session generation
+  final Map<int, List<_QueuedMutation<dynamic>>> _sessionQueues = {};
+  final Set<int> _activeSessionWorkers = {};
+  final Map<int, Set<_QueuedMutation<dynamic>>> _activeSessionMutations = {};
+  int _maxObservedConcurrent = 0;
+
+  /// Visible for testing to verify exact concurrent mutation count is never > 1.
+  int get activeMutationCount =>
+      _activeSessionMutations[_currentSessionGeneration]?.length ?? 0;
+  int get queuedMutationCount =>
+      _sessionQueues[_currentSessionGeneration]?.length ?? 0;
+  int get maxObservedConcurrent => _maxObservedConcurrent;
+  int get currentSessionGeneration => _currentSessionGeneration;
+
+  void resetMaxObservedConcurrent() {
+    _maxObservedConcurrent = 0;
+  }
 
   void init({
     ApiClient? apiClient,
@@ -84,60 +116,152 @@ class ProgressService extends ChangeNotifier {
     return '${cleanId}_$pathway';
   }
 
-  /// Serializes operations to avoid concurrent in-flight toggle requests.
-  ///
-  /// When idle, executes the first part synchronously up to the first await.
-  /// When busy, queues operations sequentially.
-  Future<T> _enqueueMutation<T>(Future<T> Function() action) {
-    if (!_isMutating) {
-      _isMutating = true;
-      final completer = Completer<T>();
-      _lastMutation = completer.future;
+  /// Strictly serializes operations in FIFO order with session invalidation support.
+  Future<T> _enqueueMutation<T>({
+    required String userId,
+    required Future<T> Function() action,
+  }) {
+    final generation = _currentSessionGeneration;
+    final completer = Completer<T>();
+    final mutation = _QueuedMutation<T>(
+      action: action,
+      completer: completer,
+      sessionGeneration: generation,
+      userId: userId,
+    );
+    final queue = _sessionQueues.putIfAbsent(generation, () => []);
+    queue.add(mutation);
+    _processSessionQueue(generation);
+    return completer.future;
+  }
 
-      try {
-        final future = action();
-        future.then((result) {
-          _isMutating = false;
-          completer.complete(result);
-        }, onError: (err, st) {
-          _isMutating = false;
-          completer.completeError(err, st);
-        });
-      } catch (err, st) {
-        _isMutating = false;
-        completer.completeError(err, st);
-      }
+  /// Executes queued mutations for [generation] one-by-one in strict FIFO sequence.
+  Future<void> _processSessionQueue(int generation) async {
+    if (_activeSessionWorkers.contains(generation)) return;
+    _activeSessionWorkers.add(generation);
 
-      return completer.future;
-    } else {
-      final completer = Completer<T>();
-      final previous = _lastMutation;
-      _lastMutation = completer.future;
-
-      previous.whenComplete(() {
-        try {
-          final future = action();
-          future.then((result) {
-            completer.complete(result);
-          }, onError: (err, st) {
-            completer.completeError(err, st);
-          });
-        } catch (err, st) {
-          completer.completeError(err, st);
+    try {
+      while (true) {
+        // If session was invalidated while in the queue loop, cancel remaining queued items
+        if (generation != _currentSessionGeneration) {
+          final queue = _sessionQueues[generation];
+          if (queue != null && queue.isNotEmpty) {
+            while (queue.isNotEmpty) {
+              final item = queue.removeAt(0);
+              if (!item.completer.isCompleted) {
+                item.completer.completeError(
+                  StateError('Operation cancelled due to logout/session change'),
+                );
+              }
+            }
+          }
+          break;
         }
-      });
 
-      return completer.future;
+        final queue = _sessionQueues[generation];
+        if (queue == null || queue.isEmpty) {
+          break;
+        }
+
+        final item = queue.removeAt(0);
+
+        // Verify that the queued operation still belongs to the active session
+        if (item.sessionGeneration != _currentSessionGeneration) {
+          if (!item.completer.isCompleted) {
+            item.completer.completeError(
+              StateError('Operation cancelled due to logout/session change'),
+            );
+          }
+          continue;
+        }
+
+        final activeSet =
+            _activeSessionMutations.putIfAbsent(generation, () => {});
+        activeSet.add(item);
+        if (activeSet.length > _maxObservedConcurrent) {
+          _maxObservedConcurrent = activeSet.length;
+        }
+
+        try {
+          final result = await item.action();
+          if (item.sessionGeneration == _currentSessionGeneration) {
+            if (!item.completer.isCompleted) {
+              item.completer.complete(result);
+            }
+          } else {
+            // Session was invalidated while the operation was executing
+            if (!item.completer.isCompleted) {
+              item.completer.completeError(
+                StateError(
+                  'Operation invalidated during execution by logout/session change',
+                ),
+              );
+            }
+          }
+        } catch (e, st) {
+          if (!item.completer.isCompleted) {
+            item.completer.completeError(e, st);
+          }
+        } finally {
+          _activeSessionMutations[generation]?.remove(item);
+        }
+      }
+    } finally {
+      _activeSessionWorkers.remove(generation);
+      _sessionQueues.remove(generation);
+      _activeSessionMutations.remove(generation);
     }
   }
 
-  Future<void> _loadPendingFromDisk(String userId, String pathway) async {
+  // Per-key write queues to serialize writes and deletes per storage key
+  final Map<String, Future<void>> _keyWriteQueues = {};
+
+  Future<void> _runWithKeyLock(
+    String key,
+    int sessionGeneration,
+    Future<void> Function() writeAction,
+  ) {
+    if (sessionGeneration != _currentSessionGeneration) {
+      return Future.value();
+    }
+
+    final prev = _keyWriteQueues[key] ?? Future.value();
+    final completer = Completer<void>();
+    _keyWriteQueues[key] = completer.future;
+
+    return prev.whenComplete(() async {
+      try {
+        if (sessionGeneration != _currentSessionGeneration) {
+          return;
+        }
+        await writeAction();
+      } catch (e) {
+        debugPrint('[ProgressService] Storage write error for key $key: $e');
+      } finally {
+        completer.complete();
+        if (_keyWriteQueues[key] == completer.future) {
+          _keyWriteQueues.remove(key);
+        }
+      }
+    });
+  }
+
+  Future<void> _loadPendingFromDisk(
+    String userId,
+    String pathway, {
+    int? sessionGeneration,
+  }) async {
+    final generation = sessionGeneration ?? _currentSessionGeneration;
+    if (generation != _currentSessionGeneration) return;
+
     final cacheKey = _getCacheKey(userId, pathway);
     if (_pendingChanges.containsKey(cacheKey)) return;
 
     try {
       final key = _getPendingStorageKey(userId, pathway);
       final raw = await _effectiveStorage.read(key);
+      if (generation != _currentSessionGeneration) return;
+
       if (raw != null && raw.isNotEmpty) {
         final Map<String, dynamic> decoded =
             json.decode(raw) as Map<String, dynamic>;
@@ -148,33 +272,61 @@ class ProgressService extends ChangeNotifier {
       }
     } catch (e) {
       debugPrint('[ProgressService] Error reading pending changes: $e');
-      _pendingChanges[cacheKey] = {};
+      if (generation == _currentSessionGeneration) {
+        _pendingChanges[cacheKey] = {};
+      }
     }
   }
 
-  Future<void> _savePendingToDisk(String userId, String pathway) async {
-    try {
-      final cacheKey = _getCacheKey(userId, pathway);
-      final key = _getPendingStorageKey(userId, pathway);
-      final map = _pendingChanges[cacheKey] ?? {};
-      if (map.isEmpty) {
+  Future<void> _savePendingToDisk(
+    String userId,
+    String pathway, {
+    int? sessionGeneration,
+  }) {
+    final generation = sessionGeneration ?? _currentSessionGeneration;
+    if (generation != _currentSessionGeneration) {
+      return Future.value();
+    }
+
+    final cacheKey = _getCacheKey(userId, pathway);
+    final key = _getPendingStorageKey(userId, pathway);
+    final map = _pendingChanges[cacheKey] ?? {};
+    final bool isEmpty = map.isEmpty;
+    final String? raw = isEmpty ? null : json.encode(map);
+
+    return _runWithKeyLock(key, generation, () async {
+      if (raw == null) {
         await _effectiveStorage.delete(key);
       } else {
-        final raw = json.encode(map);
         await _effectiveStorage.write(key, raw);
       }
-    } catch (e) {
-      debugPrint('[ProgressService] Error persisting pending changes: $e');
-    }
+    });
   }
 
-  Future<void> _ensureLoaded(String userId, String pathway) async {
+  Future<void> _ensureLoaded(
+    String userId,
+    String pathway, {
+    int? sessionGeneration,
+  }) async {
+    final generation = sessionGeneration ?? _currentSessionGeneration;
+    if (generation != _currentSessionGeneration) return;
+
     final cacheKey = _getCacheKey(userId, pathway);
     if (!_pendingChanges.containsKey(cacheKey)) {
-      await _loadPendingFromDisk(userId, pathway);
+      await _loadPendingFromDisk(
+        userId,
+        pathway,
+        sessionGeneration: generation,
+      );
     }
+    if (generation != _currentSessionGeneration) return;
+
     if (!_cache.containsKey(cacheKey)) {
-      await getCompletedModules(userId, pathway: pathway);
+      await getCompletedModules(
+        userId,
+        pathway: pathway,
+        sessionGeneration: generation,
+      );
     }
   }
 
@@ -184,9 +336,23 @@ class ProgressService extends ChangeNotifier {
   Future<Set<String>> getCompletedModules(
     String userId, {
     String pathway = 'git',
+    int? sessionGeneration,
   }) async {
+    final generation = sessionGeneration ?? _currentSessionGeneration;
+    if (generation != _currentSessionGeneration) {
+      return <String>{};
+    }
+
     final cacheKey = _getCacheKey(userId, pathway);
-    await _loadPendingFromDisk(userId, pathway);
+    await _loadPendingFromDisk(
+      userId,
+      pathway,
+      sessionGeneration: generation,
+    );
+
+    if (generation != _currentSessionGeneration) {
+      return <String>{};
+    }
 
     if (_cache.containsKey(cacheKey)) {
       return Set<String>.from(_cache[cacheKey]!);
@@ -197,12 +363,23 @@ class ProgressService extends ChangeNotifier {
     try {
       final key = _getStorageKey(userId, pathway);
       final raw = await _effectiveStorage.read(key);
+      if (generation != _currentSessionGeneration) {
+        return <String>{};
+      }
+
       if (raw != null && raw.isNotEmpty) {
         final List<dynamic> decoded = json.decode(raw) as List<dynamic>;
         set = decoded.map((e) => e.toString()).toSet();
       }
     } catch (e) {
       debugPrint('[ProgressService] Error reading stored progress: $e');
+      if (generation != _currentSessionGeneration) {
+        return <String>{};
+      }
+    }
+
+    if (generation != _currentSessionGeneration) {
+      return <String>{};
     }
 
     // Replay any pending local changes on top of stored progress
@@ -215,6 +392,10 @@ class ProgressService extends ChangeNotifier {
           set.remove(entry.key);
         }
       }
+    }
+
+    if (generation != _currentSessionGeneration) {
+      return <String>{};
     }
 
     _cache[cacheKey] = set;
@@ -234,7 +415,7 @@ class ProgressService extends ChangeNotifier {
 
   /// Checks whether local progress is confirmed to be synchronized with the backend.
   ///
-  /// Always returns `false` for guest or unauthenticated sessions.
+  /// Always returns `false` for guest, unauthenticated, pending, or offline states.
   bool isSynced(
     String userId, {
     String pathway = 'git',
@@ -282,140 +463,412 @@ class ProgressService extends ChangeNotifier {
     } else {
       _status[cacheKey] = synced ? SyncStatus.synced : SyncStatus.offline;
     }
-    _saveToDisk(userId, pathway, moduleIds);
-    _savePendingToDisk(userId, pathway);
+    _saveToDisk(userId, pathway, moduleIds, sessionGeneration: _currentSessionGeneration);
+    _savePendingToDisk(userId, pathway, sessionGeneration: _currentSessionGeneration);
     notifyListeners();
   }
 
-  /// Fetches authoritative progress from backend API and reconciles with local state.
+  /// Fetches authoritative progress from backend API and synchronizes pending changes.
   ///
-  /// CRITICAL SAFETY GUARANTEE (Issue 1):
-  /// Never deletes pending local offline completions or incompletions.
-  /// Reconciles pending changes onto server data rather than blindly wiping the local cache.
+  /// Serialized through the mutation queue to guarantee coordination with ongoing mutations.
   Future<Set<String>> fetchUserProgress(
     String userId, {
     String pathway = 'git',
+  }) {
+    final generation = _currentSessionGeneration;
+    return _enqueueMutation<Set<String>>(
+      userId: userId,
+      action: () async {
+        return _fetchAndReconcileInternal(
+          userId: userId,
+          pathway: pathway,
+          generation: generation,
+        );
+      },
+    );
+  }
+
+  /// Internal implementation of authoritative progress fetching and offline pending synchronization.
+  Future<Set<String>> _fetchAndReconcileInternal({
+    required String userId,
+    required String pathway,
+    required int generation,
   }) async {
     final cacheKey = _getCacheKey(userId, pathway);
-    await _loadPendingFromDisk(userId, pathway);
+
+    if (generation != _currentSessionGeneration) {
+      return <String>{};
+    }
+
+    await _loadPendingFromDisk(
+      userId,
+      pathway,
+      sessionGeneration: generation,
+    );
+
+    if (generation != _currentSessionGeneration) {
+      return <String>{};
+    }
 
     // Unauthenticated/guest users rely exclusively on local cache
     if (userId.trim().isEmpty || userId == 'guest') {
-      _status[cacheKey] = SyncStatus.localOnly;
-      return getCompletedModules(userId, pathway: pathway);
+      if (generation == _currentSessionGeneration) {
+        _status[cacheKey] = SyncStatus.localOnly;
+        return getCompletedModules(
+          userId,
+          pathway: pathway,
+          sessionGeneration: generation,
+        );
+      }
+      return <String>{};
     }
 
     final hasToken = await _effectiveStorage.hasToken();
+    if (generation != _currentSessionGeneration) {
+      return <String>{};
+    }
     if (!hasToken) {
       _status[cacheKey] = SyncStatus.localOnly;
-      return getCompletedModules(userId, pathway: pathway);
+      return getCompletedModules(
+        userId,
+        pathway: pathway,
+        sessionGeneration: generation,
+      );
     }
 
+    // 1. Fetch authoritative server progress (GET /api/progress/:pathwayId)
+    Set<String>? authoritativeServerSet;
     try {
       final res = await _effectiveClient.getProgress(pathwayId: pathway);
+      if (generation != _currentSessionGeneration) {
+        return <String>{};
+      }
+
       if (res['success'] == true && res['completedModules'] is List) {
-        final serverSet = (res['completedModules'] as List)
+        authoritativeServerSet = (res['completedModules'] as List)
             .map((e) => e.toString())
             .toSet();
-
-        final pending = _pendingChanges[cacheKey] ?? {};
-        final reconciledSet = Set<String>.from(serverSet);
-
-        if (pending.isNotEmpty) {
-          final resolvedModules = <String>[];
-          for (final entry in pending.entries) {
-            final modId = entry.key;
-            final desired = entry.value;
-
-            if (serverSet.contains(modId) == desired) {
-              // Server state now matches our desired state; pending change is fulfilled
-              resolvedModules.add(modId);
-            } else {
-              // Server does not yet reflect our pending change; preserve local intent
-              if (desired) {
-                reconciledSet.add(modId);
-              } else {
-                reconciledSet.remove(modId);
-              }
-            }
-          }
-
-          for (final resolved in resolvedModules) {
-            pending.remove(resolved);
-          }
-          await _savePendingToDisk(userId, pathway);
-        }
-
-        _cache[cacheKey] = reconciledSet;
-        _status[cacheKey] =
-            pending.isEmpty ? SyncStatus.synced : SyncStatus.pending;
-        await _saveToDisk(userId, pathway, reconciledSet);
-        notifyListeners();
-        return reconciledSet;
       }
     } catch (e) {
-      debugPrint('[ProgressService] fetchUserProgress network error: $e');
-      _status[cacheKey] = SyncStatus.offline;
+      debugPrint('[ProgressService] fetchUserProgress GET network error: $e');
     }
 
-    return getCompletedModules(userId, pathway: pathway);
+    if (generation != _currentSessionGeneration) {
+      return <String>{};
+    }
+
+    // Server unreachable or returned error: preserve local progress and mark offline
+    if (authoritativeServerSet == null) {
+      if (generation == _currentSessionGeneration) {
+        _status[cacheKey] = SyncStatus.offline;
+        return getCompletedModules(
+          userId,
+          pathway: pathway,
+          sessionGeneration: generation,
+        );
+      }
+      return <String>{};
+    }
+
+    // 2. Load all pending desired states
+    final pending = _pendingChanges[cacheKey] ?? {};
+    var currentServerSet = Set<String>.from(authoritativeServerSet);
+
+    // 3-8. Reconcile pending local changes sequentially using safe GET-first logic
+    if (pending.isNotEmpty) {
+      final pendingEntries = Map<String, bool>.from(pending).entries.toList();
+
+      for (final entry in pendingEntries) {
+        final moduleId = entry.key;
+        final desiredState = entry.value;
+
+        if (generation != _currentSessionGeneration) {
+          return <String>{};
+        }
+
+        // 3. Compare pending module's desired state with current server state
+        final bool serverAlreadyMatches =
+            currentServerSet.contains(moduleId) == desiredState;
+
+        // 4. If they already match, remove that pending entry
+        if (serverAlreadyMatches) {
+          pending.remove(moduleId);
+          continue;
+        }
+
+        // 5. If they differ, issue exactly one toggle request for that module
+        bool toggleConfirmed = false;
+        try {
+          final toggleRes = await _effectiveClient.toggleProgress(
+            moduleId: moduleId,
+            pathwayId: pathway,
+          );
+
+          if (generation != _currentSessionGeneration) {
+            return <String>{};
+          }
+
+          // 6. Validate the response including actual completedModules state
+          if (toggleRes['success'] == true &&
+              toggleRes['completedModules'] is List) {
+            final updatedServerSet = (toggleRes['completedModules'] as List)
+                .map((e) => e.toString())
+                .toSet();
+            currentServerSet = updatedServerSet;
+
+            // Confirm that server state actually matches desiredState
+            if (updatedServerSet.contains(moduleId) == desiredState) {
+              pending.remove(moduleId);
+              toggleConfirmed = true;
+            }
+          }
+        } catch (toggleErr) {
+          debugPrint(
+            '[ProgressService] Reconciliation toggle error ($toggleErr).',
+          );
+        }
+
+        if (generation != _currentSessionGeneration) {
+          return <String>{};
+        }
+
+        // 7. If result is uncertain or toggle didn't confirm, perform safe GET
+        if (!toggleConfirmed) {
+          try {
+            final getRes =
+                await _effectiveClient.getProgress(pathwayId: pathway);
+            if (generation != _currentSessionGeneration) {
+              return <String>{};
+            }
+
+            if (getRes['success'] == true &&
+                getRes['completedModules'] is List) {
+              final verifiedServerSet = (getRes['completedModules'] as List)
+                  .map((e) => e.toString())
+                  .toSet();
+              currentServerSet = verifiedServerSet;
+
+              // 8. Remove pending entry only after server is confirmed to match
+              if (verifiedServerSet.contains(moduleId) == desiredState) {
+                pending.remove(moduleId);
+              }
+            }
+          } catch (getErr) {
+            debugPrint(
+              '[ProgressService] Reconciliation verification GET failed: $getErr',
+            );
+          }
+        }
+      }
+    }
+
+    if (generation != _currentSessionGeneration) {
+      return <String>{};
+    }
+
+    // Save pruned pending changes to persistent storage
+    await _savePendingToDisk(
+      userId,
+      pathway,
+      sessionGeneration: generation,
+    );
+    if (generation != _currentSessionGeneration) {
+      return <String>{};
+    }
+
+    // Compute active reconciled set by replaying any remaining pending changes onto currentServerSet
+    final reconciledSet = Set<String>.from(currentServerSet);
+    for (final entry in pending.entries) {
+      if (entry.value) {
+        reconciledSet.add(entry.key);
+      } else {
+        reconciledSet.remove(entry.key);
+      }
+    }
+
+    if (generation != _currentSessionGeneration) {
+      return <String>{};
+    }
+
+    _cache[cacheKey] = reconciledSet;
+    _status[cacheKey] =
+        pending.isEmpty ? SyncStatus.synced : SyncStatus.pending;
+
+    await _saveToDisk(
+      userId,
+      pathway,
+      reconciledSet,
+      sessionGeneration: generation,
+    );
+    if (generation != _currentSessionGeneration) {
+      return <String>{};
+    }
+    notifyListeners();
+
+    return reconciledSet;
   }
 
   /// Safely toggles completion of a module on the backend.
-  ///
-  /// CRITICAL SAFETY GUARANTEES:
-  /// 1. Entire mutation lifecycle is inside [_enqueueMutation] to prevent stale state reads.
-  /// 2. Never blindly retries a toggle on timeout or network error.
-  /// 3. If a toggle outcome is uncertain, executes a safe GET request to reconcile server state.
-  /// 4. Optimistically updates local cache and preserves progress during offline usage.
-  /// 5. Stale responses arriving while newer mutations are in flight are safely reconciled.
   Future<bool> toggleModuleCompletion(
     String userId,
     String moduleId, {
     String pathway = 'git',
   }) {
-    return _enqueueMutation(() async {
-      await _ensureLoaded(userId, pathway);
-      final cacheKey = _getCacheKey(userId, pathway);
-      final current = _cache[cacheKey] ?? <String>{};
-      final bool wasCompleted = current.contains(moduleId);
-      final bool desiredState = !wasCompleted;
+    final generation = _currentSessionGeneration;
+    return _enqueueMutation<bool>(
+      userId: userId,
+      action: () async {
+        await _ensureLoaded(
+          userId,
+          pathway,
+          sessionGeneration: generation,
+        );
+        if (generation != _currentSessionGeneration) {
+          return false;
+        }
+        final cacheKey = _getCacheKey(userId, pathway);
+        final current = _cache[cacheKey] ?? <String>{};
+        final bool wasCompleted = current.contains(moduleId);
+        final bool desiredState = !wasCompleted;
 
-      return _executeMutation(
-        userId: userId,
-        pathway: pathway,
-        moduleId: moduleId,
-        desiredState: desiredState,
-      );
-    });
+        return _executeMutation(
+          userId: userId,
+          pathway: pathway,
+          moduleId: moduleId,
+          desiredState: desiredState,
+          generation: generation,
+        );
+      },
+    );
   }
 
   /// Explicitly sets a module to completed or incomplete.
   ///
-  /// Serialized and idempotent: no-ops if already in desired state inside the queue.
+  /// Serialized and idempotent:
+  /// - If local state matches and no pending change exists, returns immediately without an API request.
+  /// - If local state matches but an unresolved pending change exists, triggers safe GET-first reconciliation.
   Future<void> setModuleCompleted(
     String userId,
     String moduleId,
     bool completed, {
     String pathway = 'git',
   }) {
-    return _enqueueMutation(() async {
-      await _ensureLoaded(userId, pathway);
-      final cacheKey = _getCacheKey(userId, pathway);
-      final current = _cache[cacheKey] ?? <String>{};
-      final bool isCurrentlyCompleted = current.contains(moduleId);
+    final generation = _currentSessionGeneration;
+    return _enqueueMutation<void>(
+      userId: userId,
+      action: () async {
+        await _ensureLoaded(
+          userId,
+          pathway,
+          sessionGeneration: generation,
+        );
+        if (generation != _currentSessionGeneration) {
+          return;
+        }
+        final cacheKey = _getCacheKey(userId, pathway);
+        final current = _cache[cacheKey] ?? <String>{};
+        final bool isCurrentlyCompleted = current.contains(moduleId);
+        final bool hasPending =
+            _pendingChanges[cacheKey]?.containsKey(moduleId) ?? false;
 
-      if (isCurrentlyCompleted == completed) {
-        return; // Idempotent: already matches desired state
+        // Idempotent: already matches desired state and no pending change remains
+        if (isCurrentlyCompleted == completed && !hasPending) {
+          return;
+        }
+
+        // Local state matches, but an unconfirmed pending change exists:
+        // Do NOT send a blind toggle! Reconcile using GET-first logic.
+        if (isCurrentlyCompleted == completed && hasPending) {
+          await _reconcileSingleModulePending(
+            userId: userId,
+            pathway: pathway,
+            moduleId: moduleId,
+            desiredState: completed,
+            generation: generation,
+          );
+          return;
+        }
+
+        await _executeMutation(
+          userId: userId,
+          pathway: pathway,
+          moduleId: moduleId,
+          desiredState: completed,
+          generation: generation,
+        );
+      },
+    );
+  }
+
+  /// Reconciles a single pending module when local state already matches desiredState.
+  Future<void> _reconcileSingleModulePending({
+    required String userId,
+    required String pathway,
+    required String moduleId,
+    required bool desiredState,
+    required int generation,
+  }) async {
+    if (generation != _currentSessionGeneration) return;
+
+    bool serverOnline = false;
+    try {
+      final getRes = await _effectiveClient.getProgress(pathwayId: pathway);
+      if (generation != _currentSessionGeneration) return;
+
+      if (getRes['success'] == true && getRes['completedModules'] is List) {
+        serverOnline = true;
+        final serverSet = (getRes['completedModules'] as List)
+            .map((e) => e.toString())
+            .toSet();
+
+        if (serverSet.contains(moduleId) == desiredState) {
+          // Server already matches!
+          await _reconcileServerResponse(
+            userId: userId,
+            pathway: pathway,
+            moduleId: moduleId,
+            desiredState: desiredState,
+            serverSet: serverSet,
+            sessionGeneration: generation,
+          );
+          return;
+        }
+
+        // Server does not match; issue exactly one toggle
+        final toggleRes = await _effectiveClient.toggleProgress(
+          moduleId: moduleId,
+          pathwayId: pathway,
+        );
+        if (generation != _currentSessionGeneration) return;
+
+        if (toggleRes['success'] == true &&
+            toggleRes['completedModules'] is List) {
+          final updatedSet = (toggleRes['completedModules'] as List)
+              .map((e) => e.toString())
+              .toSet();
+          if (updatedSet.contains(moduleId) == desiredState) {
+            await _reconcileServerResponse(
+              userId: userId,
+              pathway: pathway,
+              moduleId: moduleId,
+              desiredState: desiredState,
+              serverSet: updatedSet,
+              sessionGeneration: generation,
+            );
+            return;
+          }
+        }
       }
+    } catch (e) {
+      debugPrint('[ProgressService] _reconcileSingleModulePending error: $e');
+    }
 
-      await _executeMutation(
-        userId: userId,
-        pathway: pathway,
-        moduleId: moduleId,
-        desiredState: completed,
-      );
-    });
+    if (generation == _currentSessionGeneration) {
+      final cacheKey = _getCacheKey(userId, pathway);
+      _status[cacheKey] =
+          serverOnline ? SyncStatus.pending : SyncStatus.offline;
+      notifyListeners();
+    }
   }
 
   /// Internal worker executing the mutation inside the serialized queue.
@@ -424,6 +877,7 @@ class ProgressService extends ChangeNotifier {
     required String pathway,
     required String moduleId,
     required bool desiredState,
+    required int generation,
   }) async {
     final cacheKey = _getCacheKey(userId, pathway);
 
@@ -441,69 +895,142 @@ class ProgressService extends ChangeNotifier {
     _status[cacheKey] = SyncStatus.pending;
     notifyListeners();
 
-    await _savePendingToDisk(userId, pathway);
-    await _saveToDisk(userId, pathway, current);
+    await _savePendingToDisk(
+      userId,
+      pathway,
+      sessionGeneration: generation,
+    );
+    if (generation != _currentSessionGeneration) {
+      return desiredState;
+    }
+    await _saveToDisk(
+      userId,
+      pathway,
+      current,
+      sessionGeneration: generation,
+    );
+
+    // Abort if session was invalidated during disk save
+    if (generation != _currentSessionGeneration) {
+      return desiredState;
+    }
 
     // 3. Guest / unauthenticated users store progress locally only
     if (userId.trim().isEmpty || userId == 'guest') {
+      if (generation != _currentSessionGeneration) {
+        return desiredState;
+      }
       _status[cacheKey] = SyncStatus.localOnly;
       _pendingChanges[cacheKey]?.remove(moduleId);
-      await _savePendingToDisk(userId, pathway);
+      await _savePendingToDisk(
+        userId,
+        pathway,
+        sessionGeneration: generation,
+      );
+      if (generation != _currentSessionGeneration) {
+        return desiredState;
+      }
       notifyListeners();
       return desiredState;
     }
 
     final hasToken = await _effectiveStorage.hasToken();
+    if (generation != _currentSessionGeneration) {
+      return desiredState;
+    }
     if (!hasToken) {
       _status[cacheKey] = SyncStatus.localOnly;
       _pendingChanges[cacheKey]?.remove(moduleId);
-      await _savePendingToDisk(userId, pathway);
+      await _savePendingToDisk(
+        userId,
+        pathway,
+        sessionGeneration: generation,
+      );
+      if (generation != _currentSessionGeneration) {
+        return desiredState;
+      }
       notifyListeners();
       return desiredState;
     }
 
     // 4. Commit mutation to backend API
+    bool toggleConfirmed = false;
     try {
       final res = await _effectiveClient.toggleProgress(
         moduleId: moduleId,
         pathwayId: pathway,
       );
 
+      // Session guard: if user logged out while toggle was in-flight, ignore response
+      if (generation != _currentSessionGeneration) {
+        debugPrint(
+          '[ProgressService] Session invalidated while toggle was in-flight. Ignoring response.',
+        );
+        return desiredState;
+      }
+
+      // Explicit validation of toggle response including checking actual desired state
       if (res['success'] == true && res['completedModules'] is List) {
         final serverSet = (res['completedModules'] as List)
             .map((e) => e.toString())
             .toSet();
 
-        await _reconcileServerResponse(
-          userId: userId,
-          pathway: pathway,
-          moduleId: moduleId,
-          desiredState: desiredState,
-          serverSet: serverSet,
-        );
-        return desiredState;
-      }
-    } catch (err) {
-      debugPrint(
-        '[ProgressService] Toggle error ($err). Attempting safe GET reconciliation...',
-      );
-
-      // 5. Outcome is uncertain — NEVER retry toggle! Safely query current server state
-      try {
-        final getRes = await _effectiveClient.getProgress(pathwayId: pathway);
-        if (getRes['success'] == true && getRes['completedModules'] is List) {
-          final serverSet = (getRes['completedModules'] as List)
-              .map((e) => e.toString())
-              .toSet();
-
+        if (serverSet.contains(moduleId) == desiredState) {
           await _reconcileServerResponse(
             userId: userId,
             pathway: pathway,
             moduleId: moduleId,
             desiredState: desiredState,
             serverSet: serverSet,
+            sessionGeneration: generation,
           );
+          toggleConfirmed = true;
           return desiredState;
+        } else {
+          debugPrint(
+            '[ProgressService] Toggle response contradicted desiredState (server: $serverSet, desired: $desiredState)',
+          );
+        }
+      } else {
+        debugPrint(
+          '[ProgressService] Unsuccessful or malformed toggle response: $res',
+        );
+      }
+    } catch (err) {
+      debugPrint(
+        '[ProgressService] Toggle error ($err). Attempting safe GET reconciliation...',
+      );
+    }
+
+    // Session check before attempting any fallback GET request
+    if (generation != _currentSessionGeneration) {
+      return desiredState;
+    }
+
+    // 5. Outcome is uncertain — NEVER retry toggle! Safely query current server state
+    if (!toggleConfirmed) {
+      bool getSucceeded = false;
+      try {
+        final getRes = await _effectiveClient.getProgress(pathwayId: pathway);
+        if (generation == _currentSessionGeneration &&
+            getRes['success'] == true &&
+            getRes['completedModules'] is List) {
+          getSucceeded = true;
+          final serverSet = (getRes['completedModules'] as List)
+              .map((e) => e.toString())
+              .toSet();
+
+          if (serverSet.contains(moduleId) == desiredState) {
+            await _reconcileServerResponse(
+              userId: userId,
+              pathway: pathway,
+              moduleId: moduleId,
+              desiredState: desiredState,
+              serverSet: serverSet,
+              sessionGeneration: generation,
+            );
+            return desiredState;
+          }
         }
       } catch (getErr) {
         debugPrint(
@@ -511,9 +1038,12 @@ class ProgressService extends ChangeNotifier {
         );
       }
 
-      // 6. Network unavailable / offline: keep optimistic change, mark status offline
-      _status[cacheKey] = SyncStatus.offline;
-      notifyListeners();
+      // 6. Reconciliation also failed: keep optimistic local change, mark status
+      if (generation == _currentSessionGeneration) {
+        _status[cacheKey] =
+            getSucceeded ? SyncStatus.pending : SyncStatus.offline;
+        notifyListeners();
+      }
     }
 
     return desiredState;
@@ -526,13 +1056,18 @@ class ProgressService extends ChangeNotifier {
     required String moduleId,
     required bool desiredState,
     required Set<String> serverSet,
+    required int sessionGeneration,
   }) async {
+    if (sessionGeneration != _currentSessionGeneration) {
+      return; // Do not mutate state if session is no longer active
+    }
+
     final cacheKey = _getCacheKey(userId, pathway);
     final pending = _pendingChanges[cacheKey] ?? {};
 
-    // The backend confirmed our toggle request for this module:
-    // Remove it from pending unless a newer mutation has since changed its desiredState
-    if (pending[moduleId] == desiredState) {
+    // Remove from pending only if server response actually matches desiredState
+    if (serverSet.contains(moduleId) == desiredState &&
+        pending[moduleId] == desiredState) {
       pending.remove(moduleId);
     }
 
@@ -556,51 +1091,159 @@ class ProgressService extends ChangeNotifier {
       pending.remove(r);
     }
 
+    if (sessionGeneration != _currentSessionGeneration) {
+      return;
+    }
+
     _cache[cacheKey] = reconciledSet;
     _status[cacheKey] =
         pending.isEmpty ? SyncStatus.synced : SyncStatus.pending;
-    await _saveToDisk(userId, pathway, reconciledSet);
-    await _savePendingToDisk(userId, pathway);
+    await _saveToDisk(
+      userId,
+      pathway,
+      reconciledSet,
+      sessionGeneration: sessionGeneration,
+    );
+    if (sessionGeneration != _currentSessionGeneration) {
+      return;
+    }
+    await _savePendingToDisk(
+      userId,
+      pathway,
+      sessionGeneration: sessionGeneration,
+    );
+    if (sessionGeneration != _currentSessionGeneration) {
+      return;
+    }
     notifyListeners();
   }
 
   Future<void> _saveToDisk(
     String userId,
     String pathway,
-    Set<String> moduleIds,
-  ) async {
-    try {
-      final key = _getStorageKey(userId, pathway);
-      final raw = json.encode(moduleIds.toList());
-      await _effectiveStorage.write(key, raw);
-    } catch (e) {
-      debugPrint('[ProgressService] Error persisting progress to disk: $e');
+    Set<String> moduleIds, {
+    int? sessionGeneration,
+  }) {
+    final generation = sessionGeneration ?? _currentSessionGeneration;
+    if (generation != _currentSessionGeneration) {
+      return Future.value();
     }
+
+    final key = _getStorageKey(userId, pathway);
+    final raw = json.encode(moduleIds.toList());
+
+    return _runWithKeyLock(key, generation, () async {
+      await _effectiveStorage.write(key, raw);
+    });
   }
 
-  /// Clears in-memory progress cache, pending changes, and sync state (called on logout).
+  @visibleForTesting
+  Future<void> loadPendingFromDisk(
+    String userId,
+    String pathway, {
+    int? sessionGeneration,
+  }) =>
+      _loadPendingFromDisk(
+        userId,
+        pathway,
+        sessionGeneration: sessionGeneration,
+      );
+
+  @visibleForTesting
+  Future<void> savePendingToDisk(
+    String userId,
+    String pathway, {
+    int? sessionGeneration,
+  }) =>
+      _savePendingToDisk(
+        userId,
+        pathway,
+        sessionGeneration: sessionGeneration,
+      );
+
+  @visibleForTesting
+  Future<void> saveToDisk(
+    String userId,
+    String pathway,
+    Set<String> moduleIds, {
+    int? sessionGeneration,
+  }) =>
+      _saveToDisk(
+        userId,
+        pathway,
+        moduleIds,
+        sessionGeneration: sessionGeneration,
+      );
+
+  @visibleForTesting
+  void recordPendingChangeForTesting(
+    String userId,
+    String pathway,
+    String moduleId,
+    bool desiredState,
+  ) {
+    final cacheKey = _getCacheKey(userId, pathway);
+    _pendingChanges.putIfAbsent(cacheKey, () => {})[moduleId] = desiredState;
+  }
+
+  /// Clears in-memory progress cache, pending changes, and sync state, and invalidates active operations.
   void clearCache() {
+    _currentSessionGeneration++;
+
+    // Immediately cancel and complete all active mutations across all sessions
+    for (final activeSet in _activeSessionMutations.values) {
+      for (final item in activeSet) {
+        if (!item.completer.isCompleted) {
+          item.completer.completeError(
+            StateError('Operation cancelled due to logout/session change'),
+          );
+        }
+      }
+    }
+    _activeSessionMutations.clear();
+
+    // Invalidate and cancel all pending mutations across all session queues
+    for (final queue in _sessionQueues.values) {
+      for (final item in queue) {
+        if (!item.completer.isCompleted) {
+          item.completer.completeError(
+            StateError('Operation cancelled due to logout/session change'),
+          );
+        }
+      }
+      queue.clear();
+    }
+    _sessionQueues.clear();
+
     _cache.clear();
     _pendingChanges.clear();
     _status.clear();
-    _isMutating = false;
-    _lastMutation = Future.value();
     notifyListeners();
   }
 }
 
 class _InMemoryStorageService implements ISecureStorageService {
   String? _token;
+  int _tokenVersion = 0;
   final Map<String, String> _map = {};
+
+  @override
+  int get tokenVersion => _tokenVersion;
 
   @override
   Future<String?> getToken() async => _token;
 
   @override
-  Future<void> saveToken(String token) async => _token = token;
+  Future<void> saveToken(String token) async {
+    _tokenVersion++;
+    _token = token;
+  }
 
   @override
-  Future<void> deleteToken() async => _token = null;
+  Future<void> deleteToken() async {
+    _tokenVersion++;
+    _token = null;
+  }
 
   @override
   Future<bool> hasToken() async => _token != null && _token!.isNotEmpty;

@@ -81,6 +81,11 @@ class AuthProvider extends ChangeNotifier {
     try {
       final result = await apiClient.login(email: email, password: password);
 
+      if (_user == null || _user!.id != result.user.id) {
+        ProgressService().clearCache();
+        ActivityService().clearCache();
+      }
+
       // Securely persist token in Android KeyStore
       await storageService.saveToken(result.token);
       _user = result.user;
@@ -130,6 +135,11 @@ class AuthProvider extends ChangeNotifier {
 
     try {
       final result = await apiClient.verifyEmail(email: email, otp: otp);
+
+      if (_user == null || _user!.id != result.user.id) {
+        ProgressService().clearCache();
+        ActivityService().clearCache();
+      }
 
       await storageService.saveToken(result.token);
       _user = result.user;
@@ -186,6 +196,11 @@ class AuthProvider extends ChangeNotifier {
       debugPrint(
         '[AuthProvider] loginWithGoogle: backend response successful. user=${result.user.name}, email=${result.user.email}',
       );
+
+      if (_user == null || _user!.id != result.user.id) {
+        ProgressService().clearCache();
+        ActivityService().clearCache();
+      }
 
       await storageService.saveToken(result.token);
       _user = result.user;

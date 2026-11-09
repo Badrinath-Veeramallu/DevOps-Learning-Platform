@@ -9,18 +9,24 @@ import 'package:devops_learning_app/providers/auth_provider.dart';
 /// In-memory implementation of [ISecureStorageService] for fast, deterministic unit testing.
 class MockSecureStorageService implements ISecureStorageService {
   String? _storedToken;
+  int _tokenVersion = 0;
   final Map<String, String> _storage = {};
+
+  @override
+  int get tokenVersion => _tokenVersion;
 
   @override
   Future<String?> getToken() async => _storedToken;
 
   @override
   Future<void> saveToken(String token) async {
+    _tokenVersion++;
     _storedToken = token;
   }
 
   @override
   Future<void> deleteToken() async {
+    _tokenVersion++;
     _storedToken = null;
   }
 

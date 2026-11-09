@@ -20,6 +20,12 @@ class ActivityService {
   ApiClient? _apiClient;
   ISecureStorageService? _storageService;
 
+  // Session-generation counter incremented on logout/clearCache
+  int _currentSessionGeneration = 0;
+
+  /// Visible for testing to verify session generation tracking.
+  int get currentSessionGeneration => _currentSessionGeneration;
+
   // In-memory deduplication set: "$userId:$type:$stopSlug:$todayDate"
   final Set<String> _loggedEvents = {};
 
@@ -51,17 +57,23 @@ class ActivityService {
     required String stopSlug,
     String pathwayId = 'git',
   }) async {
+    final generation = _currentSessionGeneration;
+
     if (userId.trim().isEmpty || userId == 'guest') {
       return false;
     }
 
-    if (!await _effectiveStorage.hasToken()) {
+    final hasToken = await _effectiveStorage.hasToken();
+    if (generation != _currentSessionGeneration) {
+      return false;
+    }
+    if (!hasToken) {
       return false;
     }
 
     final key = _buildEventKey(userId, 'lesson_viewed', stopSlug);
     if (_loggedEvents.contains(key)) {
-      return false; // Already recorded today
+      return false; // Already recorded today or currently in flight
     }
 
     _loggedEvents.add(key);
@@ -72,9 +84,22 @@ class ActivityService {
         stopSlug: stopSlug,
         pathwayId: pathwayId,
       );
-      return res['logged'] == true || res['success'] == true;
+
+      if (generation != _currentSessionGeneration) {
+        return false;
+      }
+
+      final bool isSuccess = res['logged'] == true || res['success'] == true;
+      if (!isSuccess) {
+        // Failed response: remove key to allow a later retry
+        _loggedEvents.remove(key);
+      }
+      return isSuccess;
     } catch (e) {
       debugPrint('[ActivityService] lesson_viewed error (ignored): $e');
+      if (generation == _currentSessionGeneration) {
+        _loggedEvents.remove(key);
+      }
       return false;
     }
   }
@@ -88,17 +113,23 @@ class ActivityService {
     required String stopSlug,
     String pathwayId = 'git',
   }) async {
+    final generation = _currentSessionGeneration;
+
     if (userId.trim().isEmpty || userId == 'guest') {
       return false;
     }
 
-    if (!await _effectiveStorage.hasToken()) {
+    final hasToken = await _effectiveStorage.hasToken();
+    if (generation != _currentSessionGeneration) {
+      return false;
+    }
+    if (!hasToken) {
       return false;
     }
 
     final key = _buildEventKey(userId, 'animation_finished', stopSlug);
     if (_loggedEvents.contains(key)) {
-      return false; // Already recorded today
+      return false; // Already recorded today or currently in flight
     }
 
     _loggedEvents.add(key);
@@ -109,9 +140,22 @@ class ActivityService {
         stopSlug: stopSlug,
         pathwayId: pathwayId,
       );
-      return res['logged'] == true || res['success'] == true;
+
+      if (generation != _currentSessionGeneration) {
+        return false;
+      }
+
+      final bool isSuccess = res['logged'] == true || res['success'] == true;
+      if (!isSuccess) {
+        // Failed response: remove key to allow a later retry
+        _loggedEvents.remove(key);
+      }
+      return isSuccess;
     } catch (e) {
       debugPrint('[ActivityService] animation_finished error (ignored): $e');
+      if (generation == _currentSessionGeneration) {
+        _loggedEvents.remove(key);
+      }
       return false;
     }
   }
@@ -126,24 +170,35 @@ class ActivityService {
     return _loggedEvents.contains(key);
   }
 
-  /// Clears in-memory deduplication cache (useful for logout and tests).
+  /// Clears in-memory deduplication cache and increments session generation.
   void clearCache() {
+    _currentSessionGeneration++;
     _loggedEvents.clear();
   }
 }
 
 class _InMemoryStorageService implements ISecureStorageService {
   String? _token;
+  int _tokenVersion = 0;
   final Map<String, String> _map = {};
+
+  @override
+  int get tokenVersion => _tokenVersion;
 
   @override
   Future<String?> getToken() async => _token;
 
   @override
-  Future<void> saveToken(String token) async => _token = token;
+  Future<void> saveToken(String token) async {
+    _tokenVersion++;
+    _token = token;
+  }
 
   @override
-  Future<void> deleteToken() async => _token = null;
+  Future<void> deleteToken() async {
+    _tokenVersion++;
+    _token = null;
+  }
 
   @override
   Future<bool> hasToken() async => _token != null && _token!.isNotEmpty;

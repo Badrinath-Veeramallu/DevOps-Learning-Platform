@@ -11,6 +11,12 @@ abstract class ISecureStorageService {
   Future<void> deleteToken();
   Future<bool> hasToken();
 
+  /// Monotonically increasing version counter for stored authentication token.
+  ///
+  /// Incremented whenever a token is saved or deleted, enabling listeners/interceptors
+  /// to detect whether authentication state changed while awaiting asynchronous reads.
+  int get tokenVersion => 0;
+
   // Generic key-value storage methods (with default fallbacks for mocks)
   Future<String?> read(String key) async => null;
   Future<void> write(String key, String value) async {}
@@ -24,6 +30,7 @@ class SecureStorageService implements ISecureStorageService {
   static const String _tokenKey = 'devops_auth_jwt_token';
 
   final FlutterSecureStorage _storage;
+  int _tokenVersion = 0;
 
   SecureStorageService({FlutterSecureStorage? storage})
     : _storage =
@@ -31,6 +38,9 @@ class SecureStorageService implements ISecureStorageService {
           const FlutterSecureStorage(
             aOptions: AndroidOptions(resetOnError: true),
           );
+
+  @override
+  int get tokenVersion => _tokenVersion;
 
   @override
   Future<String?> getToken() async {
@@ -44,11 +54,13 @@ class SecureStorageService implements ISecureStorageService {
 
   @override
   Future<void> saveToken(String token) async {
+    _tokenVersion++;
     await _storage.write(key: _tokenKey, value: token);
   }
 
   @override
   Future<void> deleteToken() async {
+    _tokenVersion++;
     await _storage.delete(key: _tokenKey);
   }
 

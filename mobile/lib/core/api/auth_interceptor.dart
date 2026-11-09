@@ -15,8 +15,24 @@ class AuthInterceptor extends Interceptor {
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
+    final initialVersion = storageService.tokenVersion;
+
     // 1. Attach Bearer token from secure storage if present
     final token = await storageService.getToken();
+
+    // Guard against race conditions: if storage was mutated (e.g. logout or account switch)
+    // while token retrieval was in-flight, cancel the request to prevent cross-account pollution.
+    if (storageService.tokenVersion != initialVersion) {
+      return handler.reject(
+        DioException(
+          requestOptions: options,
+          type: DioExceptionType.cancel,
+          message:
+              'Request cancelled: authentication state changed during token retrieval',
+        ),
+      );
+    }
+
     if (token != null && token.isNotEmpty) {
       options.headers['Authorization'] = 'Bearer $token';
     }
