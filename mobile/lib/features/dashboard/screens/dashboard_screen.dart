@@ -50,6 +50,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
       context.push(RouteNames.gitPathway);
     } else if (trackId == 'docker') {
       context.push(RouteNames.dockerPathway);
+    } else if (trackId == 'linux') {
+      context.push(RouteNames.linuxPathway);
     }
   }
 
@@ -58,6 +60,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
       context.push(RouteNames.gitPathway);
     } else if (track.id == 'docker') {
       context.push(RouteNames.dockerPathway);
+    } else if (track.id == 'linux') {
+      context.push(RouteNames.linuxPathway);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

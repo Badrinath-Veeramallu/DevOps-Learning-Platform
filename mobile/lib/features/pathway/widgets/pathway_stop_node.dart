@@ -17,6 +17,7 @@ class PathwayStopNode extends StatelessWidget {
   final ValueChanged<String> onSelectModule;
   final bool isNodeOnly;
   final bool showContinuousRoad;
+  final int totalStops;
 
   const PathwayStopNode({
     super.key,
@@ -25,6 +26,7 @@ class PathwayStopNode extends StatelessWidget {
     required this.onSelectModule,
     this.isNodeOnly = false,
     this.showContinuousRoad = true,
+    this.totalStops = 7,
   });
 
   @override
@@ -183,7 +185,7 @@ class PathwayStopNode extends StatelessWidget {
                               borderRadius: BorderRadius.circular(9999),
                             ),
                             child: Text(
-                              'Stop ${module.order} of 7',
+                              'Stop ${module.order} of $totalStops',
                               style: AppTypography.badgeText.copyWith(
                                 color: AppColors.lightAccent,
                                 fontSize: 10,

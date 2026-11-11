@@ -11,12 +11,14 @@ class ModuleHeaderCard extends StatelessWidget {
   final CurriculumModule module;
   final bool isCompleted;
   final VoidCallback onBackToPathway;
+  final int totalStops;
 
   const ModuleHeaderCard({
     super.key,
     required this.module,
     required this.isCompleted,
     required this.onBackToPathway,
+    this.totalStops = 7,
   });
 
   @override
@@ -67,7 +69,7 @@ class ModuleHeaderCard extends StatelessWidget {
                 border: Border.all(color: AppColors.primaryBorder, width: 1),
               ),
               child: Text(
-                'Stop ${module.order} of 7',
+                'Stop ${module.order} of $totalStops',
                 style: AppTypography.badgeText.copyWith(
                   color: AppColors.lightAccent,
                   fontWeight: FontWeight.w700,

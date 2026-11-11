@@ -28,6 +28,8 @@ class _LearningPathsScreenState extends State<LearningPathsScreen> {
       context.push(RouteNames.gitPathway);
     } else if (trackId == 'docker') {
       context.push(RouteNames.dockerPathway);
+    } else if (trackId == 'linux') {
+      context.push(RouteNames.linuxPathway);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
