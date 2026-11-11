@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "r
 import { AuthProvider } from "./context/AuthContext";
 import { Navbar } from "./components/Navbar";
 import { ProtectedRoute } from "./components/ProtectedRoute";
-import { KagePage } from "./pages/KagePage";
+import { Home } from "./pages/Home";
 import { Login } from "./pages/Login";
 import { Register } from "./pages/Register";
 import { VerifyEmail } from "./pages/VerifyEmail";
@@ -30,7 +30,7 @@ function AppLayout() {
       <main className={isKageLanding ? "kage-main" : "main-content"}>
         <Routes>
           {/* Public Routes */}
-          <Route path="/" element={<KagePage />} />
+          <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/verify-email" element={<VerifyEmail />} />

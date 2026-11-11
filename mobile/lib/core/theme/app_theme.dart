@@ -4,21 +4,22 @@ import 'package:flutter/services.dart';
 import 'app_colors.dart';
 import 'app_typography.dart';
 
-/// Configures Flutter's dark [ThemeData] using the Cyber Midnight design system tokens.
+/// Configures Flutter's light [ThemeData] using the Website White + Burgundy design system tokens.
 class AppTheme {
   AppTheme._();
 
-  static ThemeData get darkTheme {
+  /// Primary White + Burgundy light theme matching the DevOps website.
+  static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
-      brightness: Brightness.dark,
+      brightness: Brightness.light,
       scaffoldBackgroundColor: AppColors.background,
       primaryColor: AppColors.primary,
-      colorScheme: const ColorScheme.dark(
+      colorScheme: const ColorScheme.light(
         primary: AppColors.primary,
-        onPrimary: AppColors.textMain,
+        onPrimary: Colors.white,
         secondary: AppColors.secondary,
-        onSecondary: AppColors.textMain,
+        onSecondary: Colors.white,
         surface: AppColors.surface,
         onSurface: AppColors.textMain,
         error: AppColors.error,
@@ -35,9 +36,10 @@ class AppTheme {
         titleTextStyle: AppTypography.titleLarge,
         systemOverlayStyle: SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
-          statusBarIconBrightness: Brightness.light,
+          statusBarIconBrightness: Brightness.dark,
+          statusBarBrightness: Brightness.light,
           systemNavigationBarColor: AppColors.background,
-          systemNavigationBarIconBrightness: Brightness.light,
+          systemNavigationBarIconBrightness: Brightness.dark,
         ),
       ),
 
@@ -99,9 +101,9 @@ class AppTheme {
 
       // Progress Indicator theme
       progressIndicatorTheme: const ProgressIndicatorThemeData(
-        color: AppColors.lightAccent,
-        linearTrackColor: AppColors.surfaceElevated,
-        circularTrackColor: AppColors.surfaceElevated,
+        color: AppColors.primary,
+        linearTrackColor: AppColors.paleBlush,
+        circularTrackColor: AppColors.paleBlush,
       ),
 
       // Divider theme
@@ -112,4 +114,7 @@ class AppTheme {
       ),
     );
   }
+
+  /// Compatibility alias returning [lightTheme] so callers referencing the legacy getter stay consistent.
+  static ThemeData get darkTheme => lightTheme;
 }

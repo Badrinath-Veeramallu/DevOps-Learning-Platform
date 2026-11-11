@@ -53,7 +53,7 @@ class StageCanvas extends StatelessWidget {
           height: renderStageHeight,
           clipBehavior: Clip.hardEdge,
           decoration: BoxDecoration(
-            color: const Color(0xFF0D121F),
+            color: AppColors.surfaceAlt,
             border: Border.all(color: AppColors.borderDefault, width: 1),
           ),
           child: Stack(
@@ -119,7 +119,7 @@ class _GridBackgroundPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.04)
+      ..color = AppColors.gridLine
       ..strokeWidth = 0.8;
 
     const double step = 28.0;

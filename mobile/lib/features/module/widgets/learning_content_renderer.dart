@@ -29,7 +29,7 @@ class LearningContentRenderer extends StatelessWidget {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Copied link: $url'),
-        backgroundColor: AppColors.surfaceElevated,
+        backgroundColor: AppColors.primary,
         duration: const Duration(seconds: 2),
       ),
     );
@@ -45,6 +45,76 @@ class LearningContentRenderer extends StatelessWidget {
           height: 1.65,
           fontSize: 14.5,
         ),
+      ),
+    );
+  }
+
+  Widget _buildTable(CurriculumTable table) {
+    return Container(
+      margin: const EdgeInsets.only(top: 8, bottom: 18),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: AppColors.borderDefault, width: 1),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Table(
+        border: TableBorder(
+          horizontalInside: BorderSide(
+            color: AppColors.borderDefault.withValues(alpha: 0.6),
+            width: 1,
+          ),
+        ),
+        defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+        children: [
+          // Header row
+          TableRow(
+            decoration: const BoxDecoration(
+              color: AppColors.surfaceElevated,
+            ),
+            children: table.headers.map((h) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                child: Text(
+                  h,
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.lightAccent,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 13,
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+          // Data rows
+          ...table.rows.map((row) {
+            return TableRow(
+              children: row.map((cell) {
+                final isCode = cell.startsWith('`') && cell.endsWith('`');
+                final displayText =
+                    isCode ? cell.substring(1, cell.length - 1) : cell;
+                return Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  child: Text(
+                    displayText,
+                    style: isCode
+                        ? const TextStyle(
+                            fontFamily: 'monospace',
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.lightAccent,
+                          )
+                        : AppTypography.bodySmall.copyWith(
+                            color: AppColors.textMain,
+                            fontSize: 13,
+                          ),
+                  ),
+                );
+              }).toList(),
+            );
+          }),
+        ],
       ),
     );
   }
@@ -102,14 +172,14 @@ class LearningContentRenderer extends StatelessWidget {
                     const Icon(
                       Icons.link_rounded,
                       size: 16,
-                      color: AppColors.lightAccent,
+                      color: AppColors.primary,
                     ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         section.link!.text,
                         style: AppTypography.bodySmall.copyWith(
-                          color: AppColors.lightAccent,
+                          color: AppColors.primary,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -151,6 +221,10 @@ class LearningContentRenderer extends StatelessWidget {
           if (section.middleParagraphs != null)
             ...section.middleParagraphs!.map(_buildParagraph),
 
+          // Optional Content Table
+          if (section.table != null)
+            _buildTable(section.table!),
+
           // Code Snippet 3
           if (section.thirdSnippet != null)
             CodeBlockView(
@@ -186,7 +260,7 @@ class LearningContentRenderer extends StatelessWidget {
                               width: 6,
                               height: 6,
                               decoration: const BoxDecoration(
-                                color: AppColors.lightAccent,
+                                color: AppColors.primary,
                                 shape: BoxShape.circle,
                               ),
                             ),

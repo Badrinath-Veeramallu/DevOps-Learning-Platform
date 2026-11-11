@@ -68,7 +68,7 @@ class UserProfileSheet extends StatelessWidget {
                   child: Text(
                     initials,
                     style: AppTypography.titleLarge.copyWith(
-                      color: AppColors.subtleHighlight,
+                      color: Colors.white,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -148,7 +148,7 @@ class UserProfileSheet extends StatelessWidget {
               contentPadding: const EdgeInsets.symmetric(horizontal: 4),
               leading: const Icon(
                 Icons.person_outline_rounded,
-                color: AppColors.lightAccent,
+                color: AppColors.primary,
                 size: 22,
               ),
               title: Text(

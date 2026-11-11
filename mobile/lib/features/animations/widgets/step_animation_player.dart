@@ -174,7 +174,7 @@ class _StepAnimationPlayerState extends State<StepAnimationPlayer> {
         border: Border.all(color: AppColors.primaryBorder, width: 1.2),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.35),
+            color: AppColors.cardShadow,
             blurRadius: 18,
             offset: const Offset(0, 6),
           ),
@@ -203,7 +203,7 @@ class _StepAnimationPlayerState extends State<StepAnimationPlayer> {
                       width: 8,
                       height: 8,
                       decoration: const BoxDecoration(
-                        color: AppColors.lightAccent,
+                        color: AppColors.primary,
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -211,7 +211,7 @@ class _StepAnimationPlayerState extends State<StepAnimationPlayer> {
                     Text(
                       'ANIMATION',
                       style: AppTypography.badgeText.copyWith(
-                        color: AppColors.lightAccent,
+                        color: AppColors.primary,
                         fontSize: 11,
                         letterSpacing: 0.8,
                       ),
@@ -223,7 +223,7 @@ class _StepAnimationPlayerState extends State<StepAnimationPlayer> {
                   child: Text(
                     'Step ${safeStep + 1} / $totalSteps',
                     style: AppTypography.badgeText.copyWith(
-                      color: AppColors.lightAccent,
+                      color: AppColors.primary,
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
                     ),
@@ -272,7 +272,7 @@ class _StepAnimationPlayerState extends State<StepAnimationPlayer> {
                     child: Icon(
                       Icons.lightbulb_outline_rounded,
                       size: 16,
-                      color: AppColors.lightAccent,
+                      color: AppColors.primary,
                     ),
                   ),
                   const SizedBox(width: 8),

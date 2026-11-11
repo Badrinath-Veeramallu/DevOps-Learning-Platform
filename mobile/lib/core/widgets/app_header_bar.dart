@@ -40,13 +40,13 @@ class AppHeaderBar extends StatelessWidget implements PreferredSizeWidget {
           Container(
             padding: const EdgeInsets.all(7),
             decoration: BoxDecoration(
-              color: AppColors.surfaceElevated,
+              color: AppColors.primary,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(color: AppColors.primaryBorder, width: 1),
             ),
             child: const Icon(
               Icons.terminal_rounded,
-              color: AppColors.lightAccent,
+              color: Colors.white,
               size: 18,
             ),
           ),
@@ -68,7 +68,7 @@ class AppHeaderBar extends StatelessWidget implements PreferredSizeWidget {
                     TextSpan(
                       text: 'Platform',
                       style: AppTypography.titleLarge.copyWith(
-                        color: AppColors.lightAccent,
+                        color: AppColors.secondary,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -105,7 +105,7 @@ class AppHeaderBar extends StatelessWidget implements PreferredSizeWidget {
                   child: Text(
                     initials,
                     style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.subtleHighlight,
+                      color: Colors.white,
                       fontWeight: FontWeight.w700,
                     ),
                   ),

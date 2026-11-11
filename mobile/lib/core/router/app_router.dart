@@ -8,10 +8,12 @@ import '../../features/dashboard/screens/dashboard_screen.dart';
 import '../../features/dashboard/screens/learning_paths_screen.dart';
 import '../../features/module/screens/docker_module_screen.dart';
 import '../../features/module/screens/git_module_screen.dart';
+import '../../features/module/screens/linux_module_screen.dart';
 import '../../features/onboarding/screens/splash_screen.dart';
 import '../../features/onboarding/screens/welcome_screen.dart';
 import '../../features/pathway/screens/docker_pathway_screen.dart';
 import '../../features/pathway/screens/git_pathway_screen.dart';
+import '../../features/pathway/screens/linux_pathway_screen.dart';
 import '../../features/profile/screens/profile_screen.dart';
 import '../../providers/auth_provider.dart';
 import 'route_names.dart';
@@ -70,6 +72,8 @@ class AppRouter {
             location.startsWith('/pathways/git') ||
             location == RouteNames.dockerPathway ||
             location.startsWith('/pathways/docker') ||
+            location == RouteNames.linuxPathway ||
+            location.startsWith('/pathways/linux') ||
             location == RouteNames.profile;
 
         if (!isAuthenticated && isProtectedRoute) {
@@ -160,6 +164,21 @@ class AppRouter {
           builder: (BuildContext context, GoRouterState state) {
             final moduleId = state.pathParameters['moduleId'] ?? '';
             return DockerModuleScreen(moduleId: moduleId);
+          },
+        ),
+        GoRoute(
+          path: RouteNames.linuxPathway,
+          name: 'linuxPathway',
+          builder: (BuildContext context, GoRouterState state) {
+            return const LinuxPathwayScreen();
+          },
+        ),
+        GoRoute(
+          path: RouteNames.linuxModule,
+          name: 'linuxModule',
+          builder: (BuildContext context, GoRouterState state) {
+            final moduleId = state.pathParameters['moduleId'] ?? '';
+            return LinuxModuleScreen(moduleId: moduleId);
           },
         ),
         GoRoute(

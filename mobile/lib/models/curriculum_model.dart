@@ -35,6 +35,60 @@ class CurriculumSnippet {
   Map<String, dynamic> toJson() => {'code': code, 'language': language};
 }
 
+class CurriculumTable {
+  final List<String> headers;
+  final List<List<String>> rows;
+
+  const CurriculumTable({required this.headers, required this.rows});
+
+  factory CurriculumTable.fromJson(Map<String, dynamic> json) {
+    List<String> parseList(dynamic list) {
+      if (list is List) {
+        return list.map((e) => e.toString()).toList();
+      }
+      return const [];
+    }
+
+    final rawHeaders = parseList(json['headers']);
+    final rawRows = <List<String>>[];
+    if (json['rows'] is List) {
+      for (final row in json['rows']) {
+        rawRows.add(parseList(row));
+      }
+    }
+
+    return CurriculumTable(headers: rawHeaders, rows: rawRows);
+  }
+
+  Map<String, dynamic> toJson() => {
+    'headers': headers,
+    'rows': rows,
+  };
+}
+
+class CurriculumModuleCompletion {
+  final String title;
+  final List<String> paragraphs;
+
+  const CurriculumModuleCompletion({
+    required this.title,
+    required this.paragraphs,
+  });
+
+  factory CurriculumModuleCompletion.fromJson(Map<String, dynamic> json) {
+    final title = (json['title'] ?? '').toString();
+    final paragraphs = (json['paragraphs'] as List? ?? [])
+        .map((e) => e.toString())
+        .toList();
+    return CurriculumModuleCompletion(title: title, paragraphs: paragraphs);
+  }
+
+  Map<String, dynamic> toJson() => {
+    'title': title,
+    'paragraphs': paragraphs,
+  };
+}
+
 class CurriculumSection {
   final int number;
   final String title;
@@ -45,6 +99,7 @@ class CurriculumSection {
   final List<String>? postSnippetParagraphs;
   final CurriculumSnippet? secondSnippet;
   final List<String>? middleParagraphs;
+  final CurriculumTable? table;
   final CurriculumSnippet? thirdSnippet;
   final List<String>? afterThirdParagraphs;
   final CurriculumSnippet? fourthSnippet;
@@ -61,6 +116,7 @@ class CurriculumSection {
     this.postSnippetParagraphs,
     this.secondSnippet,
     this.middleParagraphs,
+    this.table,
     this.thirdSnippet,
     this.afterThirdParagraphs,
     this.fourthSnippet,
@@ -102,6 +158,9 @@ class CurriculumSection {
       middleParagraphs: json['middleParagraphs'] != null
           ? parseStringList(json['middleParagraphs'])
           : null,
+      table: json['table'] != null
+          ? CurriculumTable.fromJson(json['table'] as Map<String, dynamic>)
+          : null,
       thirdSnippet: json['thirdSnippet'] != null
           ? CurriculumSnippet.fromJson(
               json['thirdSnippet'] as Map<String, dynamic>,
@@ -135,6 +194,7 @@ class CurriculumSection {
       'postSnippetParagraphs': postSnippetParagraphs,
     if (secondSnippet != null) 'secondSnippet': secondSnippet!.toJson(),
     if (middleParagraphs != null) 'middleParagraphs': middleParagraphs,
+    if (table != null) 'table': table!.toJson(),
     if (thirdSnippet != null) 'thirdSnippet': thirdSnippet!.toJson(),
     if (afterThirdParagraphs != null)
       'afterThirdParagraphs': afterThirdParagraphs,
@@ -154,6 +214,7 @@ class CurriculumModule {
   final int estimatedMinutes;
   final List<String> objectives;
   final List<CurriculumSection> sections;
+  final CurriculumModuleCompletion? moduleCompletion;
 
   const CurriculumModule({
     required this.id,
@@ -165,6 +226,7 @@ class CurriculumModule {
     required this.estimatedMinutes,
     required this.objectives,
     required this.sections,
+    this.moduleCompletion,
   });
 
   factory CurriculumModule.fromJson(Map<String, dynamic> json) {
@@ -182,6 +244,11 @@ class CurriculumModule {
       sections: (json['sections'] as List? ?? [])
           .map((s) => CurriculumSection.fromJson(s as Map<String, dynamic>))
           .toList(),
+      moduleCompletion: json['moduleCompletion'] != null
+          ? CurriculumModuleCompletion.fromJson(
+              json['moduleCompletion'] as Map<String, dynamic>,
+            )
+          : null,
     );
   }
 
@@ -195,5 +262,7 @@ class CurriculumModule {
     'estimatedMinutes': estimatedMinutes,
     'objectives': objectives,
     'sections': sections.map((s) => s.toJson()).toList(),
+    if (moduleCompletion != null)
+      'moduleCompletion': moduleCompletion!.toJson(),
   };
 }

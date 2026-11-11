@@ -61,7 +61,7 @@ class SubtopicNavFooter extends StatelessWidget {
                 label: const Text('Prev'),
                 style: TextButton.styleFrom(
                   foregroundColor: hasPrevSubtopic
-                      ? AppColors.lightAccent
+                      ? AppColors.primary
                       : AppColors.textSubtle,
                   disabledForegroundColor:
                       AppColors.textSubtle.withValues(alpha: 0.4),
@@ -90,7 +90,7 @@ class SubtopicNavFooter extends StatelessWidget {
                 label: const Icon(Icons.arrow_forward_rounded, size: 14),
                 style: TextButton.styleFrom(
                   foregroundColor: hasNextSubtopic
-                      ? AppColors.lightAccent
+                      ? AppColors.primary
                       : AppColors.textSubtle,
                   disabledForegroundColor:
                       AppColors.textSubtle.withValues(alpha: 0.4),
@@ -217,7 +217,7 @@ class SubtopicNavFooter extends StatelessWidget {
                 style: TextStyle(fontSize: 12),
               ),
               style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.lightAccent,
+                foregroundColor: AppColors.primary,
                 side: const BorderSide(color: AppColors.primaryBorder),
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -229,7 +229,7 @@ class SubtopicNavFooter extends StatelessWidget {
                 onPressed: () => onNavigateModule(nextModule!.id),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.surfaceElevated,
-                  foregroundColor: AppColors.lightAccent,
+                  foregroundColor: AppColors.primary,
                   side: const BorderSide(color: AppColors.primaryBorder),
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 8),

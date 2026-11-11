@@ -20,9 +20,11 @@ class CurriculumRepository {
     }
 
     final assetBundle = bundle ?? rootBundle;
-    final assetPath = pathway == 'docker'
-        ? 'assets/data/docker_curriculum.json'
-        : 'assets/data/git_curriculum.json';
+    final assetPath = switch (pathway) {
+      'docker' => 'assets/data/docker_curriculum.json',
+      'linux' => 'assets/data/linux_curriculum.json',
+      _ => 'assets/data/git_curriculum.json',
+    };
 
     final jsonString = await assetBundle.loadString(assetPath);
     final dynamic decoded = json.decode(jsonString);

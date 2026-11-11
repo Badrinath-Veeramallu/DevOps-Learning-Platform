@@ -31,12 +31,12 @@ class LearningPathTrack {
     ),
     LearningPathTrack(
       id: 'linux',
-      title: 'Linux Systems & Automation',
+      title: 'Linux Essentials',
       level: 'Foundational',
-      modules: '8 Modules',
+      modules: '6 Lessons · Interactive Pathway',
       description:
-          'Linux kernel fundamentals, process management, permissions, systemd services, and bash shell automation.',
-      hasPathway: false,
+          'File system navigation, permissions, process management, networking, package management, and shell scripting automation.',
+      hasPathway: true,
     ),
     LearningPathTrack(
       id: 'docker',
