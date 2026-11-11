@@ -44,11 +44,11 @@ export const KagePage = () => {
     },
     {
       id: "linux",
-      title: "Linux Systems & Automation",
+      title: "Linux Essentials",
       level: "Foundational",
-      modules: "8 Modules",
+      modules: "6 Lessons",
       description:
-        "Linux kernel fundamentals, process management, permissions, systemd services, and bash shell automation.",
+        "File system navigation, permissions, process management, networking, package management, and shell scripting automation.",
     },
     {
       id: "docker",
@@ -325,6 +325,14 @@ export const KagePage = () => {
                         path.id === "git"
                           ? isAuthenticated
                             ? "/pathways/git"
+                            : "/register"
+                          : path.id === "linux"
+                          ? isAuthenticated
+                            ? "/pathways/linux"
+                            : "/register"
+                          : path.id === "docker"
+                          ? isAuthenticated
+                            ? "/pathways/docker"
                             : "/register"
                           : isAuthenticated
                           ? "/dashboard"

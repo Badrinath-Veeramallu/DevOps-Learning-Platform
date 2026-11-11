@@ -10,6 +10,8 @@ import { Dashboard } from "./pages/Dashboard";
 import { Profile } from "./pages/Profile";
 import { GitPathwayPage } from "./pages/GitPathwayPage";
 import { GitModulePage } from "./pages/GitModulePage";
+import { LinuxPathwayPage } from "./pages/LinuxPathwayPage";
+import { LinuxModulePage } from "./pages/LinuxModulePage";
 import { DockerPathwayPage } from "./pages/DockerPathwayPage";
 import { DockerModulePage } from "./pages/DockerModulePage";
 import "./App.css";
@@ -76,6 +78,33 @@ function AppLayout() {
           <Route
             path="/pathway/git/:moduleId"
             element={<Navigate to="/pathways/git" replace />}
+          />
+
+          {/* Linux Essentials Learning Pathway Routes */}
+          <Route
+            path="/pathways/linux"
+            element={
+              <ProtectedRoute>
+                <LinuxPathwayPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/pathways/linux/:moduleId"
+            element={
+              <ProtectedRoute>
+                <LinuxModulePage />
+              </ProtectedRoute>
+            }
+          />
+          {/* Aliases for convenience */}
+          <Route
+            path="/pathway/linux"
+            element={<Navigate to="/pathways/linux" replace />}
+          />
+          <Route
+            path="/pathway/linux/:moduleId"
+            element={<Navigate to="/pathways/linux" replace />}
           />
 
           {/* Docker & Container Engineering Learning Pathway Routes */}

@@ -4389,6 +4389,118 @@
   width: 100%;
 }
 
+.section-animation-container:empty {
+  display: none;
+  margin: 0;
+}
+
+/* Table Styles for Lessons */
+.content-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  margin: 1.5rem 0 1.75rem;
+  border: 1px solid #eddfe2;
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(59, 31, 36, 0.04);
+}
+
+.content-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+  text-align: left;
+}
+
+.content-table th {
+  background: #f7eff1;
+  color: #3b1f24;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  padding: 0.75rem 1.15rem;
+  border-bottom: 2px solid #eddfe2;
+  letter-spacing: 0.02em;
+}
+
+.content-table td {
+  padding: 0.75rem 1.15rem;
+  border-bottom: 1px solid #f0e6e8;
+  color: #2b2836;
+  line-height: 1.5;
+}
+
+.content-table tr:last-child td {
+  border-bottom: none;
+}
+
+.content-table tr:hover td {
+  background: #fdfafb;
+}
+
+/* Inline Code Badges */
+.content-inline-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.88em;
+  background: #f4eaec;
+  color: #3b1f24;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  border: 1px solid #e7d8db;
+}
+
+/* Finish monument alignment when stop count is even (on the right) */
+.pathway-endpoint-row.row-finish-right {
+  justify-content: flex-end;
+  padding-right: clamp(2rem, 7.5vw, 6.25rem);
+  padding-left: 0;
+}
+
+/* Module Completion Box */
+.module-completion-card {
+  margin-top: 3.5rem;
+  padding: 1.75rem 2rem;
+  background: linear-gradient(135deg, #fdf8f9 0%, #f7eff1 100%);
+  border: 1.5px solid #dfcdd1;
+  border-radius: 14px;
+  box-shadow: 0 4px 16px rgba(59, 31, 36, 0.06);
+}
+
+.completion-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.completion-badge-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #15803d;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.completion-card-title {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #171521;
+  margin: 0;
+}
+
+.completion-card-text {
+  color: #3b2a30;
+  margin-bottom: 0.75rem;
+}
+
+.completion-card-text:last-child {
+  margin-bottom: 0;
+}
+
 /* =========================================================
    RESPONSIVE DESIGN FOR PATHWAY & MODULES
    ========================================================= */
@@ -4470,8 +4582,11 @@
   }
 
   .pathway-endpoint-row.row-start,
-  .pathway-endpoint-row.row-finish {
+  .pathway-endpoint-row.row-finish,
+  .pathway-endpoint-row.row-finish-right {
     padding-left: 0;
+    padding-right: 0;
+    justify-content: flex-start;
   }
 
   .pathway-endpoint-row.row-start {

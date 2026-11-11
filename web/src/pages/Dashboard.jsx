@@ -23,6 +23,15 @@ export const Dashboard = () => {
       hasPathway: true,
     },
     {
+      id: "linux",
+      title: "Linux Essentials",
+      level: "Foundational",
+      modules: "6 Lessons · Interactive Pathway",
+      description:
+        "File system navigation, permissions, process management, networking, package management, and shell scripting automation.",
+      hasPathway: true,
+    },
+    {
       id: "docker",
       title: "Docker & Container Engineering",
       level: "Intermediate",
@@ -30,15 +39,6 @@ export const Dashboard = () => {
       description:
         "Container isolation, multi-stage Dockerfile architecture, layer caching, container networking, and security best practices.",
       hasPathway: true,
-    },
-    {
-      id: "linux",
-      title: "Linux Systems & Automation",
-      level: "Foundational",
-      modules: "8 Modules",
-      description:
-        "Linux kernel fundamentals, process management, permissions, systemd services, and bash shell automation.",
-      hasPathway: false,
     },
     {
       id: "kubernetes",
@@ -74,6 +74,8 @@ export const Dashboard = () => {
     localStorage.setItem("devops_active_track", trackId);
     if (trackId === "git") {
       navigate("/pathways/git");
+    } else if (trackId === "linux") {
+      navigate("/pathways/linux");
     } else if (trackId === "docker") {
       navigate("/pathways/docker");
     }
@@ -82,6 +84,8 @@ export const Dashboard = () => {
   const handleContinue = (path) => {
     if (path.id === "git") {
       navigate("/pathways/git");
+    } else if (path.id === "linux") {
+      navigate("/pathways/linux");
     } else if (path.id === "docker") {
       navigate("/pathways/docker");
     } else {
