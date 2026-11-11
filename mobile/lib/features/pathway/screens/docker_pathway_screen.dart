@@ -170,7 +170,7 @@ class _DockerPathwayScreenState extends State<DockerPathwayScreen> {
         top: false,
         child: _isLoading
             ? const Center(
-                child: CircularProgressIndicator(color: AppColors.lightAccent),
+                child: CircularProgressIndicator(color: AppColors.primary),
               )
             : _error != null
                 ? Center(
@@ -197,6 +197,7 @@ class _DockerPathwayScreenState extends State<DockerPathwayScreen> {
                             onPressed: _loadData,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppColors.primary,
+                              foregroundColor: Colors.white,
                             ),
                             child: const Text('Retry'),
                           ),

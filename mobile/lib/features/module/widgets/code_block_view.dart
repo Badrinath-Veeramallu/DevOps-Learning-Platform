@@ -41,9 +41,9 @@ class _CodeBlockViewState extends State<CodeBlockView> {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 12),
       decoration: BoxDecoration(
-        color: AppColors.surfaceElevated,
+        color: AppColors.codeBackground,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppColors.primaryBorder, width: 1),
+        border: Border.all(color: const Color(0xFF2A2738), width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -52,10 +52,10 @@ class _CodeBlockViewState extends State<CodeBlockView> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             decoration: const BoxDecoration(
-              color: AppColors.surface,
+              color: AppColors.codeHeader,
               borderRadius: BorderRadius.vertical(top: Radius.circular(9)),
               border: Border(
-                bottom: BorderSide(color: AppColors.primaryBorder, width: 1),
+                bottom: BorderSide(color: Color(0xFF2A2738), width: 1),
               ),
             ),
             child: Row(
@@ -67,13 +67,13 @@ class _CodeBlockViewState extends State<CodeBlockView> {
                     const Icon(
                       Icons.terminal_rounded,
                       size: 14,
-                      color: AppColors.textMuted,
+                      color: AppColors.lightAccent,
                     ),
                     const SizedBox(width: 6),
                     Text(
                       widget.language.toUpperCase(),
                       style: AppTypography.badgeText.copyWith(
-                        color: AppColors.textMuted,
+                        color: AppColors.lightAccent,
                         fontSize: 11,
                         letterSpacing: 0.5,
                       ),
@@ -97,16 +97,16 @@ class _CodeBlockViewState extends State<CodeBlockView> {
                               : Icons.copy_rounded,
                           size: 13,
                           color: _isCopied
-                              ? AppColors.success
-                              : AppColors.textMuted,
+                              ? const Color(0xFF4ADE80)
+                              : AppColors.lightAccent,
                         ),
                         const SizedBox(width: 5),
                         Text(
                           _isCopied ? 'Copied!' : 'Copy',
                           style: AppTypography.bodySmall.copyWith(
                             color: _isCopied
-                                ? AppColors.success
-                                : AppColors.textMuted,
+                                ? const Color(0xFF4ADE80)
+                                : AppColors.lightAccent,
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
                           ),
@@ -131,7 +131,7 @@ class _CodeBlockViewState extends State<CodeBlockView> {
                   fontFamily: 'monospace',
                   fontSize: 13,
                   height: 1.55,
-                  color: AppColors.textMain,
+                  color: AppColors.codeText,
                   letterSpacing: -0.2,
                 ),
               ),

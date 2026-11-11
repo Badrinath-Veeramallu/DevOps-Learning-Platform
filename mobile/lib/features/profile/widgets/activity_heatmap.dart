@@ -132,16 +132,16 @@ class _ActivityHeatmapState extends State<ActivityHeatmap> {
     }
     switch (level) {
       case 1:
-        return const Color(0xFF60343D);
+        return const Color(0xFFD8B7BD);
       case 2:
-        return const Color(0xFF82535D);
+        return const Color(0xFFA86C78);
       case 3:
-        return const Color(0xFFB88A91);
+        return const Color(0xFF60343D);
       case 4:
-        return const Color(0xFFE7D4D7);
+        return const Color(0xFF3B1F24);
       case 0:
       default:
-        return const Color(0xFF141926);
+        return const Color(0xFFF3EFF0);
     }
   }
 
@@ -151,16 +151,16 @@ class _ActivityHeatmapState extends State<ActivityHeatmap> {
     }
     switch (level) {
       case 1:
-        return const Color(0xFF723D48);
+        return const Color(0xFFC89EA6);
       case 2:
-        return const Color(0xFF9D626D);
+        return const Color(0xFF965965);
       case 3:
-        return const Color(0xFFC79CA3);
+        return const Color(0xFF4F2830);
       case 4:
-        return const Color(0xFFF3EFF0);
+        return const Color(0xFF2B1519);
       case 0:
       default:
-        return const Color(0xFF1E293B);
+        return const Color(0xFFE8DDE0);
     }
   }
 
@@ -341,7 +341,7 @@ class _ActivityHeatmapState extends State<ActivityHeatmap> {
                         ? '—'
                         : '$totalActivities',
                     style: AppTypography.displayMedium.copyWith(
-                      color: AppColors.lightAccent,
+                      color: AppColors.primary,
                       fontWeight: FontWeight.w800,
                       fontSize: 22,
                     ),
@@ -366,7 +366,7 @@ class _ActivityHeatmapState extends State<ActivityHeatmap> {
               child: Center(
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  color: AppColors.lightAccent,
+                  color: AppColors.primary,
                 ),
               ),
             )

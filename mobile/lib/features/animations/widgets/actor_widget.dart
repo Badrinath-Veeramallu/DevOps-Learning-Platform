@@ -49,38 +49,38 @@ class ActorWidget extends StatelessWidget {
     final t = tone ?? (kind == 'zone' ? 'soft' : 'plain');
     return switch (t) {
       'brand' => (
-          bg: const Color(0xFF4A1E29),
-          border: AppColors.lightAccent,
+          bg: AppColors.primary,
+          border: AppColors.accent,
           text: Colors.white,
         ),
       'soft' => (
-          bg: const Color(0x3382535D),
-          border: const Color(0x66B88A91),
-          text: const Color(0xFFE7D4D7),
+          bg: AppColors.primarySubtle,
+          border: AppColors.primaryBorder,
+          text: AppColors.primary,
         ),
       'warn' => (
-          bg: const Color(0x2EF59E0B),
-          border: const Color(0x80F59E0B),
-          text: const Color(0xFFFDE68A),
+          bg: AppColors.warningBg,
+          border: AppColors.warningBorder,
+          text: AppColors.warningText,
         ),
       'ok' => (
-          bg: const Color(0x2E10B981),
-          border: const Color(0x8010B981),
-          text: const Color(0xFFA7F3D0),
+          bg: AppColors.successBg,
+          border: AppColors.successBorder,
+          text: AppColors.successText,
         ),
       'bad' => (
-          bg: const Color(0x2EEF4444),
-          border: const Color(0x80EF4444),
-          text: const Color(0xFFFECACA),
+          bg: AppColors.errorBg,
+          border: AppColors.errorBorder,
+          text: AppColors.errorText,
         ),
       'dim' => (
-          bg: const Color(0x1AFFFFFF),
-          border: const Color(0x4094A3B8),
-          text: const Color(0xFF64748B),
+          bg: AppColors.surfaceAlt,
+          border: AppColors.borderDefault,
+          text: AppColors.textSubtle,
         ),
       _ => (
-          bg: const Color(0xFF1E293B),
-          border: const Color(0xFF334155),
+          bg: AppColors.surface,
+          border: AppColors.borderHover,
           text: AppColors.textMain,
         ),
     };
@@ -183,7 +183,7 @@ class ActorWidget extends StatelessWidget {
               ]
             : [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.25),
+                  color: AppColors.cardShadow,
                   blurRadius: 6,
                   offset: const Offset(0, 2),
                 ),
@@ -241,7 +241,7 @@ class ActorWidget extends StatelessWidget {
               borderRadius: BorderRadius.circular(4),
               child: LinearProgressIndicator(
                 value: (actor.bar! / 100.0).clamp(0.0, 1.0),
-                backgroundColor: Colors.black26,
+                backgroundColor: AppColors.surfaceAlt.withValues(alpha: 0.7),
                 valueColor: AlwaysStoppedAnimation<Color>(tone.text),
                 minHeight: 4,
               ),
@@ -273,7 +273,7 @@ class ActorWidget extends StatelessWidget {
                   ]
                 : [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.3),
+                      color: AppColors.cardShadow,
                       blurRadius: 4,
                       offset: const Offset(0, 2),
                     ),
@@ -327,7 +327,7 @@ class ActorWidget extends StatelessWidget {
         border: Border.all(color: tone.border, width: 1.2),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.25),
+            color: AppColors.cardShadow,
             blurRadius: 5,
             offset: const Offset(0, 2),
           ),
@@ -380,7 +380,7 @@ class ActorWidget extends StatelessWidget {
         border: Border.all(color: tone.border, width: 1.2),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
+            color: AppColors.cardShadow,
             blurRadius: 4,
             offset: const Offset(0, 1),
           ),
@@ -531,7 +531,7 @@ class ActorWidget extends StatelessWidget {
                   'hl' => const Color(0xFFFDE68A),
                   'mark' => const Color(0xFFF472B6),
                   'dim' => const Color(0xFF64748B),
-                  _ => AppColors.textMain,
+                  _ => AppColors.codeText,
                 };
 
                 return Container(
@@ -585,7 +585,7 @@ class ActorWidget extends StatelessWidget {
         border: Border.all(color: tone.border, width: 1.2),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.25),
+            color: AppColors.cardShadow,
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
@@ -644,7 +644,7 @@ class ActorWidget extends StatelessWidget {
               borderRadius: BorderRadius.circular(3),
               child: LinearProgressIndicator(
                 value: (actor.bar! / 100.0).clamp(0.0, 1.0),
-                backgroundColor: Colors.black26,
+                backgroundColor: AppColors.surfaceAlt.withValues(alpha: 0.7),
                 valueColor: AlwaysStoppedAnimation<Color>(tone.text),
                 minHeight: 3,
               ),
@@ -663,7 +663,7 @@ class ActorWidget extends StatelessWidget {
         border: Border.all(color: tone.border, width: 1.2),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.28),
+            color: AppColors.cardShadow,
             blurRadius: 8,
             offset: const Offset(0, 3),
           ),
@@ -742,7 +742,7 @@ class ActorWidget extends StatelessWidget {
                     borderRadius: BorderRadius.circular(3),
                     child: LinearProgressIndicator(
                       value: (actor.bar! / 100.0).clamp(0.0, 1.0),
-                      backgroundColor: Colors.black26,
+                      backgroundColor: AppColors.surfaceAlt.withValues(alpha: 0.7),
                       valueColor: AlwaysStoppedAnimation<Color>(tone.text),
                       minHeight: 3,
                     ),

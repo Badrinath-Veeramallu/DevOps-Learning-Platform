@@ -186,7 +186,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 14),
                   label: const Text('Back to Dashboard'),
                   style: TextButton.styleFrom(
-                    foregroundColor: AppColors.lightAccent,
+                    foregroundColor: AppColors.primary,
                     padding: EdgeInsets.zero,
                   ),
                 ),
@@ -280,7 +280,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           child: Text(
                             initials,
                             style: AppTypography.titleLarge.copyWith(
-                              color: AppColors.subtleHighlight,
+                              color: Colors.white,
                               fontWeight: FontWeight.w700,
                             ),
                           ),
@@ -337,7 +337,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
-                            borderSide: const BorderSide(color: AppColors.lightAccent),
+                            borderSide: const BorderSide(color: AppColors.accent),
                           ),
                         ),
                       ),
@@ -376,7 +376,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         trailing: TextButton(
                           onPressed: _handleStartEdit,
                           style: TextButton.styleFrom(
-                            foregroundColor: AppColors.lightAccent,
+                            foregroundColor: AppColors.primary,
                             padding: EdgeInsets.zero,
                             minimumSize: Size.zero,
                             tapTargetSize: MaterialTapTargetSize.shrinkWrap,

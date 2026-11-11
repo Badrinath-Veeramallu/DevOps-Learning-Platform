@@ -72,7 +72,7 @@ class _DevOpsLearningAppState extends State<DevOpsLearningApp> {
       child: MaterialApp.router(
         title: AppConfig.appName,
         debugShowCheckedModeBanner: false,
-        theme: AppTheme.darkTheme,
+        theme: AppTheme.lightTheme,
         routerConfig: _router,
       ),
     );

@@ -5,12 +5,12 @@ import '../theme/app_typography.dart';
 
 enum ButtonVariant { primary, secondary, ghost }
 
-/// Reusable button widget adhering to the Cyber Midnight design system.
+/// Reusable button widget adhering to the Website White + Burgundy design system.
 ///
 /// Features:
-/// - Primary: Vibrant Cyan background with subtle glow, dark text
-/// - Secondary: Dark surface with Cyan/Lime border
-/// - Ghost: Transparent with subtle text
+/// - Primary: Deep burgundy background with soft shadow and crisp white text
+/// - Secondary: Crisp white surface with subtle burgundy border and burgundy text
+/// - Ghost: Transparent with muted text
 /// - Built-in loading state with centered spinner
 /// - Full-width or content-sized layout
 class AppButton extends StatelessWidget {
@@ -46,7 +46,7 @@ class AppButton extends StatelessWidget {
           strokeWidth: 2.2,
           valueColor: AlwaysStoppedAnimation<Color>(
             variant == ButtonVariant.primary
-                ? AppColors.background
+                ? Colors.white
                 : AppColors.primary,
           ),
         ),
@@ -68,21 +68,14 @@ class AppButton extends StatelessWidget {
     Widget buttonWidget;
     switch (variant) {
       case ButtonVariant.primary:
-        buttonWidget = Container(
+        buttonWidget = DecoratedBox(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
-            gradient: enabled
-                ? const LinearGradient(
-                    colors: [AppColors.accent, AppColors.secondary],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  )
-                : null,
             boxShadow: enabled
                 ? [
                     BoxShadow(
-                      color: AppColors.accent.withValues(alpha: 0.35),
-                      blurRadius: 18,
+                      color: AppColors.primary.withValues(alpha: 0.16),
+                      blurRadius: 12,
                       offset: const Offset(0, 4),
                     ),
                   ]
@@ -91,10 +84,10 @@ class AppButton extends StatelessWidget {
           child: ElevatedButton(
             onPressed: enabled ? onPressed : null,
             style: ElevatedButton.styleFrom(
-              backgroundColor: enabled ? Colors.transparent : AppColors.surfaceElevated,
-              foregroundColor: AppColors.textMain,
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
               shadowColor: Colors.transparent,
-              disabledBackgroundColor: AppColors.surfaceElevated,
+              disabledBackgroundColor: AppColors.borderDefault,
               disabledForegroundColor: AppColors.textSubtle,
               elevation: 0,
               padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -111,13 +104,13 @@ class AppButton extends StatelessWidget {
         buttonWidget = OutlinedButton(
           onPressed: enabled ? onPressed : null,
           style: OutlinedButton.styleFrom(
-            backgroundColor: AppColors.surfaceElevated.withValues(alpha: 0.6),
-            foregroundColor: AppColors.subtleHighlight,
+            backgroundColor: AppColors.surface,
+            foregroundColor: AppColors.primary,
             disabledForegroundColor: AppColors.textSubtle,
             side: BorderSide(
               color: enabled
-                  ? AppColors.primaryBorder
-                  : AppColors.borderDefault,
+                  ? AppColors.borderDefault
+                  : AppColors.borderSubtle,
               width: 1.2,
             ),
             padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -160,11 +153,14 @@ class AppButton extends StatelessWidget {
     switch (variant) {
       case ButtonVariant.primary:
         return AppTypography.buttonText.copyWith(
-          color: AppColors.textMain,
-          fontWeight: FontWeight.w700,
+          color: Colors.white,
+          fontWeight: FontWeight.w600,
         );
       case ButtonVariant.secondary:
-        return AppTypography.buttonText.copyWith(color: AppColors.subtleHighlight);
+        return AppTypography.buttonText.copyWith(
+          color: AppColors.primary,
+          fontWeight: FontWeight.w600,
+        );
       case ButtonVariant.ghost:
         return AppTypography.buttonText.copyWith(color: AppColors.textMuted);
     }

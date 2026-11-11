@@ -84,7 +84,7 @@ class AppTypography {
     fontFamily: 'monospace',
     fontSize: 13,
     fontWeight: FontWeight.w500,
-    color: AppColors.primaryLight,
+    color: AppColors.primary,
     height: 1.4,
   );
 }
