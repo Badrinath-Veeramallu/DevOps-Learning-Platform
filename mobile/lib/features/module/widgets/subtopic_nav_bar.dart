@@ -36,7 +36,7 @@ class SubtopicNavBar extends StatelessWidget {
               Text(
                 'SUBTOPICS',
                 style: AppTypography.badgeText.copyWith(
-                  color: AppColors.lightAccent,
+                  color: AppColors.primary,
                   letterSpacing: 0.8,
                   fontWeight: FontWeight.w700,
                 ),
@@ -81,7 +81,7 @@ class SubtopicNavBar extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
                         color: isSelected
-                            ? AppColors.lightAccent
+                            ? AppColors.primary
                             : AppColors.primaryBorder,
                         width: isSelected ? 1.5 : 1.0,
                       ),
@@ -104,7 +104,7 @@ class SubtopicNavBar extends StatelessWidget {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: isSelected
-                                ? AppColors.lightAccent
+                                ? AppColors.primary
                                 : AppColors.surfaceElevated,
                           ),
                           alignment: Alignment.center,

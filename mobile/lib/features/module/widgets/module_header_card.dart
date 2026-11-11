@@ -36,13 +36,13 @@ class ModuleHeaderCard extends StatelessWidget {
                 const Icon(
                   Icons.arrow_back_ios_new_rounded,
                   size: 14,
-                  color: AppColors.lightAccent,
+                  color: AppColors.primary,
                 ),
                 const SizedBox(width: 8),
                 Text(
                   'Back to Pathway',
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.lightAccent,
+                    color: AppColors.primary,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -69,7 +69,7 @@ class ModuleHeaderCard extends StatelessWidget {
               child: Text(
                 'Stop ${module.order} of 7',
                 style: AppTypography.badgeText.copyWith(
-                  color: AppColors.lightAccent,
+                  color: AppColors.primary,
                   fontWeight: FontWeight.w700,
                 ),
               ),

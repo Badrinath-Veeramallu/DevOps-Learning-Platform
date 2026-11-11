@@ -29,7 +29,7 @@ class LearningContentRenderer extends StatelessWidget {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Copied link: $url'),
-        backgroundColor: AppColors.surfaceElevated,
+        backgroundColor: AppColors.primary,
         duration: const Duration(seconds: 2),
       ),
     );
@@ -102,14 +102,14 @@ class LearningContentRenderer extends StatelessWidget {
                     const Icon(
                       Icons.link_rounded,
                       size: 16,
-                      color: AppColors.lightAccent,
+                      color: AppColors.primary,
                     ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         section.link!.text,
                         style: AppTypography.bodySmall.copyWith(
-                          color: AppColors.lightAccent,
+                          color: AppColors.primary,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -186,7 +186,7 @@ class LearningContentRenderer extends StatelessWidget {
                               width: 6,
                               height: 6,
                               decoration: const BoxDecoration(
-                                color: AppColors.lightAccent,
+                                color: AppColors.primary,
                                 shape: BoxShape.circle,
                               ),
                             ),

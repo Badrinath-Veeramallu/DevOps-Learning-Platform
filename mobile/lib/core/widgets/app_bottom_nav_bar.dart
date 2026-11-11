@@ -97,13 +97,13 @@ class AppBottomNavBar extends StatelessWidget {
             Icon(
               isSelected ? activeIcon : icon,
               size: 22,
-              color: isSelected ? AppColors.lightAccent : AppColors.textMuted,
+              color: isSelected ? AppColors.primary : AppColors.textMuted,
             ),
             const SizedBox(height: 4),
             Text(
               label,
               style: AppTypography.bodySmall.copyWith(
-                color: isSelected ? AppColors.lightAccent : AppColors.textMuted,
+                color: isSelected ? AppColors.primary : AppColors.textMuted,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                 fontSize: 11,
               ),

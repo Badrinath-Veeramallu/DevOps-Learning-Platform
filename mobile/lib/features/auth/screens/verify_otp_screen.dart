@@ -206,7 +206,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                 Text(
                   widget.email,
                   style: AppTypography.bodyLarge.copyWith(
-                    color: AppColors.primaryLight,
+                    color: AppColors.primary,
                     fontWeight: FontWeight.w600,
                   ),
                   textAlign: TextAlign.center,
@@ -244,7 +244,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                                 child: Text(
                                   errorMessage,
                                   style: AppTypography.bodySmall.copyWith(
-                                    color: const Color(0xFFFCA5A5),
+                                    color: AppColors.errorText,
                                   ),
                                 ),
                               ),

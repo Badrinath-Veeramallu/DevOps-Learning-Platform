@@ -238,7 +238,7 @@ class _DockerModuleScreenState extends State<DockerModuleScreen> {
                 ? 'Module ${_currentModule!.order} marked as completed!$syncSuffix'
                 : 'Module ${_currentModule!.order} marked as incomplete.$syncSuffix',
           ),
-          backgroundColor: isNowDone ? AppColors.success : AppColors.surfaceElevated,
+          backgroundColor: isNowDone ? AppColors.success : AppColors.primary,
           duration: const Duration(seconds: 2),
         ),
       );
@@ -282,7 +282,7 @@ class _DockerModuleScreenState extends State<DockerModuleScreen> {
         top: false,
         child: _isLoading
             ? const Center(
-                child: CircularProgressIndicator(color: AppColors.lightAccent),
+                child: CircularProgressIndicator(color: AppColors.primary),
               )
             : _error != null
                 ? Center(

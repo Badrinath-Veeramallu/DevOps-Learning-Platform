@@ -47,7 +47,7 @@ class ModuleObjectivesCard extends StatelessWidget {
                     child: const Icon(
                       Icons.track_changes_rounded,
                       size: 18,
-                      color: AppColors.lightAccent,
+                      color: AppColors.primary,
                     ),
                   ),
                   const SizedBox(width: 10),

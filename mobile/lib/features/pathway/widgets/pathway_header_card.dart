@@ -69,13 +69,13 @@ class PathwayHeaderCard extends StatelessWidget {
                 const Icon(
                   Icons.arrow_back_ios_new_rounded,
                   size: 14,
-                  color: AppColors.lightAccent,
+                  color: AppColors.primary,
                 ),
                 const SizedBox(width: 8),
                 Text(
                   'Back to Dashboard',
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.lightAccent,
+                    color: AppColors.primary,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -95,7 +95,7 @@ class PathwayHeaderCard extends StatelessWidget {
             border: Border.all(color: AppColors.borderDefault, width: 1),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.18),
+                color: AppColors.cardShadow,
                 blurRadius: 16,
                 offset: const Offset(0, 4),
               ),
@@ -125,7 +125,7 @@ class PathwayHeaderCard extends StatelessWidget {
                     child: Text(
                       badgeText,
                       style: AppTypography.badgeText.copyWith(
-                        color: AppColors.lightAccent,
+                        color: AppColors.primary,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -182,7 +182,7 @@ class PathwayHeaderCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: AppColors.surfaceElevated.withValues(alpha: 0.6),
+                  color: AppColors.surfaceAlt,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: AppColors.borderDefault, width: 1),
                 ),
@@ -233,9 +233,9 @@ class PathwayHeaderCard extends StatelessWidget {
                       child: LinearProgressIndicator(
                         value: totalCount > 0 ? completedCount / totalCount : 0.0,
                         minHeight: 8,
-                        backgroundColor: AppColors.surfaceElevated,
+                        backgroundColor: AppColors.paleBlush,
                         valueColor: const AlwaysStoppedAnimation<Color>(
-                          AppColors.accent,
+                          AppColors.primary,
                         ),
                       ),
                     ),
@@ -251,7 +251,7 @@ class PathwayHeaderCard extends StatelessWidget {
                       style: AppTypography.bodySmall.copyWith(
                         color: isAllDone
                             ? AppColors.success
-                            : AppColors.lightAccent,
+                            : AppColors.primary,
                         fontWeight: FontWeight.w500,
                         fontSize: 12,
                       ),

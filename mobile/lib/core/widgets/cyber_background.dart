@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
 
-/// Renders the signature Cyber Midnight grid and ambient glowing background.
+/// Renders the website's signature subtle grid and pale blush ambient background.
 ///
 /// Matches the web application's `BackgroundGrid` component.
 class CyberBackground extends StatelessWidget {
@@ -16,7 +16,7 @@ class CyberBackground extends StatelessWidget {
       color: AppColors.background,
       child: Stack(
         children: [
-          // Ambient Radial Gradient - Top Right (Burgundy glow)
+          // Ambient Radial Gradient - Top Right (Pale blush glow matching Web)
           Positioned(
             top: -120,
             right: -100,
@@ -27,7 +27,7 @@ class CyberBackground extends StatelessWidget {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    AppColors.secondary.withValues(alpha: 0.28),
+                    AppColors.paleBlush.withValues(alpha: 0.45),
                     Colors.transparent,
                   ],
                 ),
@@ -35,7 +35,7 @@ class CyberBackground extends StatelessWidget {
             ),
           ),
 
-          // Ambient Radial Gradient - Bottom Left (Dusty Rose glow)
+          // Ambient Radial Gradient - Bottom Left (Soft blush grid glow matching Web)
           Positioned(
             bottom: -100,
             left: -80,
@@ -46,7 +46,7 @@ class CyberBackground extends StatelessWidget {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    AppColors.accent.withValues(alpha: 0.22),
+                    AppColors.gridLine.withValues(alpha: 0.65),
                     Colors.transparent,
                   ],
                 ),
@@ -54,7 +54,7 @@ class CyberBackground extends StatelessWidget {
             ),
           ),
 
-          // Grid Overlay
+          // Subtle Blush Architectural Grid Overlay
           Positioned.fill(child: CustomPaint(painter: _GridPainter())),
 
           // Content
@@ -69,7 +69,7 @@ class _GridPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.025)
+      ..color = AppColors.gridLine
       ..strokeWidth = 1.0;
 
     const double step = 32.0;

@@ -1,150 +1,399 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
-import { BackgroundGrid } from "../components/BackgroundGrid";
-import { Badge } from "../components/Badge";
-import { Card } from "../components/Card";
+import { UserProfileMenu } from "../components/UserProfileMenu";
+import { HeroDevOpsIllustration } from "../components/home/HeroDevOpsIllustration";
+import { LearningPathsBento } from "../components/home/LearningPathsBento";
+import {
+  FinalCtaSection,
+  LearningJourneySection,
+  WhatYouLearnSection,
+} from "../components/home/LearningJourneySection";
+import { gitCurriculum } from "../data/gitCurriculum";
+import { dockerCurriculum } from "../data/dockerCurriculum";
+import "../styles/home.css";
 
+const CURRENT_YEAR = new Date().getFullYear();
+
+/**
+ * DevOps Learning Platform Homepage — White + Deep Burgundy light editorial design
+ * featuring a split hero with live DevOps illustration, asymmetric Bento learning paths,
+ * capability overview, interactive pathway preview, and conversion CTA.
+ */
 export const Home = () => {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, logout } = useAuth();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const features = [
-    {
-      title: "Email OTP Verification",
-      desc: "Cryptographically secure 6-digit confirmation codes with anti-tamper single-use guarantees and brute-force lockouts.",
-      tag: "Security",
-      icon: (
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <rect width="20" height="16" x="2" y="4" rx="2" />
-          <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-        </svg>
-      ),
-    },
-    {
-      title: "Interactive Kubernetes Labs",
-      desc: "Multi-node sandbox clusters to deploy deployments, ingress controllers, statefulsets, and configmaps in real time.",
-      tag: "Cloud Native",
-      icon: (
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <polygon points="12 2 2 7 12 12 22 7 12 2" />
-          <polyline points="2 17 12 22 22 17" />
-          <polyline points="2 12 12 17 22 12" />
-        </svg>
-      ),
-    },
-    {
-      title: "Automated CI/CD Workflows",
-      desc: "End-to-end pipeline creation with automated unit test runners, Docker layer caching, and GitOps rollouts.",
-      tag: "Automation",
-      icon: (
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <circle cx="12" cy="12" r="10" />
-          <polyline points="12 6 12 12 16 14" />
-        </svg>
-      ),
-    },
-    {
-      title: "Google OAuth 2.0 Integration",
-      desc: "Hardware-token validated identity federation alongside traditional bcrypt credentials and safe account linking.",
-      tag: "Identity",
-      icon: (
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
-        </svg>
-      ),
-    },
-  ];
+  const liveModuleCount = gitCurriculum.length + dockerCurriculum.length;
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 768) {
+        setMobileMenuOpen(false);
+      }
+    };
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setMobileMenuOpen(false);
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
+  const scrollToSection = (event, sectionId) => {
+    event.preventDefault();
+    setMobileMenuOpen(false);
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
   return (
-    <BackgroundGrid className="home-wrapper">
-      <div className="home-hero-container">
-        {/* Status Pill */}
-        <div className="hero-badge-wrap">
-          <Badge variant="teal" dot>
-            Next-Gen DevOps Platform
-          </Badge>
-          <Badge variant="indigo">
-            CI/CD • Kubernetes • Terraform
-          </Badge>
-        </div>
-
-        {/* Hero Title */}
-        <h1 className="hero-main-title">
-          Master Modern DevOps <br />
-          <span className="gradient-text-indigo-teal">From Code to Production</span>
-        </h1>
-
-        <p className="hero-description">
-          Hands-on cloud sandboxes, automated pipeline blueprints, and production-ready architectures.
-          Engineered for developers who build, automate, and scale.
-        </p>
-
-        {/* Call to Actions */}
-        <div className="hero-action-buttons">
-          {isAuthenticated ? (
-            <Link to="/dashboard" className="btn-primary-glow">
-              <span>Go to Command Center</span>
-              <span className="btn-user-label">({user?.name})</span>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <line x1="5" y1="12" x2="19" y2="12" />
-                <polyline points="12 5 19 12 12 19" />
+    <div className="hp-page">
+      {/* ========================================================
+          1. NAVIGATION HEADER
+          ======================================================== */}
+      <header className="devops-navbar">
+        <div className="devops-nav-container">
+          <Link to="/" className="devops-brand" aria-label="DevOps Learning Platform Home">
+            <div className="devops-logo-badge" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="4 17 10 11 4 5" />
+                <line x1="12" y1="19" x2="20" y2="19" />
               </svg>
-            </Link>
-          ) : (
-            <>
-              <Link to="/register" className="btn-primary-glow">
-                <span>Start Learning Free</span>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                  <polyline points="12 5 19 12 12 19" />
+            </div>
+            <div className="devops-brand-text">
+              <span className="brand-primary-text">DevOps</span>
+              <span className="brand-secondary-text">Platform</span>
+            </div>
+          </Link>
+
+          <nav className="devops-nav-links" aria-label="Primary Navigation">
+            <a
+              href="#paths"
+              onClick={(e) => scrollToSection(e, "paths")}
+              className="nav-link"
+            >
+              Learning Paths
+            </a>
+            <a
+              href="#what-you-learn"
+              onClick={(e) => scrollToSection(e, "what-you-learn")}
+              className="nav-link"
+            >
+              What You&apos;ll Learn
+            </a>
+            <a
+              href="#how-it-works"
+              onClick={(e) => scrollToSection(e, "how-it-works")}
+              className="nav-link"
+            >
+              How It Works
+            </a>
+          </nav>
+
+          <div className="devops-nav-actions">
+            {isAuthenticated ? (
+              <>
+                <Link to="/dashboard" className="btn-nav-primary">
+                  <span>Dashboard</span>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
+                    <polyline points="9 18 15 12 9 6" />
+                  </svg>
+                </Link>
+                <UserProfileMenu />
+              </>
+            ) : (
+              <>
+                <Link to="/login" className="btn-nav-secondary" id="nav-btn-signin">
+                  Sign In
+                </Link>
+                <Link to="/register" className="btn-nav-primary" id="nav-btn-getstarted">
+                  <span>Get Started Free</span>
+                </Link>
+              </>
+            )}
+
+            <button
+              type="button"
+              className="mobile-hamburger-btn"
+              onClick={() => setMobileMenuOpen((prev) => !prev)}
+              aria-expanded={mobileMenuOpen}
+              aria-label="Toggle navigation menu"
+            >
+              {mobileMenuOpen ? (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
                 </svg>
-              </Link>
-              <Link to="/login" className="btn-secondary-clean">
-                <span>Sign In to Account</span>
-              </Link>
-            </>
-          )}
-        </div>
-
-        {/* Terminal Visual Mockup */}
-        <div className="hero-terminal-mockup" aria-label="Terminal demonstration">
-          <div className="terminal-header">
-            <span className="terminal-dot dot-red" />
-            <span className="terminal-dot dot-yellow" />
-            <span className="terminal-dot dot-green" />
-            <span className="terminal-title">bash — kubectl get deployments,pods,services</span>
-          </div>
-          <div className="terminal-body">
-            <p className="terminal-line"><span className="term-prompt">$</span> kubectl get pods -n devops-platform</p>
-            <p className="terminal-line term-output"><span className="term-teal">NAME</span>                               READY   STATUS    RESTARTS   AGE</p>
-            <p className="terminal-line term-output">api-gateway-6d8b5c98bc-7xk2q         1/1     <span className="term-teal">Running</span>   0          42m</p>
-            <p className="terminal-line term-output">auth-service-589fc78c77-4r9mt        1/1     <span className="term-teal">Running</span>   0          42m</p>
-            <p className="terminal-line term-output">otp-verifier-76b9fcd6f9-p8b5d        1/1     <span className="term-teal">Running</span>   0          18m</p>
-            <p className="terminal-line"><span className="term-prompt">$</span> helm status platform-prod-v2 --show-resources <span className="term-indigo">[OK]</span></p>
+              ) : (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="3" y1="12" x2="21" y2="12" />
+                  <line x1="3" y1="6" x2="21" y2="6" />
+                  <line x1="3" y1="18" x2="21" y2="18" />
+                </svg>
+              )}
+            </button>
           </div>
         </div>
 
-        {/* Features Grid */}
-        <section className="features-grid-section" aria-label="Key Platform Capabilities">
-          <div className="features-header">
-            <h2>Built with Enterprise-Grade Rigor</h2>
-            <p>Every component is crafted for security, scale, and performance.</p>
+        {mobileMenuOpen && (
+          <div className="mobile-nav-drawer" role="dialog" aria-modal="true" aria-label="Mobile menu">
+            <nav className="mobile-drawer-links">
+              <a href="#paths" onClick={(e) => scrollToSection(e, "paths")} className="mobile-link">
+                Learning Paths
+              </a>
+              <a href="#what-you-learn" onClick={(e) => scrollToSection(e, "what-you-learn")} className="mobile-link">
+                What You&apos;ll Learn
+              </a>
+              <a href="#how-it-works" onClick={(e) => scrollToSection(e, "how-it-works")} className="mobile-link">
+                How It Works
+              </a>
+            </nav>
+
+            <div className="mobile-drawer-actions">
+              {isAuthenticated ? (
+                <>
+                  <Link
+                    to="/dashboard"
+                    className="btn-hero-primary"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Dashboard ({user?.name || "Learner"})
+                  </Link>
+                  <Link
+                    to="/profile"
+                    className="btn-hero-secondary"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    My Profile
+                  </Link>
+                  <button
+                    type="button"
+                    className="btn-hero-secondary"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      logout();
+                    }}
+                  >
+                    Sign Out
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    className="btn-hero-secondary"
+                    id="mobile-btn-login"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="btn-hero-primary"
+                    id="mobile-btn-register"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Get Started Free
+                  </Link>
+                </>
+              )}
+            </div>
+          </div>
+        )}
+      </header>
+
+      {/* ========================================================
+          2. MAIN HOMEPAGE CONTENT
+          ======================================================== */}
+      <main className="hp-main">
+        {/* HERO SECTION */}
+        <section className="hp-hero" id="hero">
+          <div className="hp-hero-backdrop" aria-hidden="true">
+            <div className="hp-hero-grid" />
+            <div className="hp-hero-orb hp-hero-orb-1" />
+            <div className="hp-hero-orb hp-hero-orb-2" />
           </div>
 
-          <div className="features-cards-grid">
-            {features.map((feat, idx) => (
-              <Card key={idx} hoverable className="feature-card">
-                <div className="feature-card-header">
-                  <div className="feature-icon-box">{feat.icon}</div>
-                  <Badge variant="teal" size="sm">{feat.tag}</Badge>
+          <div className="hp-container hp-hero-inner">
+            {/* Hero Left Copy */}
+            <div className="hp-hero-copy">
+              <div className="hp-hero-pill">
+                <span className="hp-live-dot" aria-hidden="true" />
+                <span>Hands-On DevOps Learning Platform</span>
+              </div>
+
+              <h1 className="hp-hero-title">
+                Build Your DevOps Skills.{" "}
+                <span className="hp-hero-accent">One Step at a Time.</span>
+              </h1>
+
+              <p className="hp-hero-desc">
+                Learn Git &amp; GitHub, Docker containers, Linux fundamentals, and delivery workflows through guided interactive roadmaps, visual step animations, and practical command-line labs.
+              </p>
+
+              <div className="hp-hero-actions">
+                <Link
+                  to={isAuthenticated ? "/dashboard" : "/register"}
+                  className="btn-hero-primary"
+                  id="hero-cta-start"
+                >
+                  <span>Start Learning</span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                    <polyline points="12 5 19 12 12 19" />
+                  </svg>
+                </Link>
+
+                <a
+                  href="#paths"
+                  onClick={(e) => scrollToSection(e, "paths")}
+                  className="btn-hero-secondary"
+                  id="hero-cta-explore"
+                >
+                  <span>Explore Learning Paths</span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" aria-hidden="true">
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <polyline points="19 12 12 19 5 12" />
+                  </svg>
+                </a>
+              </div>
+
+              {/* Honest factual capability strip */}
+              <div className="hp-hero-facts" aria-label="Platform highlights">
+                <div className="hp-fact-item">
+                  <span className="hp-fact-icon" aria-hidden="true">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  </span>
+                  <span>{liveModuleCount} Guided Pathway Stops</span>
                 </div>
-                <h3>{feat.title}</h3>
-                <p>{feat.desc}</p>
-              </Card>
-            ))}
+
+                <div className="hp-fact-item">
+                  <span className="hp-fact-icon" aria-hidden="true">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3">
+                      <polyline points="4 17 10 11 4 5" />
+                      <line x1="12" y1="19" x2="20" y2="19" />
+                    </svg>
+                  </span>
+                  <span>Real CLI Workflows</span>
+                </div>
+
+                <div className="hp-fact-item">
+                  <span className="hp-fact-icon" aria-hidden="true">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3">
+                      <circle cx="12" cy="12" r="9" />
+                      <polyline points="12 7 12 12 15 14" />
+                    </svg>
+                  </span>
+                  <span>Progress Synced Automatically</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Hero Right Connected Illustration */}
+            <HeroDevOpsIllustration />
           </div>
         </section>
-      </div>
-    </BackgroundGrid>
+
+        {/* BENTO LEARNING PATHS */}
+        <LearningPathsBento />
+
+        {/* WHAT YOU'LL LEARN */}
+        <WhatYouLearnSection />
+
+        {/* LEARNING JOURNEY + HOW IT WORKS */}
+        <LearningJourneySection />
+
+        {/* FINAL CALL TO ACTION */}
+        <FinalCtaSection />
+      </main>
+
+      {/* ========================================================
+          3. FOOTER
+          ======================================================== */}
+      <footer className="devops-footer">
+        <div className="footer-container">
+          <div className="footer-brand-col">
+            <div className="devops-brand">
+              <div className="devops-logo-badge" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <polyline points="4 17 10 11 4 5" />
+                  <line x1="12" y1="19" x2="20" y2="19" />
+                </svg>
+              </div>
+              <div className="devops-brand-text">
+                <span className="brand-primary-text">DevOps</span>
+                <span className="brand-secondary-text">Platform</span>
+              </div>
+            </div>
+            <p className="footer-tagline">
+              Structured interactive pathways, visual architecture diagrams, and hands-on command exercises for modern DevOps.
+            </p>
+          </div>
+
+          <div className="footer-links-col">
+            <h4 className="footer-heading">Platform</h4>
+            <ul className="footer-links-list">
+              <li>
+                <a href="#paths" onClick={(e) => scrollToSection(e, "paths")}>
+                  Learning Paths
+                </a>
+              </li>
+              <li>
+                <a href="#what-you-learn" onClick={(e) => scrollToSection(e, "what-you-learn")}>
+                  What You&apos;ll Learn
+                </a>
+              </li>
+              <li>
+                <a href="#how-it-works" onClick={(e) => scrollToSection(e, "how-it-works")}>
+                  How It Works
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div className="footer-links-col">
+            <h4 className="footer-heading">Explore &amp; Account</h4>
+            <ul className="footer-links-list">
+              <li>
+                <Link
+                  to={isAuthenticated ? "/pathways/git" : "/login"}
+                  state={!isAuthenticated ? { from: { pathname: "/pathways/git" } } : undefined}
+                >
+                  Git &amp; GitHub Pathway
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to={isAuthenticated ? "/pathways/docker" : "/login"}
+                  state={!isAuthenticated ? { from: { pathname: "/pathways/docker" } } : undefined}
+                >
+                  Docker Pathway
+                </Link>
+              </li>
+              {isAuthenticated ? (
+                <li><Link to="/dashboard">Dashboard</Link></li>
+              ) : (
+                <li><Link to="/register">Create Account</Link></li>
+              )}
+            </ul>
+          </div>
+        </div>
+
+        <div className="footer-bottom-bar">
+          <p>&copy; {CURRENT_YEAR} DevOps Learning Platform. All rights reserved.</p>
+        </div>
+      </footer>
+    </div>
   );
 };
 

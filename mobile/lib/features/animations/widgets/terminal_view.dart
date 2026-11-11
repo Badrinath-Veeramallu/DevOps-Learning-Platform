@@ -54,12 +54,12 @@ class _TerminalViewState extends State<TerminalView> {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
-        color: const Color(0xFF0F0B17),
+        color: AppColors.terminalBackground,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: AppColors.primaryBorder, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.35),
+            color: AppColors.cardShadow,
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
@@ -73,7 +73,7 @@ class _TerminalViewState extends State<TerminalView> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: const BoxDecoration(
-              color: Color(0xFF2E171B),
+              color: AppColors.terminalHeader,
               borderRadius: BorderRadius.vertical(top: Radius.circular(9)),
             ),
             child: Row(
@@ -164,10 +164,10 @@ class _TerminalViewState extends State<TerminalView> {
     }
 
     final Color textColor = switch (tone) {
-      '+' => AppColors.success,
-      '~' => AppColors.warning,
-      '!' => AppColors.error,
-      _ => AppColors.textMuted,
+      '+' => const Color(0xFF4ADE80),
+      '~' => const Color(0xFFFBBF24),
+      '!' => const Color(0xFFF87171),
+      _ => AppColors.terminalText,
     };
 
     return Padding(

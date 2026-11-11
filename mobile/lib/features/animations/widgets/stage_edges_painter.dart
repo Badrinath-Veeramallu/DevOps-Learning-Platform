@@ -48,7 +48,7 @@ class StageEdgesPainter extends CustomPainter {
       final Color edgeColor = switch (edge.style) {
         'ok' => AppColors.success,
         'warn' => AppColors.error,
-        _ => AppColors.lightAccent,
+        _ => AppColors.accent,
       };
 
       final bool isDashed = edge.style == 'dash' || edge.style == 'warn';

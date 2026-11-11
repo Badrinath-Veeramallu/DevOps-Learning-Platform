@@ -41,7 +41,7 @@ class StatusBadge extends StatelessWidget {
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: colors.accent.withValues(alpha: 0.6),
+                    color: colors.accent.withValues(alpha: 0.4),
                     blurRadius: 4,
                   ),
                 ],
@@ -65,35 +65,35 @@ class StatusBadge extends StatelessWidget {
           bg: AppColors.primarySubtle,
           border: AppColors.primaryBorder,
           accent: AppColors.accent,
-          text: AppColors.subtleHighlight,
+          text: AppColors.primary,
         );
       case BadgeVariant.lime:
         return (
-          bg: AppColors.secondarySubtle,
-          border: AppColors.secondaryBorder,
-          accent: AppColors.lightAccent,
-          text: AppColors.subtleHighlight,
+          bg: AppColors.surfaceAlt,
+          border: AppColors.borderDefault,
+          accent: AppColors.secondary,
+          text: AppColors.secondary,
         );
       case BadgeVariant.indigo:
         return (
           bg: AppColors.indigoSubtle,
           border: AppColors.indigoBorder,
           accent: AppColors.accent,
-          text: AppColors.lightAccent,
+          text: AppColors.accent,
         );
       case BadgeVariant.warning:
         return (
           bg: AppColors.warningBg,
           border: AppColors.warningBorder,
           accent: AppColors.warning,
-          text: const Color(0xFFFDE68A),
+          text: AppColors.warningText,
         );
       case BadgeVariant.error:
         return (
           bg: AppColors.errorBg,
           border: AppColors.errorBorder,
           accent: AppColors.error,
-          text: const Color(0xFFFCA5A5),
+          text: AppColors.errorText,
         );
     }
   }

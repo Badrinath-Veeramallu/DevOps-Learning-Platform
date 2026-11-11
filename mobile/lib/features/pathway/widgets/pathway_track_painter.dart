@@ -1,78 +1,99 @@
 import 'package:flutter/material.dart';
 
-/// Custom painter that draws the winding / S-curved learning pathway road.
+import '../../../core/theme/app_colors.dart';
+
+/// Paints a continuous, smooth winding cubic-Bézier road across a list of
+/// milestone anchor points ([points]) in the background of the roadmap.
 ///
-/// Features 3 distinct layered passes matching the Web application:
-/// 1. Subtle Road Cushion (outer glow / roadbed buffer)
-/// 2. Road Track Base (solid burgundy surface)
-/// 3. Dashed Center Line (dusty rose dashed markings)
+/// Purely visual and completely independent from learning module data.
 class PathwayTrackPainter extends CustomPainter {
   final List<Offset> points;
   final Color cushionColor;
   final Color baseColor;
   final Color dashColor;
+  final double cushionWidth;
+  final double roadWidth;
+  final double dashWidth;
+  final double dashLength;
+  final double dashSpace;
+  final double curveTension;
 
   PathwayTrackPainter({
     required this.points,
     Color? cushionColor,
     Color? baseColor,
     Color? dashColor,
-  })  : cushionColor = cushionColor ??
-            const Color(0xFF2E171B).withValues(alpha: 0.55),
-        baseColor = baseColor ?? const Color(0xFF3B1F24),
-        dashColor = dashColor ?? const Color(0xFFB88A91);
+    this.cushionWidth = 36.0,
+    this.roadWidth = 24.0,
+    this.dashWidth = 2.8,
+    this.dashLength = 10.0,
+    this.dashSpace = 10.0,
+    this.curveTension = 0.54,
+  })  : cushionColor = cushionColor ?? AppColors.roadCushion,
+        baseColor = baseColor ?? AppColors.paleBlush,
+        dashColor = dashColor ?? AppColors.roadDash;
 
-  @override
-  void paint(Canvas canvas, Size size) {
-    if (points.length < 2) return;
-
-    // Construct the continuous smooth pathway
+  /// Builds a C1-smooth continuous cubic-Bézier [Path] visiting every anchor.
+  Path buildRoadPath() {
     final path = Path();
+    if (points.length < 2) return path;
+
     path.moveTo(points.first.dx, points.first.dy);
 
     for (int i = 0; i < points.length - 1; i++) {
       final p1 = points[i];
       final p2 = points[i + 1];
+      final dy = p2.dy - p1.dy;
 
-      // Vertical S-curve connection between two milestones
-      final midY = (p1.dy + p2.dy) / 2;
-      path.cubicTo(
-        p1.dx,
-        midY,
-        p2.dx,
-        midY,
-        p2.dx,
-        p2.dy,
-      );
+      // Vertical departure & arrival tangents ensure smooth S-curves without kinks.
+      final c1 = Offset(p1.dx, p1.dy + dy * curveTension);
+      final c2 = Offset(p2.dx, p2.dy - dy * curveTension);
+
+      path.cubicTo(c1.dx, c1.dy, c2.dx, c2.dy, p2.dx, p2.dy);
     }
 
-    // 1. Outer Cushion
+    return path;
+  }
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (points.length < 2) return;
+
+    final path = buildRoadPath();
+
+    // 1. Soft pale blush outer cushion (halo around the road bed)
     final cushionPaint = Paint()
       ..color = cushionColor
-      ..strokeWidth = 32.0
+      ..strokeWidth = cushionWidth
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round;
     canvas.drawPath(path, cushionPaint);
 
-    // 2. Base Road
+    // 2. Pale pink/blush continuous road surface
     final basePaint = Paint()
       ..color = baseColor
-      ..strokeWidth = 20.0
+      ..strokeWidth = roadWidth
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round;
     canvas.drawPath(path, basePaint);
 
-    // 3. Dashed Center Line
+    // 3. Muted burgundy dashed centerline
     final dashPaint = Paint()
       ..color = dashColor
-      ..strokeWidth = 3.0
+      ..strokeWidth = dashWidth
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round;
 
-    _drawDashedPath(canvas, path, dashPaint, dashLength: 10.0, dashSpace: 8.0);
+    _drawDashedPath(
+      canvas,
+      path,
+      dashPaint,
+      dashLength: dashLength,
+      dashSpace: dashSpace,
+    );
   }
 
   void _drawDashedPath(
@@ -103,25 +124,30 @@ class PathwayTrackPainter extends CustomPainter {
     }
     return oldDelegate.cushionColor != cushionColor ||
         oldDelegate.baseColor != baseColor ||
-        oldDelegate.dashColor != dashColor;
+        oldDelegate.dashColor != dashColor ||
+        oldDelegate.cushionWidth != cushionWidth ||
+        oldDelegate.roadWidth != roadWidth ||
+        oldDelegate.dashWidth != dashWidth ||
+        oldDelegate.dashLength != dashLength ||
+        oldDelegate.dashSpace != dashSpace ||
+        oldDelegate.curveTension != curveTension;
   }
 }
 
-/// Geometry coordinate configuration for the winding pathway roadmap.
+/// Geometry coordinate helper retained for standalone per-row stop previews.
 class PathwayRoadGeometry {
   static const double laneWidth = 68.0;
   static const double xStart = 34.0;
   static const double xFinish = 34.0;
 
-  /// Node centers for modules 1 to 7 creating a graceful side-to-side winding road.
   static const List<double> nodeX = [
-    26.0, // Stop 1 (module 1) - Left
-    42.0, // Stop 2 (module 2) - Right
-    26.0, // Stop 3 (module 3) - Left
-    42.0, // Stop 4 (module 4) - Right
-    26.0, // Stop 5 (module 5) - Left
-    42.0, // Stop 6 (module 6) - Right
-    30.0, // Stop 7 (module 7) - Center-Left
+    26.0,
+    42.0,
+    26.0,
+    42.0,
+    26.0,
+    42.0,
+    30.0,
   ];
 
   static double getNodeX(int moduleIndex) {
@@ -131,20 +157,21 @@ class PathwayRoadGeometry {
 
   static double getEntryX(int moduleIndex) {
     if (moduleIndex <= 0) {
-      return (xStart + nodeX[0]) / 2.0; // 30.0
+      return (xStart + nodeX[0]) / 2.0;
     }
     return (nodeX[moduleIndex - 1] + nodeX[moduleIndex]) / 2.0;
   }
 
   static double getExitX(int moduleIndex) {
     if (moduleIndex >= nodeX.length - 1) {
-      return (nodeX.last + xFinish) / 2.0; // 32.0
+      return (nodeX.last + xFinish) / 2.0;
     }
     return (nodeX[moduleIndex] + nodeX[moduleIndex + 1]) / 2.0;
   }
 }
 
-/// Painter for continuous, seamless timeline highway road segments between milestones.
+/// Segment painter retained for standalone [PathwayStopNode] rendering when
+/// `showContinuousRoad` is enabled outside [GitPathwayMap].
 class ContinuousRoadSegmentPainter extends CustomPainter {
   final bool isStart;
   final bool isFinish;
@@ -160,17 +187,15 @@ class ContinuousRoadSegmentPainter extends CustomPainter {
     Color? cushionColor,
     Color? baseColor,
     Color? dashColor,
-  })  : cushionColor = cushionColor ??
-            const Color(0xFF2E171B).withValues(alpha: 0.55),
-        baseColor = baseColor ?? const Color(0xFF3B1F24),
-        dashColor = dashColor ?? const Color(0xFFB88A91);
+  })  : cushionColor = cushionColor ?? AppColors.roadCushion,
+        baseColor = baseColor ?? AppColors.paleBlush,
+        dashColor = dashColor ?? AppColors.roadDash;
 
   @override
   void paint(Canvas canvas, Size size) {
     final path = Path();
 
     if (isStart) {
-      // Connects from Start emblem center (x=42, y=26) down to exit at (35, size.height)
       const double x0 = PathwayRoadGeometry.xStart;
       final double xExit = PathwayRoadGeometry.getEntryX(0);
 
@@ -184,7 +209,6 @@ class ContinuousRoadSegmentPainter extends CustomPainter {
         size.height,
       );
     } else if (isFinish) {
-      // Connects from top (x=37, y=0) to Finish emblem center (x=42, y=26)
       final double xIn = PathwayRoadGeometry.getExitX(6);
       const double xEnd = PathwayRoadGeometry.xFinish;
 
@@ -202,7 +226,6 @@ class ContinuousRoadSegmentPainter extends CustomPainter {
       final double xNode = PathwayRoadGeometry.getNodeX(moduleIndex);
       final double xOut = PathwayRoadGeometry.getExitX(moduleIndex);
 
-      // Smooth cubic Bézier entering into node center at (xNode, 32)
       path.moveTo(xIn, 0);
       path.cubicTo(
         xIn,
@@ -213,7 +236,6 @@ class ContinuousRoadSegmentPainter extends CustomPainter {
         32,
       );
 
-      // Graceful winding S-curve from node center to row exit
       final double dy = size.height - 32;
       path.cubicTo(
         xNode,
@@ -225,7 +247,6 @@ class ContinuousRoadSegmentPainter extends CustomPainter {
       );
     }
 
-    // 1. Outer Cushion
     final cushionPaint = Paint()
       ..color = cushionColor
       ..strokeWidth = 32.0
@@ -234,7 +255,6 @@ class ContinuousRoadSegmentPainter extends CustomPainter {
       ..strokeJoin = StrokeJoin.round;
     canvas.drawPath(path, cushionPaint);
 
-    // 2. Base Road
     final basePaint = Paint()
       ..color = baseColor
       ..strokeWidth = 20.0
@@ -243,32 +263,23 @@ class ContinuousRoadSegmentPainter extends CustomPainter {
       ..strokeJoin = StrokeJoin.round;
     canvas.drawPath(path, basePaint);
 
-    // 3. Dashed Center Line
     final dashPaint = Paint()
       ..color = dashColor
-      ..strokeWidth = 3.0
+      ..strokeWidth = 2.5
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round;
 
-    _drawDashedPath(canvas, path, dashPaint, dashLength: 8.0, dashSpace: 6.0);
-  }
-
-  void _drawDashedPath(
-    Canvas canvas,
-    Path source,
-    Paint paint, {
-    required double dashLength,
-    required double dashSpace,
-  }) {
-    for (final metric in source.computeMetrics()) {
+    for (final metric in path.computeMetrics()) {
       double distance = 0.0;
+      const double dashLength = 8.0;
+      const double dashSpace = 8.0;
       while (distance < metric.length) {
         final length = (distance + dashLength < metric.length)
             ? dashLength
             : metric.length - distance;
         final extract = metric.extractPath(distance, distance + length);
-        canvas.drawPath(extract, paint);
+        canvas.drawPath(extract, dashPaint);
         distance += dashLength + dashSpace;
       }
     }

@@ -45,7 +45,7 @@ class ContinueLearningCard extends StatelessWidget {
                 child: Text(
                   hasPathway ? 'Interactive Pathway Active' : 'Module in progress',
                   style: AppTypography.bodySmall.copyWith(
-                    color: hasPathway ? AppColors.lightAccent : AppColors.textMuted,
+                    color: hasPathway ? AppColors.primary : AppColors.textMuted,
                     fontWeight: FontWeight.w500,
                   ),
                 ),

@@ -36,21 +36,21 @@ class LevelBadge extends StatelessWidget {
     switch (level.toLowerCase()) {
       case 'foundational':
         return (
-          bg: const Color(0xFF1E293B),
-          border: AppColors.secondaryBorder,
-          text: AppColors.lightAccent,
+          bg: AppColors.surfaceAlt,
+          border: AppColors.borderDefault,
+          text: AppColors.primary,
         );
       case 'intermediate':
         return (
           bg: AppColors.primarySubtle,
           border: AppColors.primaryBorder,
-          text: AppColors.subtleHighlight,
+          text: AppColors.secondary,
         );
       case 'advanced':
         return (
-          bg: AppColors.secondaryActive,
-          border: AppColors.secondary,
-          text: AppColors.textMain,
+          bg: AppColors.primary,
+          border: AppColors.primary,
+          text: Colors.white,
         );
       default:
         return (

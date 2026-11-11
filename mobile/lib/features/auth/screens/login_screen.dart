@@ -193,7 +193,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   child: Text(
                                     errorMessage,
                                     style: AppTypography.bodySmall.copyWith(
-                                      color: const Color(0xFFFCA5A5),
+                                      color: AppColors.errorText,
                                     ),
                                   ),
                                 ),
