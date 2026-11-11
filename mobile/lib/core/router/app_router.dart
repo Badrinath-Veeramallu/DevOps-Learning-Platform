@@ -5,9 +5,12 @@ import '../../features/auth/screens/login_screen.dart';
 import '../../features/auth/screens/register_screen.dart';
 import '../../features/auth/screens/verify_otp_screen.dart';
 import '../../features/dashboard/screens/dashboard_screen.dart';
+import '../../features/dashboard/screens/learning_paths_screen.dart';
+import '../../features/module/screens/docker_module_screen.dart';
 import '../../features/module/screens/git_module_screen.dart';
 import '../../features/onboarding/screens/splash_screen.dart';
 import '../../features/onboarding/screens/welcome_screen.dart';
+import '../../features/pathway/screens/docker_pathway_screen.dart';
 import '../../features/pathway/screens/git_pathway_screen.dart';
 import '../../features/profile/screens/profile_screen.dart';
 import '../../providers/auth_provider.dart';
@@ -62,8 +65,11 @@ class AppRouter {
         // 4. If unauthenticated user tries to access protected routes, send to login
         final isProtectedRoute =
             location == RouteNames.dashboard ||
+            location == RouteNames.learningPaths ||
             location == RouteNames.gitPathway ||
             location.startsWith('/pathways/git') ||
+            location == RouteNames.dockerPathway ||
+            location.startsWith('/pathways/docker') ||
             location == RouteNames.profile;
 
         if (!isAuthenticated && isProtectedRoute) {
@@ -120,6 +126,13 @@ class AppRouter {
           },
         ),
         GoRoute(
+          path: RouteNames.learningPaths,
+          name: 'learningPaths',
+          builder: (BuildContext context, GoRouterState state) {
+            return const LearningPathsScreen();
+          },
+        ),
+        GoRoute(
           path: RouteNames.gitPathway,
           name: 'gitPathway',
           builder: (BuildContext context, GoRouterState state) {
@@ -132,6 +145,21 @@ class AppRouter {
           builder: (BuildContext context, GoRouterState state) {
             final moduleId = state.pathParameters['moduleId'] ?? '';
             return GitModuleScreen(moduleId: moduleId);
+          },
+        ),
+        GoRoute(
+          path: RouteNames.dockerPathway,
+          name: 'dockerPathway',
+          builder: (BuildContext context, GoRouterState state) {
+            return const DockerPathwayScreen();
+          },
+        ),
+        GoRoute(
+          path: RouteNames.dockerModule,
+          name: 'dockerModule',
+          builder: (BuildContext context, GoRouterState state) {
+            final moduleId = state.pathParameters['moduleId'] ?? '';
+            return DockerModuleScreen(moduleId: moduleId);
           },
         ),
         GoRoute(

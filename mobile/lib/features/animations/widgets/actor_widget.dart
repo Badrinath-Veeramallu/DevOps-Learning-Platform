@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
@@ -19,6 +20,30 @@ class ActorWidget extends StatelessWidget {
     required this.stageWidth,
     required this.stageHeight,
   });
+
+  int get _maxWordLength {
+    if (actor.text == null || actor.text!.trim().isEmpty) return 0;
+    int maxLen = 0;
+    for (final word in actor.text!.trim().split(RegExp(r'[\s_/\\]+'))) {
+      if (word.length > maxLen) maxLen = word.length;
+    }
+    return maxLen;
+  }
+
+  String _displayFormattedText(String? text) {
+    if (text == null) return '';
+    if (actor.k == 'file') {
+      return text.replaceAll('_', '_\u200B').replaceAll('/', '/\u200B');
+    }
+    return text;
+  }
+
+  double get _responsiveFontSize {
+    final len = _maxWordLength;
+    if (len > 14) return 8.5;
+    if (len > 10) return 9.5;
+    return 10.5;
+  }
 
   ({Color bg, Color border, Color text}) _resolveTone(String? tone, String kind) {
     final t = tone ?? (kind == 'zone' ? 'soft' : 'plain');
@@ -70,10 +95,34 @@ class ActorWidget extends StatelessWidget {
     final double posX = (actor.x / 100.0) * stageWidth;
     final double posY = (actor.y / 100.0) * stageHeight;
 
-    final defaultW = StepEngine.defaultW[actor.k] ?? 16.0;
-    final double? width = actor.w != null
+    final defaultW = (stageWidth < 600.0
+            ? StepEngine.defaultWMobile[actor.k]
+            : StepEngine.defaultW[actor.k]) ??
+        16.0;
+    double? width = actor.w != null
         ? (actor.w! / 100.0) * stageWidth
         : (defaultW > 0 ? (defaultW / 100.0) * stageWidth : null);
+
+    // Natural word boundary protection:
+    // Ensure sufficient width so long words (e.g. Dockerfile, Development, report_final.docx)
+    // do not awkwardly break character-by-character.
+    if (actor.k != 'zone' && actor.k != 'commit') {
+      final maxLen = _maxWordLength;
+      if (maxLen > 0) {
+        final double charW = maxLen > 14 ? 6.2 : 7.2;
+        final double minContentW = (maxLen * charW) + (actor.ic != null ? 36.0 : 24.0);
+        if (width != null) {
+          width = math.max(width, minContentW);
+        } else {
+          width = minContentW;
+        }
+      }
+    }
+
+    // Keep within stage boundaries with proper padding
+    if (width != null) {
+      width = math.min(width, stageWidth - 12.0);
+    }
 
     final double? height = actor.k == 'zone' && actor.h != null
         ? (actor.h! / 100.0) * stageHeight
@@ -81,9 +130,15 @@ class ActorWidget extends StatelessWidget {
 
     final toneColors = _resolveTone(actor.tone, actor.k);
 
+    // Clamp coordinates to prevent stage overflow on edges
+    final double halfW = (width ?? 40.0) / 2.0;
+    final double halfH = (height ?? 32.0) / 2.0;
+    final double clampedPosX = posX.clamp(halfW + 4.0, stageWidth - halfW - 4.0);
+    final double clampedPosY = posY.clamp(halfH + 4.0, stageHeight - halfH - 4.0);
+
     return Positioned(
-      left: posX,
-      top: posY,
+      left: clampedPosX,
+      top: clampedPosY,
       child: FractionalTranslation(
         translation: const Offset(-0.5, -0.5),
         child: AnimatedContainer(
@@ -105,6 +160,8 @@ class ActorWidget extends StatelessWidget {
       'zone' => _buildZone(tone),
       'code' => _buildCode(tone),
       'note' => _buildNote(tone),
+      'vol' => _buildVol(tone),
+      'layer' => _buildLayer(tone),
       _ => _buildBox(tone),
     };
   }
@@ -153,10 +210,10 @@ class ActorWidget extends StatelessWidget {
               if (actor.text != null)
                 Flexible(
                   child: Text(
-                    actor.text!,
+                    _displayFormattedText(actor.text),
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 11,
+                      fontSize: _responsiveFontSize,
                       fontWeight: FontWeight.w700,
                       color: tone.text,
                       height: 1.2,
@@ -286,10 +343,10 @@ class ActorWidget extends StatelessWidget {
               const SizedBox(width: 3),
               Flexible(
                 child: Text(
-                  actor.text ?? '',
+                  _displayFormattedText(actor.text),
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 10,
+                    fontSize: _responsiveFontSize,
                     fontWeight: FontWeight.w700,
                     color: tone.text,
                   ),
@@ -331,6 +388,7 @@ class ActorWidget extends StatelessWidget {
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           if (actor.ic != null) ...[
             Text(
@@ -343,13 +401,17 @@ class ActorWidget extends StatelessWidget {
             ),
             const SizedBox(width: 4),
           ],
-          Text(
-            actor.text ?? '',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 10.5,
-              fontWeight: FontWeight.w700,
-              color: tone.text,
+          Flexible(
+            child: Text(
+              _displayFormattedText(actor.text),
+              textAlign: TextAlign.center,
+              softWrap: true,
+              style: TextStyle(
+                fontSize: _responsiveFontSize,
+                fontWeight: FontWeight.w700,
+                color: tone.text,
+                height: 1.2,
+              ),
             ),
           ),
         ],
@@ -503,13 +565,193 @@ class ActorWidget extends StatelessWidget {
         border: Border.all(color: tone.border, width: 1),
       ),
       child: Text(
-        actor.text ?? '',
+        _displayFormattedText(actor.text),
         textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: 10,
           fontWeight: FontWeight.w600,
           color: tone.text,
         ),
+      ),
+    );
+  }
+
+  Widget _buildLayer(({Color bg, Color border, Color text}) tone) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: tone.bg,
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: tone.border, width: 1.2),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.25),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (actor.ic != null) ...[
+                Text(
+                  actor.ic!,
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w800,
+                    color: tone.text,
+                  ),
+                ),
+                const SizedBox(width: 4),
+              ],
+              if (actor.text != null)
+                Flexible(
+                  child: Text(
+                    _displayFormattedText(actor.text),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: _responsiveFontSize,
+                      fontWeight: FontWeight.w700,
+                      color: tone.text,
+                      height: 1.2,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          if (actor.sub != null) ...[
+            const SizedBox(height: 2),
+            Text(
+              actor.sub!,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 8.5,
+                fontWeight: FontWeight.w500,
+                color: tone.text.withValues(alpha: 0.8),
+                height: 1.2,
+              ),
+            ),
+          ],
+          if (actor.bar != null) ...[
+            const SizedBox(height: 3),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(3),
+              child: LinearProgressIndicator(
+                value: (actor.bar! / 100.0).clamp(0.0, 1.0),
+                backgroundColor: Colors.black26,
+                valueColor: AlwaysStoppedAnimation<Color>(tone.text),
+                minHeight: 3,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildVol(({Color bg, Color border, Color text}) tone) {
+    return Container(
+      decoration: BoxDecoration(
+        color: tone.bg,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: tone.border, width: 1.2),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.28),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          // Cylindrical Top Oval Cap
+          Positioned(
+            left: -1,
+            right: -1,
+            top: -1,
+            height: 12,
+            child: Container(
+              decoration: BoxDecoration(
+                color: tone.bg.withValues(alpha: 0.7),
+                borderRadius: const BorderRadius.all(Radius.elliptical(50, 12)),
+                border: Border.all(color: tone.border, width: 1.2),
+              ),
+            ),
+          ),
+          // Content inside volume
+          Padding(
+            padding: const EdgeInsets.fromLTRB(6, 12, 6, 6),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (actor.ic != null) ...[
+                      Text(
+                        actor.ic!,
+                        style: TextStyle(
+                          fontSize: _responsiveFontSize,
+                          fontWeight: FontWeight.w800,
+                          color: tone.text,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                    ],
+                    if (actor.text != null)
+                      Flexible(
+                        child: Text(
+                          _displayFormattedText(actor.text),
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: _responsiveFontSize,
+                            fontWeight: FontWeight.w700,
+                            color: tone.text,
+                            height: 1.2,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                if (actor.sub != null) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    actor.sub!,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 8.5,
+                      fontWeight: FontWeight.w500,
+                      color: tone.text.withValues(alpha: 0.8),
+                      height: 1.2,
+                    ),
+                  ),
+                ],
+                if (actor.bar != null) ...[
+                  const SizedBox(height: 4),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(3),
+                    child: LinearProgressIndicator(
+                      value: (actor.bar! / 100.0).clamp(0.0, 1.0),
+                      backgroundColor: Colors.black26,
+                      valueColor: AlwaysStoppedAnimation<Color>(tone.text),
+                      minHeight: 3,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

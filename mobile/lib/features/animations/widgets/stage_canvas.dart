@@ -15,19 +15,26 @@ import 'stage_edges_painter.dart';
 /// - Responsive horizontal pan/scroll on compact mobile widths
 class StageCanvas extends StatelessWidget {
   final AnimationFrame frame;
+  final double stageWidth;
+  final double stageHeight;
 
   const StageCanvas({
     super.key,
     required this.frame,
+    this.stageWidth = 1000.0,
+    this.stageHeight = 400.0,
   });
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        // Guarantee at least 540 dp of stage width for readable labels on small screens
-        final double stageWidth = math.max(constraints.maxWidth, 540.0);
-        final double stageHeight = stageWidth / 2.5; // Aspect ratio 1000:400
+        final bool isLandscape = stageWidth >= 600.0;
+        final double renderStageWidth = isLandscape
+            ? math.max(constraints.maxWidth, 540.0)
+            : math.min(constraints.maxWidth, 420.0);
+        final double renderStageHeight =
+            renderStageWidth * (stageHeight / stageWidth);
 
         // Separate zones (background layer) and foreground actors
         final zoneActors = <ActorModel>[];
@@ -41,61 +48,68 @@ class StageCanvas extends StatelessWidget {
           }
         });
 
-        return SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          physics: const BouncingScrollPhysics(),
-          child: Container(
-            width: stageWidth,
-            height: stageHeight,
-            decoration: BoxDecoration(
-              color: const Color(0xFF0D121F),
-              border: Border.all(color: AppColors.borderDefault, width: 1),
-            ),
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                // 1. Subtle Engineering Grid Pattern
-                Positioned.fill(
-                  child: CustomPaint(
-                    painter: _GridBackgroundPainter(),
-                  ),
+        final content = Container(
+          width: renderStageWidth,
+          height: renderStageHeight,
+          clipBehavior: Clip.hardEdge,
+          decoration: BoxDecoration(
+            color: const Color(0xFF0D121F),
+            border: Border.all(color: AppColors.borderDefault, width: 1),
+          ),
+          child: Stack(
+            clipBehavior: Clip.hardEdge,
+            children: [
+              // 1. Subtle Engineering Grid Pattern
+              Positioned.fill(
+                child: CustomPaint(
+                  painter: _GridBackgroundPainter(),
                 ),
+              ),
 
-                // 2. Background Zones Layer
-                ...zoneActors.map(
-                  (a) => ActorWidget(
-                    key: ValueKey('zone-${a.id}'),
-                    actor: a,
-                    stageWidth: stageWidth,
-                    stageHeight: stageHeight,
-                  ),
+              // 2. Background Zones Layer
+              ...zoneActors.map(
+                (a) => ActorWidget(
+                  key: ValueKey('zone-${a.id}'),
+                  actor: a,
+                  stageWidth: renderStageWidth,
+                  stageHeight: renderStageHeight,
                 ),
+              ),
 
-                // 3. Directional Edges & Arrows Layer
-                Positioned.fill(
-                  child: CustomPaint(
-                    painter: StageEdgesPainter(
-                      actors: frame.actors,
-                      edges: frame.edges,
-                      stageWidth: stageWidth,
-                      stageHeight: stageHeight,
-                    ),
+              // 3. Directional Edges & Arrows Layer
+              Positioned.fill(
+                child: CustomPaint(
+                  painter: StageEdgesPainter(
+                    actors: frame.actors,
+                    edges: frame.edges,
+                    stageWidth: renderStageWidth,
+                    stageHeight: renderStageHeight,
                   ),
                 ),
+              ),
 
-                // 4. Foreground Interactive Actors (Commits, Files, Boxes, Code, Pills)
-                ...fgActors.map(
-                  (a) => ActorWidget(
-                    key: ValueKey('actor-${a.id}'),
-                    actor: a,
-                    stageWidth: stageWidth,
-                    stageHeight: stageHeight,
-                  ),
+              // 4. Foreground Interactive Actors (Commits, Files, Boxes, Code, Pills, Vol, Layer)
+              ...fgActors.map(
+                (a) => ActorWidget(
+                  key: ValueKey('actor-${a.id}'),
+                  actor: a,
+                  stageWidth: renderStageWidth,
+                  stageHeight: renderStageHeight,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         );
+
+        if (isLandscape) {
+          return SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            child: content,
+          );
+        }
+
+        return Center(child: content);
       },
     );
   }

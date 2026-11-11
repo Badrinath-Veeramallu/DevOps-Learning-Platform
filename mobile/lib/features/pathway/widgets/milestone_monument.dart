@@ -79,7 +79,8 @@ class MilestoneMonument extends StatelessWidget {
 
         // Text Pill
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+          constraints: const BoxConstraints(minWidth: 54),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
           decoration: BoxDecoration(
             color: pillBg,
             borderRadius: BorderRadius.circular(9999),
@@ -94,11 +95,15 @@ class MilestoneMonument extends StatelessWidget {
           ),
           child: Text(
             isStart ? 'START' : 'FINISH',
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            softWrap: false,
+            overflow: TextOverflow.visible,
             style: AppTypography.badgeText.copyWith(
               color: pillTextColor,
               fontSize: 10,
               fontWeight: FontWeight.w800,
-              letterSpacing: 1.2,
+              letterSpacing: 1.0,
             ),
           ),
         ),

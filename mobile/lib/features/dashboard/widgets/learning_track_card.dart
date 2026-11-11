@@ -22,7 +22,7 @@ class LearningTrackCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isGit = track.id == 'git';
+    final hasPathway = track.hasPathway;
 
     return AppCard(
       borderColor: isActive ? AppColors.lightAccent : null,
@@ -86,10 +86,10 @@ class LearningTrackCard extends StatelessWidget {
                 ],
               ),
               AppButton(
-                text: isGit
+                text: hasPathway
                     ? 'View Pathway'
                     : (isActive ? 'Active Path' : 'Start Learning'),
-                variant: isGit
+                variant: hasPathway
                     ? ButtonVariant.primary
                     : (isActive ? ButtonVariant.secondary : ButtonVariant.ghost),
                 isFullWidth: false,

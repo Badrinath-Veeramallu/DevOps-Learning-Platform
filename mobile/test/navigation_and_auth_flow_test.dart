@@ -69,7 +69,7 @@ void main() {
 
         // Preserves all 3 navigation items
         expect(find.text('Dashboard'), findsOneWidget);
-        expect(find.text('Git Pathway'), findsOneWidget);
+        expect(find.text('Learning Paths'), findsOneWidget);
         expect(find.text('Profile'), findsOneWidget);
       },
     );

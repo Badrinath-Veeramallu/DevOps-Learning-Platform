@@ -46,7 +46,7 @@ class AppBottomNavBar extends StatelessWidget {
                   heightFactor: 1.0,
                   child: _buildNavItem(
                     index: 1,
-                    label: 'Git Pathway',
+                    label: 'Learning Paths',
                     icon: Icons.alt_route_outlined,
                     activeIcon: Icons.alt_route_rounded,
                   ),

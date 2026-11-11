@@ -336,8 +336,8 @@ void main() {
           findsOneWidget,
         );
 
-        // Bottom nav is on Git Pathway (index 1)
-        expect(find.text('Git Pathway'), findsWidgets);
+        // Bottom nav is on Learning Paths (index 1)
+        expect(find.text('Learning Paths'), findsWidgets);
 
         // Verify no Flutter layout overflow occurred
         expect(tester.takeException(), isNull);

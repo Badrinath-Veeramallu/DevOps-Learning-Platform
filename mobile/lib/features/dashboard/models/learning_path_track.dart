@@ -42,10 +42,10 @@ class LearningPathTrack {
       id: 'docker',
       title: 'Docker & Container Engineering',
       level: 'Intermediate',
-      modules: '8 Modules',
+      modules: '7 Modules · Interactive Pathway',
       description:
           'Container isolation, multi-stage Dockerfile architecture, layer caching, container networking, and security best practices.',
-      hasPathway: false,
+      hasPathway: true,
     ),
     LearningPathTrack(
       id: 'kubernetes',

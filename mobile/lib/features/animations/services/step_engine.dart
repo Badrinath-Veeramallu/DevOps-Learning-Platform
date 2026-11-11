@@ -37,6 +37,20 @@ class StepEngine {
     'code': 30.0,
     'note': 0.0,
     'zone': 30.0,
+    'vol': 12.0,
+    'layer': 24.0,
+  };
+
+  static const Map<String, double> defaultWMobile = {
+    'file': 22.0,
+    'commit': 13.0,
+    'pill': 0.0,
+    'box': 36.0,
+    'code': 94.0,
+    'note': 0.0,
+    'zone': 30.0,
+    'vol': 26.0,
+    'layer': 60.0,
   };
 
   static const Map<String, double> halfH = {
@@ -45,6 +59,8 @@ class StepEngine {
     'pill': 13.0,
     'box': 26.0,
     'note': 10.0,
+    'vol': 32.0,
+    'layer': 15.0,
   };
 
   /// Turns a list of steps into renderable frames matching Web `stepEngine.js`.
@@ -120,7 +136,39 @@ class StepEngine {
     return frames;
   }
 
-  static ({double w, double h}) halfSize(ActorModel a) {
+  static ({double w, double h}) halfSize(
+    ActorModel a, {
+    double stageWidth = stageWidth,
+    double stageHeight = stageHeight,
+  }) {
+    final mobile = stageWidth < 600.0;
+    if (mobile) {
+      final defaultWidth = defaultWMobile[a.k] ?? 16.0;
+      final wp = ((a.w ?? defaultWidth) * stageWidth) / 100.0;
+      if (a.k == 'pill' || a.k == 'note') {
+        final textLen = (a.text ?? '').length;
+        final full = textLen * 6.2 + 24.0;
+        final w = a.w != null ? wp : math.min(full, stageWidth * 0.9);
+        final denom = math.max(20.0, w - 24.0);
+        final n = math.max(1, ((textLen * 6.2) / denom).ceil());
+        return (w: w / 2.0, h: (n * 13.0 + 10.0) / 2.0);
+      }
+      if (a.k == 'code') {
+        final linesCount = (a.lines ?? const []).length;
+        return (w: wp / 2.0, h: ((linesCount * 14.0 + 40.0) / 2.0));
+      }
+      if (a.k == 'commit') {
+        return (w: wp / 2.0, h: wp / 2.0);
+      }
+      final double hVal = switch (a.k) {
+        'file' => 24.0,
+        'layer' => 12.0,
+        'vol' => 30.0,
+        _ => 27.0,
+      };
+      return (w: wp / 2.0, h: hVal);
+    }
+
     final w = a.w ?? defaultW[a.k] ?? 16.0;
     if (a.k == 'pill' || a.k == 'note') {
       final textLen = (a.text ?? '').length;
@@ -134,11 +182,18 @@ class StepEngine {
   }
 
   /// Line between two actors, trimmed so arrows stop at actor borders (viewBox units).
-  static EdgeGeometry? edgeGeometry(ActorModel a, ActorModel b) {
-    final ax = a.x * 10.0;
-    final ay = a.y * 4.0;
-    final bx = b.x * 10.0;
-    final by = b.y * 4.0;
+  static EdgeGeometry? edgeGeometry(
+    ActorModel a,
+    ActorModel b, {
+    double stageWidth = stageWidth,
+    double stageHeight = stageHeight,
+  }) {
+    final sx = stageWidth / 100.0;
+    final sy = stageHeight / 100.0;
+    final ax = a.x * sx;
+    final ay = a.y * sy;
+    final bx = b.x * sx;
+    final by = b.y * sy;
     final dx = bx - ax;
     final dy = by - ay;
     final len = math.sqrt(dx * dx + dy * dy);
@@ -150,8 +205,8 @@ class StepEngine {
       return math.min(tx, ty);
     }
 
-    final sizeA = halfSize(a);
-    final sizeB = halfSize(b);
+    final sizeA = halfSize(a, stageWidth: stageWidth, stageHeight: stageHeight);
+    final sizeB = halfSize(b, stageWidth: stageWidth, stageHeight: stageHeight);
     final ta = t(sizeA.w, sizeA.h);
     final tb = t(sizeB.w, sizeB.h);
 
@@ -159,7 +214,7 @@ class StepEngine {
 
     final ux = dx / len;
     final uy = dy / len;
-    const gap = 5.0;
+    final gap = stageWidth < 600.0 ? 3.0 : 5.0;
 
     return EdgeGeometry(
       x1: ax + dx * ta + ux * gap,

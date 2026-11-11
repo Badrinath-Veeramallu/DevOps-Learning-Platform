@@ -14,12 +14,14 @@ class LearningContentRenderer extends StatelessWidget {
   final CurriculumSection section;
   final String moduleNumber;
   final VoidCallback? onAnimationFinish;
+  final String pathway;
 
   const LearningContentRenderer({
     super.key,
     required this.section,
     required this.moduleNumber,
     this.onAnimationFinish,
+    this.pathway = 'git',
   });
 
   void _handleCopyLink(BuildContext context, String url) {
@@ -216,6 +218,7 @@ class LearningContentRenderer extends StatelessWidget {
             animationKey: '$moduleNumber.${section.number}',
             fallbackTitle: section.title,
             onFinish: onAnimationFinish,
+            pathway: pathway,
           ),
         ],
       ),

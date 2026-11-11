@@ -25,15 +25,20 @@ class StageEdgesPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     if (edges.isEmpty || actors.isEmpty) return;
 
-    final double scaleX = size.width / StepEngine.stageWidth;
-    final double scaleY = size.height / StepEngine.stageHeight;
+    final double scaleX = size.width / stageWidth;
+    final double scaleY = size.height / stageHeight;
 
     for (final edge in edges) {
       final a = actors[edge.from];
       final b = actors[edge.to];
       if (a == null || b == null || a.hide || b.hide) continue;
 
-      final geom = StepEngine.edgeGeometry(a, b);
+      final geom = StepEngine.edgeGeometry(
+        a,
+        b,
+        stageWidth: stageWidth,
+        stageHeight: stageHeight,
+      );
       if (geom == null) continue;
 
       final p1 = Offset(geom.x1 * scaleX, geom.y1 * scaleY);

@@ -1,0 +1,5138 @@
+{
+  "course": "Docker",
+  "version": 1,
+  "device": "mobile",
+  "modules": [
+    {
+      "id": "01",
+      "title": "Introduction to Docker & Containerization",
+      "subtopics": [
+        {
+          "id": "01.1",
+          "title": "Why Do We Need Containerization?",
+          "stage": {
+            "w": 360,
+            "h": 640
+          },
+          "steps": [
+            {
+              "say": "You built a React + Node.js app, and it works perfectly on your computer.",
+              "actors": {
+                "dev": {
+                  "k": "box",
+                  "text": "Your computer",
+                  "x": 28,
+                  "y": 16,
+                  "w": 44,
+                  "tone": "ok",
+                  "ic": "\u2713",
+                  "sub": "Node 20 \u00b7 everything works"
+                }
+              }
+            },
+            {
+              "say": "A teammate clones the project, but their Node.js version and dependencies differ \u2014 errors appear.",
+              "actors": {
+                "tm": {
+                  "k": "box",
+                  "text": "Teammate\u2019s computer",
+                  "x": 28,
+                  "y": 40,
+                  "w": 44,
+                  "tone": "bad",
+                  "ic": "\u2715",
+                  "sub": "Node 16 \u00b7 build fails"
+                }
+              },
+              "edges": [
+                [
+                  "dev",
+                  "tm",
+                  "git clone",
+                  "dash"
+                ]
+              ]
+            },
+            {
+              "say": "Moving to production hits the same problem: a different configuration behaves differently.",
+              "actors": {
+                "pr": {
+                  "k": "box",
+                  "text": "Production server",
+                  "x": 28,
+                  "y": 64,
+                  "w": 44,
+                  "tone": "warn",
+                  "ic": "!",
+                  "sub": "different system config"
+                },
+                "q": {
+                  "k": "pill",
+                  "text": "\u201cIt works on my machine\u201d",
+                  "x": 72,
+                  "y": 28,
+                  "tone": "bad",
+                  "w": 44
+                }
+              },
+              "edges": [
+                [
+                  "dev",
+                  "tm",
+                  "git clone",
+                  "dash"
+                ],
+                [
+                  "tm",
+                  "pr",
+                  "deploy",
+                  "dash"
+                ]
+              ]
+            },
+            {
+              "say": "A container packages the app with its dependencies in an isolated environment, so it runs the same everywhere.",
+              "actors": {
+                "c1": {
+                  "k": "box",
+                  "text": "Container",
+                  "x": 74,
+                  "y": 16,
+                  "w": 34,
+                  "tone": "brand",
+                  "sub": "app + dependencies"
+                },
+                "c2": {
+                  "k": "box",
+                  "text": "Container",
+                  "x": 74,
+                  "y": 40,
+                  "w": 34,
+                  "tone": "brand",
+                  "sub": "app + dependencies"
+                },
+                "c3": {
+                  "k": "box",
+                  "text": "Container",
+                  "x": 74,
+                  "y": 64,
+                  "w": 34,
+                  "tone": "brand",
+                  "sub": "app + dependencies"
+                },
+                "tm": {
+                  "tone": "ok",
+                  "ic": "\u2713",
+                  "sub": "runs the container"
+                },
+                "pr": {
+                  "tone": "ok",
+                  "ic": "\u2713",
+                  "sub": "runs the container"
+                },
+                "q": null,
+                "ok": {
+                  "k": "pill",
+                  "text": "Same behaviour everywhere",
+                  "x": 50,
+                  "y": 86,
+                  "tone": "ok",
+                  "ic": "\u2713"
+                }
+              },
+              "edges": [
+                [
+                  "dev",
+                  "c1",
+                  "",
+                  "ok"
+                ],
+                [
+                  "tm",
+                  "c2",
+                  "",
+                  "ok"
+                ],
+                [
+                  "pr",
+                  "c3",
+                  "",
+                  "ok"
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "id": "01.2",
+          "title": "What is Docker?",
+          "stage": {
+            "w": 360,
+            "h": 640
+          },
+          "steps": [
+            {
+              "say": "Docker is an open-source platform to build, package, distribute and run applications in containers.",
+              "actors": {
+                "dk": {
+                  "k": "box",
+                  "text": "Docker",
+                  "x": 50,
+                  "y": 8,
+                  "w": 60,
+                  "tone": "brand",
+                  "sub": "open-source container platform"
+                }
+              }
+            },
+            {
+              "say": "A container holds the application and the dependencies required to run it.",
+              "actors": {
+                "v1": {
+                  "k": "pill",
+                  "text": "Build",
+                  "x": 17.6,
+                  "y": 26,
+                  "tone": "soft"
+                },
+                "v2": {
+                  "k": "pill",
+                  "text": "Package",
+                  "x": 37.7,
+                  "y": 26,
+                  "tone": "soft"
+                },
+                "v3": {
+                  "k": "pill",
+                  "text": "Distribute",
+                  "x": 62.5,
+                  "y": 26,
+                  "tone": "soft"
+                },
+                "v4": {
+                  "k": "pill",
+                  "text": "Run",
+                  "x": 83.6,
+                  "y": 26,
+                  "tone": "soft"
+                }
+              },
+              "edges": [
+                [
+                  "dk",
+                  "v1"
+                ],
+                [
+                  "dk",
+                  "v2"
+                ],
+                [
+                  "dk",
+                  "v3"
+                ],
+                [
+                  "dk",
+                  "v4"
+                ]
+              ]
+            },
+            {
+              "say": "Docker also provides tools to manage images, containers, networks and storage.",
+              "actors": {
+                "v1": null,
+                "v2": null,
+                "v3": null,
+                "v4": null,
+                "t1": {
+                  "k": "box",
+                  "text": "Images",
+                  "x": 27,
+                  "y": 32,
+                  "w": 36
+                },
+                "t2": {
+                  "k": "box",
+                  "text": "Containers",
+                  "x": 73,
+                  "y": 32,
+                  "w": 36
+                },
+                "t3": {
+                  "k": "box",
+                  "text": "Networks",
+                  "x": 27,
+                  "y": 46,
+                  "w": 36
+                },
+                "t4": {
+                  "k": "box",
+                  "text": "Storage",
+                  "x": 73,
+                  "y": 46,
+                  "w": 36
+                }
+              },
+              "edges": []
+            },
+            {
+              "say": "Package once, then use the same environment in development, testing and production.",
+              "actors": {
+                "t1": null,
+                "t2": null,
+                "t3": null,
+                "t4": null,
+                "pk": {
+                  "k": "file",
+                  "text": "App + deps",
+                  "x": 22,
+                  "y": 24,
+                  "tone": "plain",
+                  "w": 24
+                },
+                "im": {
+                  "k": "box",
+                  "text": "Image",
+                  "x": 22,
+                  "y": 44,
+                  "w": 32,
+                  "tone": "soft",
+                  "sub": "built once"
+                },
+                "e1": {
+                  "k": "pill",
+                  "text": "Development",
+                  "x": 72,
+                  "y": 30,
+                  "tone": "ok"
+                },
+                "e2": {
+                  "k": "pill",
+                  "text": "Testing",
+                  "x": 72,
+                  "y": 44,
+                  "tone": "ok"
+                },
+                "e3": {
+                  "k": "pill",
+                  "text": "Production",
+                  "x": 72,
+                  "y": 58,
+                  "tone": "ok"
+                }
+              },
+              "edges": [
+                [
+                  "pk",
+                  "im",
+                  "package"
+                ],
+                [
+                  "im",
+                  "e1",
+                  "",
+                  "ok"
+                ],
+                [
+                  "im",
+                  "e2",
+                  "",
+                  "ok"
+                ],
+                [
+                  "im",
+                  "e3",
+                  "",
+                  "ok"
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "id": "01.3",
+          "title": "Virtual Machines vs Containers",
+          "stage": {
+            "w": 360,
+            "h": 720
+          },
+          "steps": [
+            {
+              "say": "Virtual machines run separate guest operating systems on top of the hardware through a hypervisor.",
+              "actors": {
+                "zl": {
+                  "k": "zone",
+                  "text": "Virtual machines",
+                  "x": 50,
+                  "y": 22,
+                  "w": 90,
+                  "h": 40
+                },
+                "hw1": {
+                  "k": "layer",
+                  "text": "Hardware",
+                  "x": 50,
+                  "y": 33,
+                  "tone": "plain",
+                  "w": 80
+                },
+                "hv": {
+                  "k": "layer",
+                  "text": "Hypervisor",
+                  "x": 50,
+                  "y": 24,
+                  "tone": "soft",
+                  "w": 80
+                },
+                "vm1": {
+                  "k": "box",
+                  "text": "VM 1",
+                  "x": 28,
+                  "y": 11,
+                  "w": 36,
+                  "sub": "Guest OS + app"
+                },
+                "vm2": {
+                  "k": "box",
+                  "text": "VM 2",
+                  "x": 72,
+                  "y": 11,
+                  "w": 36,
+                  "sub": "Guest OS + app"
+                }
+              }
+            },
+            {
+              "say": "Containers isolate applications and their dependencies while sharing the host operating system\u2019s kernel.",
+              "actors": {
+                "zr": {
+                  "k": "zone",
+                  "text": "Containers",
+                  "x": 50,
+                  "y": 66,
+                  "w": 90,
+                  "h": 42,
+                  "tone": "brand"
+                },
+                "hw2": {
+                  "k": "layer",
+                  "text": "Hardware",
+                  "x": 50,
+                  "y": 79,
+                  "tone": "plain",
+                  "w": 80
+                },
+                "os": {
+                  "k": "layer",
+                  "text": "Host OS \u00b7 shared kernel",
+                  "x": 50,
+                  "y": 71,
+                  "tone": "soft",
+                  "w": 80
+                },
+                "de": {
+                  "k": "layer",
+                  "text": "Docker Engine",
+                  "x": 50,
+                  "y": 63,
+                  "tone": "soft",
+                  "w": 80
+                },
+                "c1": {
+                  "k": "box",
+                  "text": "App A",
+                  "x": 17,
+                  "y": 54,
+                  "w": 28,
+                  "tone": "brand"
+                },
+                "c2": {
+                  "k": "box",
+                  "text": "App B",
+                  "x": 50,
+                  "y": 54,
+                  "w": 28,
+                  "tone": "brand"
+                },
+                "c3": {
+                  "k": "box",
+                  "text": "App C",
+                  "x": 83,
+                  "y": 54,
+                  "w": 28,
+                  "tone": "brand"
+                }
+              }
+            },
+            {
+              "say": "Containers generally need fewer resources and start faster than virtual machines.",
+              "actors": {
+                "pl": {
+                  "k": "pill",
+                  "text": "Heavier \u00b7 each VM runs its own OS",
+                  "x": 50,
+                  "y": 41,
+                  "tone": "warn"
+                },
+                "pr": {
+                  "k": "pill",
+                  "text": "Lighter \u00b7 faster to start",
+                  "x": 50,
+                  "y": 87,
+                  "tone": "ok"
+                }
+              }
+            },
+            {
+              "say": "Choose by need: separate operating systems \u2192 VMs; portable apps and efficient resources \u2192 containers.",
+              "actors": {
+                "pl": {
+                  "text": "Need separate operating systems \u2192 VM"
+                },
+                "pr": {
+                  "text": "Portable apps, efficient resources \u2192 container"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "01.4",
+          "title": "Installing and Verifying Docker",
+          "stage": {
+            "w": 360,
+            "h": 640
+          },
+          "steps": [
+            {
+              "say": "Download Docker Desktop from the official website for your operating system.",
+              "actors": {
+                "dd": {
+                  "k": "box",
+                  "text": "Docker Desktop",
+                  "x": 50,
+                  "y": 9,
+                  "w": 56,
+                  "sub": "docker.com/products/docker-desktop"
+                }
+              }
+            },
+            {
+              "say": "Install it and start Docker Desktop.",
+              "actors": {
+                "dd": {
+                  "tone": "soft",
+                  "bar": 60,
+                  "sub": "installing\u2026"
+                }
+              }
+            },
+            {
+              "say": "Docker Desktop is running, so the terminal can talk to Docker.",
+              "actors": {
+                "dd": {
+                  "tone": "ok",
+                  "ic": "\u2713",
+                  "bar": 100,
+                  "text": "Docker Desktop running",
+                  "sub": "ready"
+                }
+              }
+            },
+            {
+              "say": "Verify the installation: the version and the daemon information are displayed.",
+              "actors": {
+                "ver": {
+                  "k": "pill",
+                  "text": "Docker CLI + daemon respond",
+                  "x": 50,
+                  "y": 24,
+                  "tone": "ok",
+                  "ic": "\u2713"
+                }
+              },
+              "term": [
+                "$ docker --version",
+                "+Docker version 27.3.1",
+                "$ docker info",
+                "Server Version: 27.3.1",
+                "Containers: 0   Images: 0"
+              ]
+            },
+            {
+              "say": "docker run hello-world downloads the test image if needed, creates a container and prints a confirmation.",
+              "actors": {
+                "hub": {
+                  "k": "box",
+                  "text": "Docker Hub",
+                  "x": 50,
+                  "y": 42,
+                  "w": 32
+                },
+                "img": {
+                  "k": "box",
+                  "text": "hello-world",
+                  "x": 50,
+                  "y": 58,
+                  "w": 44,
+                  "tone": "soft",
+                  "sub": "test image"
+                },
+                "ctr": {
+                  "k": "box",
+                  "text": "Container",
+                  "x": 50,
+                  "y": 74,
+                  "w": 32,
+                  "tone": "brand"
+                },
+                "msg": {
+                  "k": "pill",
+                  "text": "Hello from Docker!",
+                  "x": 50,
+                  "y": 85,
+                  "tone": "ok",
+                  "ic": "\u2713"
+                }
+              },
+              "clear": true,
+              "term": [
+                "$ docker run hello-world",
+                "Unable to find image 'hello-world:latest' locally",
+                "latest: Pulling from library/hello-world",
+                "+Hello from Docker!"
+              ],
+              "edges": [
+                [
+                  "hub",
+                  "img",
+                  "pull if missing",
+                  "ok"
+                ],
+                [
+                  "img",
+                  "ctr",
+                  "create",
+                  "ok"
+                ]
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "title": "Docker Architecture, Images & Containers",
+      "subtopics": [
+        {
+          "id": "02.1",
+          "title": "Understand Docker Architecture",
+          "stage": {
+            "w": 360,
+            "h": 640
+          },
+          "steps": [
+            {
+              "say": "The Docker Client is where you type commands.",
+              "actors": {
+                "cl": {
+                  "k": "box",
+                  "text": "Docker Client",
+                  "x": 50,
+                  "y": 11,
+                  "w": 32,
+                  "tone": "brand",
+                  "sub": "docker CLI"
+                }
+              }
+            },
+            {
+              "say": "It talks to the Docker Daemon (dockerd) on the Docker Host, which manages images, containers, networks and volumes.",
+              "actors": {
+                "zh": {
+                  "k": "zone",
+                  "text": "Docker host",
+                  "x": 50,
+                  "y": 58,
+                  "w": 90,
+                  "h": 50
+                },
+                "dm": {
+                  "k": "box",
+                  "text": "Docker Daemon",
+                  "x": 24,
+                  "y": 58,
+                  "w": 28,
+                  "tone": "brand",
+                  "sub": "dockerd"
+                },
+                "i1": {
+                  "k": "pill",
+                  "text": "Images",
+                  "x": 52,
+                  "y": 38,
+                  "tone": "soft",
+                  "w": 20
+                },
+                "i2": {
+                  "k": "pill",
+                  "text": "Containers",
+                  "x": 52,
+                  "y": 50,
+                  "tone": "soft",
+                  "w": 20
+                },
+                "i3": {
+                  "k": "pill",
+                  "text": "Networks",
+                  "x": 52,
+                  "y": 62.5,
+                  "tone": "soft",
+                  "w": 20
+                },
+                "i4": {
+                  "k": "pill",
+                  "text": "Volumes",
+                  "x": 52,
+                  "y": 74,
+                  "tone": "soft",
+                  "w": 20
+                }
+              },
+              "edges": [
+                [
+                  "cl",
+                  "dm",
+                  "commands"
+                ]
+              ]
+            },
+            {
+              "say": "A registry stores and distributes images. Docker Hub is a commonly used one.",
+              "actors": {
+                "rg": {
+                  "k": "box",
+                  "text": "Registry",
+                  "x": 50,
+                  "y": 84,
+                  "w": 28,
+                  "sub": "e.g. Docker Hub"
+                }
+              },
+              "edges": [
+                [
+                  "cl",
+                  "dm",
+                  "commands"
+                ]
+              ]
+            },
+            {
+              "say": "docker run nginx: the Daemon checks locally, pulls the image from the registry if missing, then creates the container.",
+              "actors": {
+                "ng": {
+                  "k": "box",
+                  "text": "nginx container",
+                  "x": 80,
+                  "y": 58,
+                  "w": 26,
+                  "tone": "brand"
+                }
+              },
+              "term": [
+                "$ docker run nginx"
+              ],
+              "edges": [
+                [
+                  "cl",
+                  "dm",
+                  "docker run nginx",
+                  "ok"
+                ],
+                [
+                  "dm",
+                  "rg",
+                  "not local \u2192 pull",
+                  "ok"
+                ],
+                [
+                  "dm",
+                  "ng",
+                  "",
+                  "ok"
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "id": "02.2",
+          "title": "Understand Docker Images",
+          "stage": {
+            "w": 360,
+            "h": 600
+          },
+          "steps": [
+            {
+              "say": "A Docker image is a read-only template used to create containers.",
+              "actors": {
+                "hd": {
+                  "k": "box",
+                  "text": "Docker image",
+                  "x": 22,
+                  "y": 7,
+                  "w": 40,
+                  "tone": "brand",
+                  "sub": "read-only template"
+                }
+              }
+            },
+            {
+              "say": "It contains the application code, runtime, libraries and dependencies \u2014 built as layers.",
+              "actors": {
+                "la1": {
+                  "k": "layer",
+                  "text": "App code",
+                  "x": 22,
+                  "y": 20,
+                  "tone": "plain",
+                  "w": 36
+                },
+                "la2": {
+                  "k": "layer",
+                  "text": "Dependencies (npm packages)",
+                  "x": 22,
+                  "y": 30,
+                  "tone": "plain",
+                  "w": 36
+                },
+                "la3": {
+                  "k": "layer",
+                  "text": "Node.js runtime",
+                  "x": 22,
+                  "y": 40,
+                  "tone": "plain",
+                  "w": 36
+                },
+                "la4": {
+                  "k": "layer",
+                  "text": "Base OS layer",
+                  "x": 22,
+                  "y": 50,
+                  "tone": "plain",
+                  "w": 36
+                }
+              }
+            },
+            {
+              "say": "Docker reuses existing layers, so another image built on the same base avoids repeating that work.",
+              "actors": {
+                "hd2": {
+                  "k": "box",
+                  "text": "Another image",
+                  "x": 78,
+                  "y": 7,
+                  "w": 40,
+                  "tone": "soft",
+                  "sub": "same Node.js base"
+                },
+                "lb1": {
+                  "k": "layer",
+                  "text": "Different app code",
+                  "x": 78,
+                  "y": 20,
+                  "tone": "brand",
+                  "w": 36
+                },
+                "lb2": {
+                  "k": "layer",
+                  "text": "Different dependencies",
+                  "x": 78,
+                  "y": 30,
+                  "tone": "brand",
+                  "w": 36
+                },
+                "lb3": {
+                  "k": "layer",
+                  "text": "Node.js runtime",
+                  "x": 78,
+                  "y": 40,
+                  "tone": "ok",
+                  "w": 36,
+                  "ic": "\u2713"
+                },
+                "lb4": {
+                  "k": "layer",
+                  "text": "Base OS layer",
+                  "x": 78,
+                  "y": 50,
+                  "tone": "ok",
+                  "w": 36,
+                  "ic": "\u2713"
+                },
+                "la3": {
+                  "tone": "ok",
+                  "ic": "\u2713"
+                },
+                "la4": {
+                  "tone": "ok",
+                  "ic": "\u2713"
+                }
+              },
+              "edges": [
+                [
+                  "la3",
+                  "lb3",
+                  "reused",
+                  "ok"
+                ],
+                [
+                  "la4",
+                  "lb4",
+                  "reused",
+                  "ok"
+                ]
+              ]
+            },
+            {
+              "say": "For example, start from an existing Node.js image instead of installing Node.js every time.",
+              "actors": {
+                "tip": {
+                  "k": "pill",
+                  "text": "FROM node:20  \u2192 no manual Node.js install",
+                  "x": 50,
+                  "y": 64,
+                  "tone": "soft"
+                }
+              },
+              "edges": [
+                [
+                  "la3",
+                  "lb3",
+                  "reused",
+                  "ok"
+                ],
+                [
+                  "la4",
+                  "lb4",
+                  "reused",
+                  "ok"
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "id": "02.3",
+          "title": "Understand Docker Containers",
+          "stage": {
+            "w": 360,
+            "h": 640
+          },
+          "steps": [
+            {
+              "say": "A container is an instance created from an image. The image is the template.",
+              "actors": {
+                "img": {
+                  "k": "box",
+                  "text": "nginx image",
+                  "x": 50,
+                  "y": 10,
+                  "w": 46,
+                  "tone": "soft",
+                  "sub": "read-only template"
+                }
+              }
+            },
+            {
+              "say": "The container is where the application actually runs \u2014 with its own writable layer.",
+              "actors": {
+                "c1": {
+                  "k": "box",
+                  "text": "Container 1",
+                  "x": 17,
+                  "y": 36,
+                  "w": 28,
+                  "tone": "brand",
+                  "sub": "running"
+                },
+                "w1": {
+                  "k": "layer",
+                  "text": "writable layer",
+                  "x": 17,
+                  "y": 56,
+                  "tone": "warn",
+                  "w": 28
+                }
+              },
+              "edges": [
+                [
+                  "img",
+                  "c1",
+                  "create",
+                  "ok"
+                ],
+                [
+                  "c1",
+                  "w1",
+                  "",
+                  "dash"
+                ]
+              ]
+            },
+            {
+              "say": "Many containers can be created from the same image, and each one operates independently.",
+              "actors": {
+                "c2": {
+                  "k": "box",
+                  "text": "Container 2",
+                  "x": 50,
+                  "y": 36,
+                  "w": 28,
+                  "tone": "brand",
+                  "sub": "running"
+                },
+                "w2": {
+                  "k": "layer",
+                  "text": "writable layer",
+                  "x": 50,
+                  "y": 56,
+                  "tone": "warn",
+                  "w": 28
+                },
+                "c3": {
+                  "k": "box",
+                  "text": "Container 3",
+                  "x": 83,
+                  "y": 36,
+                  "w": 28,
+                  "tone": "brand",
+                  "sub": "running"
+                },
+                "w3": {
+                  "k": "layer",
+                  "text": "writable layer",
+                  "x": 83,
+                  "y": 56,
+                  "tone": "warn",
+                  "w": 28
+                }
+              },
+              "edges": [
+                [
+                  "img",
+                  "c1",
+                  "create",
+                  "ok"
+                ],
+                [
+                  "c1",
+                  "w1",
+                  "",
+                  "dash"
+                ],
+                [
+                  "img",
+                  "c2",
+                  "",
+                  "ok"
+                ],
+                [
+                  "c2",
+                  "w2",
+                  "",
+                  "dash"
+                ],
+                [
+                  "img",
+                  "c3",
+                  "",
+                  "ok"
+                ],
+                [
+                  "c3",
+                  "w3",
+                  "",
+                  "dash"
+                ]
+              ]
+            },
+            {
+              "say": "Containers can be stopped\u2026",
+              "actors": {
+                "c2": {
+                  "tone": "dim",
+                  "sub": "stopped"
+                }
+              },
+              "edges": [
+                [
+                  "img",
+                  "c1",
+                  "create",
+                  "ok"
+                ],
+                [
+                  "c1",
+                  "w1",
+                  "",
+                  "dash"
+                ],
+                [
+                  "img",
+                  "c2",
+                  "",
+                  "ok"
+                ],
+                [
+                  "c2",
+                  "w2",
+                  "",
+                  "dash"
+                ],
+                [
+                  "img",
+                  "c3",
+                  "",
+                  "ok"
+                ],
+                [
+                  "c3",
+                  "w3",
+                  "",
+                  "dash"
+                ]
+              ]
+            },
+            {
+              "say": "\u2026restarted or removed \u2014 without modifying the original image.",
+              "actors": {
+                "c2": {
+                  "tone": "brand",
+                  "sub": "restarted"
+                },
+                "c3": null,
+                "w3": null,
+                "ok": {
+                  "k": "pill",
+                  "text": "The image stays unchanged",
+                  "x": 50,
+                  "y": 75,
+                  "tone": "ok",
+                  "ic": "\u2713"
+                }
+              },
+              "edges": [
+                [
+                  "img",
+                  "c1",
+                  "create",
+                  "ok"
+                ],
+                [
+                  "c1",
+                  "w1",
+                  "",
+                  "dash"
+                ],
+                [
+                  "img",
+                  "c2",
+                  "",
+                  "ok"
+                ],
+                [
+                  "c2",
+                  "w2",
+                  "",
+                  "dash"
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "id": "02.4",
+          "title": "Download Images and Run Containers",
+          "stage": {
+            "w": 360,
+            "h": 640
+          },
+          "steps": [
+            {
+              "say": "docker pull downloads the Nginx image from the registry.",
+              "actors": {
+                "reg": {
+                  "k": "box",
+                  "text": "Docker Hub",
+                  "x": 27,
+                  "y": 8,
+                  "w": 34,
+                  "sub": "registry"
+                },
+                "zh": {
+                  "k": "zone",
+                  "text": "Docker host",
+                  "x": 50,
+                  "y": 55,
+                  "w": 92,
+                  "h": 72
+                },
+                "img": {
+                  "k": "box",
+                  "text": "nginx image",
+                  "x": 27,
+                  "y": 27,
+                  "w": 30,
+                  "tone": "soft"
+                }
+              },
+              "term": [
+                "$ docker pull nginx",
+                "Using default tag: latest",
+                "latest: Pulling from library/nginx",
+                "+Status: Downloaded newer image for nginx:latest"
+              ],
+              "edges": [
+                [
+                  "reg",
+                  "img",
+                  "pull",
+                  "ok"
+                ]
+              ]
+            },
+            {
+              "say": "docker images lists the images available locally.",
+              "actors": {
+                "img": {
+                  "glow": true
+                }
+              },
+              "term": [
+                "$ docker images",
+                "REPOSITORY   TAG      IMAGE ID",
+                "nginx        latest   a1b2c3d4e5f6"
+              ],
+              "edges": []
+            },
+            {
+              "say": "docker run creates and starts a container. -d runs it in the background; -p maps host port 8080 to container port 80.",
+              "actors": {
+                "img": {
+                  "glow": false
+                },
+                "ctr": {
+                  "k": "box",
+                  "text": "my-nginx",
+                  "x": 73,
+                  "y": 27,
+                  "w": 30,
+                  "tone": "brand",
+                  "sub": "listens on port 80"
+                },
+                "f1": {
+                  "k": "pill",
+                  "text": "-d   runs in the background",
+                  "x": 50,
+                  "y": 45,
+                  "tone": "soft"
+                },
+                "f2": {
+                  "k": "pill",
+                  "text": "-p 8080:80   host port \u2192 container port",
+                  "x": 50,
+                  "y": 54,
+                  "tone": "soft"
+                }
+              },
+              "term": [
+                "$ docker run -d -p 8080:80 --name my-nginx nginx"
+              ],
+              "edges": [
+                [
+                  "img",
+                  "ctr",
+                  "create",
+                  "ok"
+                ]
+              ]
+            },
+            {
+              "say": "Open http://localhost:8080 in your browser to reach the Nginx welcome page.",
+              "actors": {
+                "br": {
+                  "k": "box",
+                  "text": "Browser",
+                  "x": 73,
+                  "y": 8,
+                  "w": 34,
+                  "sub": "localhost:8080"
+                },
+                "res": {
+                  "k": "pill",
+                  "text": "Nginx welcome page",
+                  "x": 50,
+                  "y": 70,
+                  "tone": "ok",
+                  "ic": "\u2713"
+                }
+              },
+              "edges": [
+                [
+                  "img",
+                  "ctr",
+                  "create",
+                  "ok"
+                ],
+                [
+                  "br",
+                  "ctr",
+                  "port 8080 \u2192 80",
+                  "ok"
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "id": "02.5",
+          "title": "Manage Docker Containers",
+          "stage": {
+            "w": 360,
+            "h": 640
+          },
+          "steps": [
+            {
+              "say": "docker ps shows running containers.",
+              "actors": {
+                "run": {
+                  "k": "box",
+                  "text": "Running",
+                  "x": 50,
+                  "y": 8,
+                  "w": 40,
+                  "tone": "brand",
+                  "sub": "my-nginx"
+                },
+                "st": {
+                  "k": "box",
+                  "text": "Stopped",
+                  "x": 50,
+                  "y": 26,
+                  "w": 40,
+                  "sub": "my-nginx"
+                },
+                "gone": {
+                  "k": "box",
+                  "text": "Removed",
+                  "x": 50,
+                  "y": 44,
+                  "w": 40,
+                  "sub": "my-nginx"
+                },
+                "out": {
+                  "k": "code",
+                  "lines": [
+                    "NAMES       STATUS",
+                    "my-nginx    Up 2 minutes"
+                  ],
+                  "x": 50,
+                  "y": 72,
+                  "title": "docker ps"
+                }
+              },
+              "term": [
+                "$ docker ps"
+              ],
+              "edges": [
+                [
+                  "run",
+                  "st",
+                  "stop \u21c4 start"
+                ],
+                [
+                  "st",
+                  "gone",
+                  "rm"
+                ]
+              ]
+            },
+            {
+              "say": "docker stop halts the container; docker ps -a still lists it.",
+              "actors": {
+                "run": {
+                  "tone": "soft"
+                },
+                "st": {
+                  "tone": "brand"
+                },
+                "out": {
+                  "title": "docker ps -a",
+                  "lines": [
+                    "NAMES       STATUS",
+                    "my-nginx    Exited (0) 5 seconds ago"
+                  ]
+                }
+              },
+              "term": [
+                "$ docker stop my-nginx",
+                "$ docker ps -a"
+              ]
+            },
+            {
+              "say": "docker start brings it back.",
+              "actors": {
+                "run": {
+                  "tone": "brand"
+                },
+                "st": {
+                  "tone": "soft"
+                },
+                "out": {
+                  "title": "docker ps",
+                  "lines": [
+                    "NAMES       STATUS",
+                    "my-nginx    Up 3 seconds"
+                  ]
+                }
+              },
+              "term": [
+                "$ docker start my-nginx"
+              ]
+            },
+            {
+              "say": "docker logs displays the container\u2019s output, so you can monitor the application.",
+              "actors": {
+                "out": {
+                  "title": "docker logs my-nginx",
+                  "lines": [
+                    "/docker-entrypoint.sh: Configuration complete",
+                    "ready for start up"
+                  ]
+                }
+              },
+              "term": [
+                "$ docker logs my-nginx"
+              ]
+            },
+            {
+              "say": "A stopped container can be removed with docker rm.",
+              "actors": {
+                "run": {
+                  "tone": "dim"
+                },
+                "st": {
+                  "tone": "soft"
+                },
+                "gone": {
+                  "tone": "ok",
+                  "ic": "\u2713"
+                },
+                "out": {
+                  "title": "docker ps -a",
+                  "lines": [
+                    [
+                      "(my-nginx removed)",
+                      "dim"
+                    ]
+                  ]
+                }
+              },
+              "term": [
+                "$ docker stop my-nginx",
+                "$ docker rm my-nginx"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "title": "Dockerfile & Building Custom Images",
+      "subtopics": [
+        {
+          "id": "03.1",
+          "title": "Why Do We Need a Dockerfile?",
+          "stage": {
+            "w": 360,
+            "h": 640
+          },
+          "steps": [
+            {
+              "say": "A Node.js app needs a runtime version, dependencies and configuration. Preparing this by hand is repetitive.",
+              "actors": {
+                "man": {
+                  "k": "code",
+                  "lines": [
+                    "Install Node.js 20",
+                    "Copy the application files",
+                    "npm install",
+                    "Set configuration",
+                    "Start the app"
+                  ],
+                  "x": 48.5,
+                  "y": 28,
+                  "title": "Manual setup \u2014 repeated on every server"
+                },
+                "s1": {
+                  "k": "box",
+                  "text": "Server A",
+                  "x": 18,
+                  "y": 80,
+                  "w": 28,
+                  "tone": "warn",
+                  "sub": "manual setup"
+                },
+                "s2": {
+                  "k": "box",
+                  "text": "Server B",
+                  "x": 50,
+                  "y": 80,
+                  "w": 28,
+                  "tone": "warn",
+                  "sub": "manual setup"
+                },
+                "s3": {
+                  "k": "box",
+                  "text": "Server C",
+                  "x": 82,
+                  "y": 80,
+                  "w": 28,
+                  "tone": "warn",
+                  "sub": "manual setup"
+                }
+              },
+              "edges": [
+                [
+                  "man",
+                  "s1",
+                  "",
+                  "dash"
+                ],
+                [
+                  "man",
+                  "s2",
+                  "",
+                  "dash"
+                ],
+                [
+                  "man",
+                  "s3",
+                  "",
+                  "dash"
+                ]
+              ]
+            },
+            {
+              "say": "A Dockerfile captures the environment and build instructions in one text file\u2026",
+              "actors": {
+                "man": null,
+                "s1": null,
+                "s2": null,
+                "s3": null,
+                "df": {
+                  "k": "file",
+                  "text": "Dockerfile",
+                  "x": 50,
+                  "y": 12,
+                  "tone": "brand",
+                  "w": 22
+                }
+              }
+            },
+            {
+              "say": "\u2026Docker builds an image from it, and that image can be reused across environments.",
+              "actors": {
+                "im": {
+                  "k": "box",
+                  "text": "Image",
+                  "x": 50,
+                  "y": 40,
+                  "w": 32,
+                  "tone": "soft",
+                  "sub": "reusable"
+                },
+                "e1": {
+                  "k": "box",
+                  "text": "Development",
+                  "x": 18,
+                  "y": 78,
+                  "w": 28,
+                  "tone": "ok"
+                },
+                "e2": {
+                  "k": "box",
+                  "text": "Testing",
+                  "x": 50,
+                  "y": 78,
+                  "w": 28,
+                  "tone": "ok"
+                },
+                "e3": {
+                  "k": "box",
+                  "text": "Production",
+                  "x": 82,
+                  "y": 78,
+                  "w": 28,
+                  "tone": "ok"
+                }
+              },
+              "edges": [
+                [
+                  "df",
+                  "im",
+                  "docker build",
+                  "ok"
+                ],
+                [
+                  "im",
+                  "e1",
+                  "",
+                  "ok"
+                ],
+                [
+                  "im",
+                  "e2",
+                  "",
+                  "ok"
+                ],
+                [
+                  "im",
+                  "e3",
+                  "",
+                  "ok"
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "id": "03.2",
+          "title": "Common Dockerfile Instructions",
+          "stage": {
+            "w": 360,
+            "h": 640
+          },
+          "steps": [
+            {
+              "say": "FROM picks the base image; WORKDIR sets the working directory inside the image.",
+              "actors": {
+                "k": {
+                  "k": "code",
+                  "lines": [
+                    [
+                      "FROM node:20",
+                      "hl"
+                    ],
+                    [
+                      "WORKDIR /app",
+                      "hl"
+                    ],
+                    "COPY package*.json ./",
+                    "RUN npm install",
+                    "EXPOSE 3000",
+                    "ENV PORT=3000",
+                    "CMD [\"npm\", \"start\"]"
+                  ],
+                  "x": 50,
+                  "y": 28,
+                  "title": "Dockerfile"
+                },
+                "d1": {
+                  "k": "box",
+                  "text": "FROM",
+                  "x": 50,
+                  "y": 62,
+                  "w": 80,
+                  "tone": "brand",
+                  "sub": "Specifies the base image"
+                },
+                "d2": {
+                  "k": "box",
+                  "text": "WORKDIR",
+                  "x": 50,
+                  "y": 80,
+                  "w": 80,
+                  "tone": "brand",
+                  "sub": "Sets the working directory inside the image"
+                }
+              }
+            },
+            {
+              "say": "COPY brings application files into the image; RUN executes commands while the image is built.",
+              "actors": {
+                "k": {
+                  "lines": [
+                    "FROM node:20",
+                    "WORKDIR /app",
+                    [
+                      "COPY package*.json ./",
+                      "hl"
+                    ],
+                    [
+                      "RUN npm install",
+                      "hl"
+                    ],
+                    "EXPOSE 3000",
+                    "ENV PORT=3000",
+                    "CMD [\"npm\", \"start\"]"
+                  ]
+                },
+                "d1": {
+                  "text": "COPY",
+                  "sub": "Copies application files into the image"
+                },
+                "d2": {
+                  "text": "RUN",
+                  "sub": "Executes commands during image building"
+                }
+              }
+            },
+            {
+              "say": "EXPOSE documents the port the app uses; ENV defines environment variables.",
+              "actors": {
+                "k": {
+                  "lines": [
+                    "FROM node:20",
+                    "WORKDIR /app",
+                    "COPY package*.json ./",
+                    "RUN npm install",
+                    [
+                      "EXPOSE 3000",
+                      "hl"
+                    ],
+                    [
+                      "ENV PORT=3000",
+                      "hl"
+                    ],
+                    "CMD [\"npm\", \"start\"]"
+                  ]
+                },
+                "d1": {
+                  "text": "EXPOSE",
+                  "sub": "Documents the port used by the application"
+                },
+                "d2": {
+                  "text": "ENV",
+                  "sub": "Defines environment variables"
+                }
+              }
+            },
+            {
+              "say": "CMD sets the default command that runs when a container starts.",
+              "actors": {
+                "k": {
+                  "lines": [
+                    "FROM node:20",
+                    "WORKDIR /app",
+                    "COPY package*.json ./",
+                    "RUN npm install",
+                    "EXPOSE 3000",
+                    "ENV PORT=3000",
+                    [
+                      "CMD [\"npm\", \"start\"]",
+                      "hl"
+                    ]
+                  ]
+                },
+                "d1": {
+                  "text": "CMD",
+                  "sub": "Specifies the default command executed when a container starts"
+                },
+                "d2": null
+              }
+            }
+          ]
+        },
+        {
+          "id": "03.3",
+          "title": "Create a Dockerfile for a Node.js App",
+          "stage": {
+            "w": 360,
+            "h": 640
+          },
+          "steps": [
+            {
+              "say": "Start with the project: server.js, package.json, package-lock.json \u2014 and a new file named Dockerfile.",
+              "actors": {
+                "z": {
+                  "k": "zone",
+                  "text": "node-app/",
+                  "x": 50,
+                  "y": 17,
+                  "w": 92,
+                  "h": 34
+                },
+                "f1": {
+                  "k": "file",
+                  "text": "server.js",
+                  "x": 27,
+                  "y": 9,
+                  "tone": "plain",
+                  "w": 30
+                },
+                "f2": {
+                  "k": "file",
+                  "text": "package.json",
+                  "x": 73,
+                  "y": 9,
+                  "tone": "plain",
+                  "w": 30
+                },
+                "f3": {
+                  "k": "file",
+                  "text": "package-lock.json",
+                  "x": 27,
+                  "y": 24,
+                  "tone": "plain",
+                  "w": 30
+                },
+                "f4": {
+                  "k": "file",
+                  "text": "Dockerfile",
+                  "x": 73,
+                  "y": 24,
+                  "tone": "brand",
+                  "glow": true,
+                  "w": 30
+                }
+              }
+            },
+            {
+              "say": "Use Node.js as the base image and create a working directory.",
+              "actors": {
+                "k": {
+                  "k": "code",
+                  "lines": [
+                    [
+                      "FROM node:20",
+                      "hl"
+                    ],
+                    [
+                      "",
+                      "hl"
+                    ],
+                    [
+                      "WORKDIR /app",
+                      "hl"
+                    ]
+                  ],
+                  "x": 50,
+                  "y": 64,
+                  "title": "Dockerfile"
+                }
+              }
+            },
+            {
+              "say": "Copy the package files first, then install dependencies.",
+              "actors": {
+                "k": {
+                  "lines": [
+                    "FROM node:20",
+                    "",
+                    "WORKDIR /app",
+                    "",
+                    [
+                      "COPY package*.json ./",
+                      "hl"
+                    ],
+                    [
+                      "",
+                      "hl"
+                    ],
+                    [
+                      "RUN npm install",
+                      "hl"
+                    ]
+                  ]
+                }
+              }
+            },
+            {
+              "say": "Copy the remaining application files and document the port.",
+              "actors": {
+                "k": {
+                  "lines": [
+                    "FROM node:20",
+                    "",
+                    "WORKDIR /app",
+                    "",
+                    "COPY package*.json ./",
+                    "",
+                    "RUN npm install",
+                    "",
+                    [
+                      "COPY . .",
+                      "hl"
+                    ],
+                    [
+                      "",
+                      "hl"
+                    ],
+                    [
+                      "EXPOSE 3000",
+                      "hl"
+                    ]
+                  ]
+                }
+              }
+            },
+            {
+              "say": "The final instruction defines the command used to start the application.",
+              "actors": {
+                "k": {
+                  "lines": [
+                    "FROM node:20",
+                    "",
+                    "WORKDIR /app",
+                    "",
+                    "COPY package*.json ./",
+                    "",
+                    "RUN npm install",
+                    "",
+                    "COPY . .",
+                    "",
+                    "EXPOSE 3000",
+                    "",
+                    [
+                      "CMD [\"npm\", \"start\"]",
+                      "hl"
+                    ]
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "03.4",
+          "title": "Build and Run a Custom Image",
+          "stage": {
+            "w": 360,
+            "h": 640
+          },
+          "steps": [
+            {
+              "say": "Open the terminal in the project directory \u2014 the folder with the Dockerfile.",
+              "actors": {
+                "pf": {
+                  "k": "box",
+                  "text": "Project folder",
+                  "x": 30,
+                  "y": 10,
+                  "w": 40,
+                  "sub": "Dockerfile \u00b7 code \u00b7 package.json"
+                }
+              }
+            },
+            {
+              "say": "docker build creates the image. -t names it; the dot is the build context (the current directory).",
+              "actors": {
+                "im": {
+                  "k": "box",
+                  "text": "my-node-app",
+                  "x": 30,
+                  "y": 34,
+                  "w": 40,
+                  "tone": "soft",
+                  "sub": "image"
+                },
+                "tip": {
+                  "k": "pill",
+                  "text": "-t names the image \u00b7 . = build context",
+                  "x": 72,
+                  "y": 34,
+                  "tone": "soft",
+                  "w": 40
+                }
+              },
+              "term": [
+                "$ docker build -t my-node-app ."
+              ],
+              "edges": [
+                [
+                  "pf",
+                  "im",
+                  "docker build -t",
+                  "ok"
+                ]
+              ]
+            },
+            {
+              "say": "docker run starts a container from the new image and maps port 3000.",
+              "actors": {
+                "ct": {
+                  "k": "box",
+                  "text": "my-app",
+                  "x": 30,
+                  "y": 58,
+                  "w": 40,
+                  "tone": "brand",
+                  "sub": "container"
+                },
+                "tip2": {
+                  "k": "pill",
+                  "text": "-p 3000:3000 maps the port",
+                  "x": 72,
+                  "y": 58,
+                  "tone": "soft",
+                  "w": 40
+                }
+              },
+              "term": [
+                "$ docker run -d -p 3000:3000 --name my-app my-node-app"
+              ],
+              "edges": [
+                [
+                  "pf",
+                  "im",
+                  "docker build -t",
+                  "ok"
+                ],
+                [
+                  "im",
+                  "ct",
+                  "docker run",
+                  "ok"
+                ]
+              ]
+            },
+            {
+              "say": "If the app listens on port 3000, it is reachable at http://localhost:3000.",
+              "actors": {
+                "br": {
+                  "k": "box",
+                  "text": "localhost:3000",
+                  "x": 30,
+                  "y": 82,
+                  "w": 40,
+                  "tone": "ok",
+                  "ic": "\u2713"
+                }
+              },
+              "edges": [
+                [
+                  "pf",
+                  "im",
+                  "docker build -t",
+                  "ok"
+                ],
+                [
+                  "im",
+                  "ct",
+                  "docker run",
+                  "ok"
+                ],
+                [
+                  "ct",
+                  "br",
+                  "port 3000",
+                  "ok"
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "id": "03.5",
+          "title": "Image Layers and Build Caching",
+          "stage": {
+            "w": 360,
+            "h": 640
+          },
+          "steps": [
+            {
+              "say": "Each Dockerfile instruction produces an image layer.",
+              "actors": {
+                "zl": {
+                  "k": "zone",
+                  "text": "package files first",
+                  "x": 25,
+                  "y": 44,
+                  "w": 48,
+                  "h": 80
+                },
+                "a1": {
+                  "k": "layer",
+                  "text": "FROM node:20",
+                  "x": 25,
+                  "y": 14,
+                  "tone": "plain",
+                  "w": 42
+                },
+                "a2": {
+                  "k": "layer",
+                  "text": "WORKDIR /app",
+                  "x": 25,
+                  "y": 25,
+                  "tone": "plain",
+                  "w": 42
+                },
+                "a3": {
+                  "k": "layer",
+                  "text": "COPY package*.json",
+                  "x": 25,
+                  "y": 36,
+                  "tone": "plain",
+                  "w": 42
+                },
+                "a4": {
+                  "k": "layer",
+                  "text": "RUN npm install",
+                  "x": 25,
+                  "y": 47,
+                  "tone": "plain",
+                  "w": 42
+                },
+                "a5": {
+                  "k": "layer",
+                  "text": "COPY . .",
+                  "x": 25,
+                  "y": 58,
+                  "tone": "plain",
+                  "w": 42
+                },
+                "a6": {
+                  "k": "layer",
+                  "text": "CMD",
+                  "x": 25,
+                  "y": 69,
+                  "tone": "plain",
+                  "w": 42
+                }
+              }
+            },
+            {
+              "say": "Change server.js: layers above the change are reused from cache; only the layers after it are rebuilt.",
+              "actors": {
+                "ch": {
+                  "k": "pill",
+                  "text": "server.js changed",
+                  "x": 75,
+                  "y": 46,
+                  "tone": "warn",
+                  "w": 44
+                },
+                "a1": {
+                  "tone": "ok",
+                  "ic": "\u2713"
+                },
+                "a2": {
+                  "tone": "ok",
+                  "ic": "\u2713"
+                },
+                "a3": {
+                  "tone": "ok",
+                  "ic": "\u2713"
+                },
+                "a4": {
+                  "tone": "ok",
+                  "ic": "\u2713"
+                },
+                "a5": {
+                  "tone": "warn",
+                  "ic": "\u21bb"
+                },
+                "a6": {
+                  "tone": "warn",
+                  "ic": "\u21bb"
+                }
+              },
+              "edges": [
+                [
+                  "ch",
+                  "a5",
+                  "rebuilds from here",
+                  "warn"
+                ]
+              ]
+            },
+            {
+              "say": "That is why package files and dependencies come before frequently changing source files.",
+              "actors": {
+                "ch": null,
+                "zr": {
+                  "k": "zone",
+                  "text": "copy everything first",
+                  "x": 75,
+                  "y": 44,
+                  "w": 48,
+                  "h": 80,
+                  "tone": "brand"
+                },
+                "b1": {
+                  "k": "layer",
+                  "text": "FROM node:20",
+                  "x": 75,
+                  "y": 14,
+                  "tone": "ok",
+                  "w": 42,
+                  "ic": "\u2713"
+                },
+                "b2": {
+                  "k": "layer",
+                  "text": "WORKDIR /app",
+                  "x": 75,
+                  "y": 25,
+                  "tone": "ok",
+                  "w": 42,
+                  "ic": "\u2713"
+                },
+                "b3": {
+                  "k": "layer",
+                  "text": "COPY . .",
+                  "x": 75,
+                  "y": 36,
+                  "tone": "warn",
+                  "w": 42,
+                  "ic": "\u21bb"
+                },
+                "b4": {
+                  "k": "layer",
+                  "text": "RUN npm install",
+                  "x": 75,
+                  "y": 47,
+                  "tone": "bad",
+                  "w": 42,
+                  "ic": "\u21bb"
+                },
+                "b5": {
+                  "k": "layer",
+                  "text": "CMD",
+                  "x": 75,
+                  "y": 58,
+                  "tone": "warn",
+                  "w": 42,
+                  "ic": "\u21bb"
+                },
+                "note": {
+                  "k": "pill",
+                  "text": "npm install runs again on every code change",
+                  "x": 75,
+                  "y": 72,
+                  "tone": "bad",
+                  "w": 44
+                }
+              },
+              "edges": []
+            },
+            {
+              "say": "Tags identify image versions, such as v1 and v2.",
+              "actors": {
+                "zr": null,
+                "b1": null,
+                "b2": null,
+                "b3": null,
+                "b4": null,
+                "b5": null,
+                "note": null,
+                "t1": {
+                  "k": "box",
+                  "text": "my-node-app:v1",
+                  "x": 75,
+                  "y": 30,
+                  "w": 44,
+                  "tone": "soft",
+                  "sub": "release 1"
+                },
+                "t2": {
+                  "k": "box",
+                  "text": "my-node-app:v2",
+                  "x": 75,
+                  "y": 54,
+                  "w": 44,
+                  "tone": "brand",
+                  "sub": "release 2"
+                }
+              },
+              "term": [
+                "$ docker build -t my-node-app:v1 .",
+                "$ docker build -t my-node-app:v2 ."
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "04",
+      "title": "Docker Storage, Volumes & Networking",
+      "subtopics": [
+        {
+          "id": "04.1",
+          "title": "Why Do We Need Persistent Storage?",
+          "stage": {
+            "w": 360,
+            "h": 640
+          },
+          "steps": [
+            {
+              "say": "Containers are replaceable. A database container stores user records in its writable layer.",
+              "actors": {
+                "ct": {
+                  "k": "box",
+                  "text": "my-database container",
+                  "x": 50,
+                  "y": 12,
+                  "w": 60,
+                  "tone": "brand"
+                },
+                "wl": {
+                  "k": "layer",
+                  "text": "writable layer: user records",
+                  "x": 50,
+                  "y": 30,
+                  "tone": "warn",
+                  "w": 60
+                }
+              },
+              "edges": [
+                [
+                  "ct",
+                  "wl",
+                  "",
+                  "dash"
+                ]
+              ]
+            },
+            {
+              "say": "Remove the container and the data stored only in its writable layer is lost.",
+              "actors": {
+                "ct": null,
+                "wl": {
+                  "tone": "bad",
+                  "ic": "\u2715",
+                  "text": "user records lost"
+                }
+              },
+              "edges": []
+            },
+            {
+              "say": "Volumes and bind mounts store data outside the writable layer.",
+              "actors": {
+                "ct": {
+                  "tone": "brand"
+                },
+                "wl": null,
+                "vol": {
+                  "k": "vol",
+                  "text": "mydata volume",
+                  "x": 50,
+                  "y": 70,
+                  "tone": "ok",
+                  "w": 34
+                }
+              },
+              "edges": [
+                [
+                  "ct",
+                  "vol",
+                  "stores data outside",
+                  "ok"
+                ]
+              ]
+            },
+            {
+              "say": "Now the container can be removed \u2014 the data stays.",
+              "actors": {
+                "ct": null,
+                "ok": {
+                  "k": "pill",
+                  "text": "Data still available",
+                  "x": 50,
+                  "y": 86,
+                  "tone": "ok",
+                  "ic": "\u2713"
+                }
+              },
+              "edges": []
+            },
+            {
+              "say": "A new container attaches to the same volume and finds the records.",
+              "actors": {
+                "ct": {
+                  "text": "new my-database container"
+                },
+                "ok": null
+              },
+              "edges": [
+                [
+                  "ct",
+                  "vol",
+                  "same data",
+                  "ok"
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "id": "04.2",
+          "title": "Understand Docker Volumes",
+          "stage": {
+            "w": 360,
+            "h": 640
+          },
+          "steps": [
+            {
+              "say": "A volume is storage managed by Docker, independent of any container\u2019s lifecycle.",
+              "actors": {
+                "vol": {
+                  "k": "vol",
+                  "text": "mydata",
+                  "x": 50,
+                  "y": 12,
+                  "tone": "ok",
+                  "w": 30
+                }
+              },
+              "term": [
+                "$ docker volume create mydata"
+              ]
+            },
+            {
+              "say": "List the available volumes.",
+              "actors": {
+                "vol": {
+                  "glow": true
+                }
+              },
+              "term": [
+                "$ docker volume ls",
+                "DRIVER    VOLUME NAME",
+                "local     mydata"
+              ]
+            },
+            {
+              "say": "Mount it in a MySQL container: mydata appears at /var/lib/mysql, where MySQL keeps its files.",
+              "actors": {
+                "vol": {
+                  "glow": false
+                },
+                "ct": {
+                  "k": "box",
+                  "text": "my-database (mysql:8)",
+                  "x": 50,
+                  "y": 38,
+                  "w": 70,
+                  "tone": "brand",
+                  "sub": "MySQL files in /var/lib/mysql"
+                },
+                "env": {
+                  "k": "pill",
+                  "text": "-e MYSQL_ROOT_PASSWORD=example",
+                  "x": 50,
+                  "y": 56,
+                  "tone": "soft"
+                }
+              },
+              "term": [
+                "$ docker run -d --name my-database -v mydata:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=example mysql:8"
+              ],
+              "edges": [
+                [
+                  "vol",
+                  "ct",
+                  "mounted at /var/lib/mysql",
+                  "ok"
+                ]
+              ]
+            },
+            {
+              "say": "Remove the container: the volume remains, unless the volume itself is deleted.",
+              "actors": {
+                "ct": null,
+                "env": null,
+                "keep": {
+                  "k": "pill",
+                  "text": "Volume remains available",
+                  "x": 50,
+                  "y": 62,
+                  "tone": "ok",
+                  "ic": "\u2713"
+                }
+              },
+              "edges": []
+            }
+          ]
+        },
+        {
+          "id": "04.3",
+          "title": "Understand Bind Mounts",
+          "stage": {
+            "w": 360,
+            "h": 640
+          },
+          "steps": [
+            {
+              "say": "A bind mount connects a directory on the host machine to a location inside a container.",
+              "actors": {
+                "zh": {
+                  "k": "zone",
+                  "text": "Host machine",
+                  "x": 50,
+                  "y": 24,
+                  "w": 92,
+                  "h": 40
+                },
+                "hd": {
+                  "k": "box",
+                  "text": "./project",
+                  "x": 26,
+                  "y": 24,
+                  "w": 40,
+                  "sub": "current directory"
+                },
+                "hf1": {
+                  "k": "file",
+                  "text": "server.js",
+                  "x": 58,
+                  "y": 14,
+                  "tone": "plain"
+                },
+                "hf2": {
+                  "k": "file",
+                  "text": "package.json",
+                  "x": 58,
+                  "y": 32,
+                  "tone": "plain"
+                }
+              }
+            },
+            {
+              "say": "Mount the current directory at /app inside a Node.js container.",
+              "actors": {
+                "zc": {
+                  "k": "zone",
+                  "text": "Container",
+                  "x": 50,
+                  "y": 76,
+                  "w": 92,
+                  "h": 40,
+                  "tone": "brand"
+                },
+                "cd": {
+                  "k": "box",
+                  "text": "/app",
+                  "x": 26,
+                  "y": 76,
+                  "w": 40,
+                  "tone": "brand",
+                  "sub": "inside the container"
+                },
+                "cf1": {
+                  "k": "file",
+                  "text": "server.js",
+                  "x": 58,
+                  "y": 66,
+                  "tone": "plain"
+                },
+                "cf2": {
+                  "k": "file",
+                  "text": "package.json",
+                  "x": 58,
+                  "y": 84,
+                  "tone": "plain"
+                }
+              },
+              "term": [
+                "$ docker run -d --name node-dev -p 3000:3000 -v \"$(pwd):/app\" node:20"
+              ],
+              "edges": [
+                [
+                  "hd",
+                  "cd",
+                  "bind mount",
+                  "ok"
+                ]
+              ]
+            },
+            {
+              "say": "Edit a file on the host and the container sees the change.",
+              "actors": {
+                "hf1": {
+                  "tone": "warn",
+                  "sub": "edited"
+                },
+                "cf1": {
+                  "tone": "warn",
+                  "sub": "sees the change"
+                }
+              },
+              "edges": [
+                [
+                  "hd",
+                  "cd",
+                  "bind mount",
+                  "ok"
+                ],
+                [
+                  "hf1",
+                  "cf1",
+                  "same file",
+                  "dash"
+                ]
+              ]
+            },
+            {
+              "say": "That is especially useful during development.",
+              "actors": {
+                "dev": {
+                  "k": "pill",
+                  "text": "Edit locally \u00b7 run inside the container",
+                  "x": 61.6,
+                  "y": 50,
+                  "tone": "ok"
+                }
+              },
+              "edges": [
+                [
+                  "hd",
+                  "cd",
+                  "bind mount",
+                  "ok"
+                ],
+                [
+                  "hf1",
+                  "cf1",
+                  "same file",
+                  "dash"
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "id": "04.4",
+          "title": "Understand Docker Networking",
+          "stage": {
+            "w": 360,
+            "h": 640
+          },
+          "steps": [
+            {
+              "say": "An app often has a frontend, a backend and a database in separate containers. They need a way to talk.",
+              "actors": {
+                "fe": {
+                  "k": "box",
+                  "text": "Frontend",
+                  "x": 36,
+                  "y": 20,
+                  "w": 36
+                },
+                "be": {
+                  "k": "box",
+                  "text": "Backend",
+                  "x": 36,
+                  "y": 50,
+                  "w": 36
+                },
+                "db": {
+                  "k": "box",
+                  "text": "Database",
+                  "x": 36,
+                  "y": 80,
+                  "w": 36
+                }
+              },
+              "edges": [
+                [
+                  "fe",
+                  "be",
+                  "isolated",
+                  "warn"
+                ],
+                [
+                  "be",
+                  "db",
+                  "isolated",
+                  "warn"
+                ]
+              ]
+            },
+            {
+              "say": "Docker Networking provides that connectivity.",
+              "actors": {
+                "zn": {
+                  "k": "zone",
+                  "text": "Docker network",
+                  "x": 36,
+                  "y": 50,
+                  "w": 46,
+                  "h": 92,
+                  "tone": "brand"
+                }
+              },
+              "edges": [
+                [
+                  "fe",
+                  "be",
+                  "connected",
+                  "ok"
+                ],
+                [
+                  "be",
+                  "db",
+                  "connected",
+                  "ok"
+                ]
+              ]
+            },
+            {
+              "say": "Common network drivers: Bridge, Host, None and Overlay.",
+              "actors": {
+                "d1": {
+                  "k": "box",
+                  "text": "Bridge",
+                  "x": 78.5,
+                  "y": 14,
+                  "w": 40,
+                  "sub": "same Docker host"
+                },
+                "d2": {
+                  "k": "box",
+                  "text": "Host",
+                  "x": 78.5,
+                  "y": 38,
+                  "w": 40,
+                  "sub": "shares host network"
+                },
+                "d3": {
+                  "k": "box",
+                  "text": "None",
+                  "x": 78.5,
+                  "y": 62,
+                  "w": 40,
+                  "sub": "no normal networking"
+                },
+                "d4": {
+                  "k": "box",
+                  "text": "Overlay",
+                  "x": 78.5,
+                  "y": 86,
+                  "w": 40,
+                  "sub": "multiple Docker hosts"
+                }
+              },
+              "edges": [
+                [
+                  "fe",
+                  "be",
+                  "connected",
+                  "ok"
+                ],
+                [
+                  "be",
+                  "db",
+                  "connected",
+                  "ok"
+                ]
+              ]
+            },
+            {
+              "say": "Bridge connects containers on the same Docker host.",
+              "actors": {
+                "d1": {
+                  "tone": "brand",
+                  "glow": true
+                }
+              },
+              "edges": [
+                [
+                  "fe",
+                  "be",
+                  "connected",
+                  "ok"
+                ],
+                [
+                  "be",
+                  "db",
+                  "connected",
+                  "ok"
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "id": "04.5",
+          "title": "Create and Connect Docker Networks",
+          "stage": {
+            "w": 360,
+            "h": 640
+          },
+          "steps": [
+            {
+              "say": "Create a custom bridge network.",
+              "actors": {
+                "zn": {
+                  "k": "zone",
+                  "text": "my-network",
+                  "x": 50,
+                  "y": 44,
+                  "w": 82,
+                  "h": 76
+                },
+                "out": {
+                  "k": "box",
+                  "text": "Outside world",
+                  "x": 50,
+                  "y": 85,
+                  "w": 28
+                }
+              },
+              "term": [
+                "$ docker network create my-network"
+              ]
+            },
+            {
+              "say": "Run the first container on the network.",
+              "actors": {
+                "be": {
+                  "k": "box",
+                  "text": "backend",
+                  "x": 40,
+                  "y": 26,
+                  "w": 36,
+                  "tone": "brand",
+                  "sub": "nginx"
+                }
+              },
+              "term": [
+                "$ docker run -d --name backend --network my-network nginx"
+              ]
+            },
+            {
+              "say": "Run a second container on the same network.",
+              "actors": {
+                "fe": {
+                  "k": "box",
+                  "text": "frontend",
+                  "x": 40,
+                  "y": 62,
+                  "w": 36,
+                  "tone": "brand",
+                  "sub": "nginx"
+                }
+              },
+              "term": [
+                "$ docker run -d --name frontend --network my-network nginx"
+              ]
+            },
+            {
+              "say": "On the same user-defined bridge network, containers communicate using their container names.",
+              "actors": {
+                "pl": {
+                  "k": "pill",
+                  "text": "frontend \u2192 http://backend",
+                  "x": 50,
+                  "y": 74,
+                  "tone": "ok"
+                }
+              },
+              "edges": [
+                [
+                  "fe",
+                  "be",
+                  "http://backend",
+                  "ok"
+                ]
+              ]
+            },
+            {
+              "say": "No ports are published, so these services are not exposed directly to the outside world.",
+              "actors": {
+                "pl": {
+                  "text": "Services stay inside the network"
+                }
+              },
+              "edges": [
+                [
+                  "fe",
+                  "be",
+                  "http://backend",
+                  "ok"
+                ],
+                [
+                  "out",
+                  "fe",
+                  "not exposed",
+                  "warn"
+                ]
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "05",
+      "title": "Docker Compose & Multi-Container Applications",
+      "subtopics": [
+        {
+          "id": "05.1",
+          "title": "Why Do We Need Docker Compose?",
+          "stage": {
+            "w": 360,
+            "h": 640
+          },
+          "steps": [
+            {
+              "say": "A typical web app has a frontend, a backend and a database, each in its own container.",
+              "actors": {
+                "fe": {
+                  "k": "box",
+                  "text": "Frontend",
+                  "x": 22,
+                  "y": 14,
+                  "w": 30
+                },
+                "be": {
+                  "k": "box",
+                  "text": "Backend",
+                  "x": 22,
+                  "y": 34,
+                  "w": 30
+                },
+                "db": {
+                  "k": "box",
+                  "text": "Database",
+                  "x": 22,
+                  "y": 54,
+                  "w": 30
+                },
+                "c1": {
+                  "k": "pill",
+                  "text": "docker run \u2026 (frontend)",
+                  "x": 66,
+                  "y": 14,
+                  "tone": "warn"
+                },
+                "c2": {
+                  "k": "pill",
+                  "text": "docker run \u2026 (backend)",
+                  "x": 66,
+                  "y": 34,
+                  "tone": "warn"
+                },
+                "c3": {
+                  "k": "pill",
+                  "text": "docker run \u2026 (database)",
+                  "x": 66,
+                  "y": 54,
+                  "tone": "warn"
+                }
+              }
+            },
+            {
+              "say": "Managing them one by one takes many commands and separate configurations.",
+              "actors": {
+                "many": {
+                  "k": "pill",
+                  "text": "many commands \u00b7 separate configs",
+                  "x": 50,
+                  "y": 70,
+                  "tone": "bad"
+                }
+              }
+            },
+            {
+              "say": "Compose defines all services in one YAML file\u2026",
+              "actors": {
+                "c1": null,
+                "c2": null,
+                "c3": null,
+                "many": null,
+                "cp": {
+                  "k": "file",
+                  "text": "compose.yaml",
+                  "x": 64,
+                  "y": 34,
+                  "tone": "brand",
+                  "w": 24
+                }
+              },
+              "edges": [
+                [
+                  "cp",
+                  "fe",
+                  "",
+                  "ok"
+                ],
+                [
+                  "cp",
+                  "be",
+                  "",
+                  "ok"
+                ],
+                [
+                  "cp",
+                  "db",
+                  "",
+                  "ok"
+                ]
+              ]
+            },
+            {
+              "say": "\u2026and manages them together with a single command.",
+              "actors": {
+                "cmd": {
+                  "k": "box",
+                  "text": "docker compose up -d",
+                  "x": 64,
+                  "y": 58,
+                  "w": 46,
+                  "tone": "brand"
+                }
+              },
+              "edges": [
+                [
+                  "cp",
+                  "fe",
+                  "",
+                  "ok"
+                ],
+                [
+                  "cp",
+                  "be",
+                  "",
+                  "ok"
+                ],
+                [
+                  "cp",
+                  "db",
+                  "",
+                  "ok"
+                ],
+                [
+                  "cmd",
+                  "cp",
+                  "one command",
+                  "ok"
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "id": "05.2",
+          "title": "Understand Docker Compose",
+          "stage": {
+            "w": 360,
+            "h": 640
+          },
+          "steps": [
+            {
+              "say": "Docker Compose defines and runs multi-container applications from a file, commonly named compose.yaml.",
+              "actors": {
+                "cp": {
+                  "k": "file",
+                  "text": "compose.yaml",
+                  "x": 50,
+                  "y": 40,
+                  "tone": "brand",
+                  "w": 28
+                }
+              }
+            },
+            {
+              "say": "The file describes services, ports, environment variables, networks and volumes.",
+              "actors": {
+                "p1": {
+                  "k": "pill",
+                  "text": "services",
+                  "x": 20,
+                  "y": 28,
+                  "tone": "soft"
+                },
+                "p2": {
+                  "k": "pill",
+                  "text": "ports",
+                  "x": 80,
+                  "y": 28,
+                  "tone": "soft"
+                },
+                "p3": {
+                  "k": "pill",
+                  "text": "environment variables",
+                  "x": 50,
+                  "y": 12,
+                  "tone": "soft"
+                },
+                "p4": {
+                  "k": "pill",
+                  "text": "networks",
+                  "x": 22,
+                  "y": 52,
+                  "tone": "soft"
+                },
+                "p5": {
+                  "k": "pill",
+                  "text": "volumes",
+                  "x": 78,
+                  "y": 52,
+                  "tone": "soft"
+                }
+              },
+              "edges": [
+                [
+                  "cp",
+                  "p1",
+                  "",
+                  "dash"
+                ],
+                [
+                  "cp",
+                  "p2",
+                  "",
+                  "dash"
+                ],
+                [
+                  "cp",
+                  "p3",
+                  "",
+                  "dash"
+                ],
+                [
+                  "cp",
+                  "p4",
+                  "",
+                  "dash"
+                ],
+                [
+                  "cp",
+                  "p5",
+                  "",
+                  "dash"
+                ]
+              ]
+            },
+            {
+              "say": "Instead of starting every container separately, a single command starts the entire application.",
+              "actors": {
+                "cmd": {
+                  "k": "box",
+                  "text": "docker compose up -d",
+                  "x": 50,
+                  "y": 78,
+                  "w": 60,
+                  "tone": "brand",
+                  "sub": "starts the whole app"
+                }
+              },
+              "edges": [
+                [
+                  "cp",
+                  "p1",
+                  "",
+                  "dash"
+                ],
+                [
+                  "cp",
+                  "p2",
+                  "",
+                  "dash"
+                ],
+                [
+                  "cp",
+                  "p3",
+                  "",
+                  "dash"
+                ],
+                [
+                  "cp",
+                  "p4",
+                  "",
+                  "dash"
+                ],
+                [
+                  "cp",
+                  "p5",
+                  "",
+                  "dash"
+                ],
+                [
+                  "cmd",
+                  "cp",
+                  "",
+                  "ok"
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "id": "05.3",
+          "title": "Create a Compose File",
+          "stage": {
+            "w": 360,
+            "h": 640
+          },
+          "steps": [
+            {
+              "say": "The web service runs Nginx and publishes port 8080.",
+              "actors": {
+                "k": {
+                  "k": "code",
+                  "lines": [
+                    "services:",
+                    [
+                      "  web:",
+                      "hl"
+                    ],
+                    [
+                      "    image: nginx",
+                      "hl"
+                    ],
+                    [
+                      "    ports:",
+                      "hl"
+                    ],
+                    [
+                      "      - \"8080:80\"",
+                      "hl"
+                    ]
+                  ],
+                  "x": 50,
+                  "y": 30,
+                  "title": "compose.yaml"
+                },
+                "web": {
+                  "k": "box",
+                  "text": "web",
+                  "x": 17,
+                  "y": 76,
+                  "w": 26,
+                  "tone": "brand",
+                  "sub": "Nginx \u00b7 8080:80"
+                }
+              }
+            },
+            {
+              "say": "The db service runs MySQL with a root password from an environment variable.",
+              "actors": {
+                "k": {
+                  "lines": [
+                    "services:",
+                    "  web:",
+                    "    image: nginx",
+                    "    ports:",
+                    "      - \"8080:80\"",
+                    "",
+                    [
+                      "  db:",
+                      "hl"
+                    ],
+                    [
+                      "    image: mysql:8",
+                      "hl"
+                    ],
+                    [
+                      "    environment:",
+                      "hl"
+                    ],
+                    [
+                      "      MYSQL_ROOT_PASSWORD: example",
+                      "hl"
+                    ]
+                  ]
+                },
+                "db": {
+                  "k": "box",
+                  "text": "db",
+                  "x": 50,
+                  "y": 76,
+                  "w": 26,
+                  "tone": "brand",
+                  "sub": "MySQL 8"
+                }
+              }
+            },
+            {
+              "say": "The named volume db-data keeps database files outside the container\u2019s writable layer.",
+              "actors": {
+                "k": {
+                  "lines": [
+                    "services:",
+                    "  web:",
+                    "    image: nginx",
+                    "    ports:",
+                    "      - \"8080:80\"",
+                    "",
+                    "  db:",
+                    "    image: mysql:8",
+                    "    environment:",
+                    "      MYSQL_ROOT_PASSWORD: example",
+                    [
+                      "    volumes:",
+                      "hl"
+                    ],
+                    [
+                      "      - db-data:/var/lib/mysql",
+                      "hl"
+                    ],
+                    [
+                      "",
+                      "hl"
+                    ],
+                    [
+                      "volumes:",
+                      "hl"
+                    ],
+                    [
+                      "  db-data:",
+                      "hl"
+                    ]
+                  ]
+                },
+                "vol": {
+                  "k": "vol",
+                  "text": "db-data",
+                  "x": 83,
+                  "y": 76,
+                  "tone": "ok",
+                  "w": 22
+                }
+              },
+              "edges": [
+                [
+                  "db",
+                  "vol",
+                  "",
+                  "ok"
+                ]
+              ]
+            },
+            {
+              "say": "Compose also creates a default network, so the services can reach each other.",
+              "actors": {
+                "zn": {
+                  "k": "zone",
+                  "text": "default network",
+                  "x": 50,
+                  "y": 78,
+                  "w": 94,
+                  "h": 30
+                }
+              },
+              "edges": [
+                [
+                  "db",
+                  "vol",
+                  "",
+                  "ok"
+                ],
+                [
+                  "web",
+                  "db",
+                  "",
+                  "ok"
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "id": "05.4",
+          "title": "Run and Manage Services",
+          "stage": {
+            "w": 360,
+            "h": 640
+          },
+          "steps": [
+            {
+              "say": "docker compose up -d starts all services in the background.",
+              "actors": {
+                "zp": {
+                  "k": "zone",
+                  "text": "Compose project",
+                  "x": 50,
+                  "y": 34,
+                  "w": 90,
+                  "h": 60
+                },
+                "web": {
+                  "k": "box",
+                  "text": "web",
+                  "x": 34,
+                  "y": 20,
+                  "w": 32,
+                  "tone": "brand",
+                  "sub": "nginx",
+                  "delay": 300
+                },
+                "db": {
+                  "k": "box",
+                  "text": "db",
+                  "x": 34,
+                  "y": 48,
+                  "w": 32,
+                  "tone": "brand",
+                  "sub": "mysql:8",
+                  "delay": 700
+                },
+                "vol": {
+                  "k": "vol",
+                  "text": "db-data",
+                  "x": 72,
+                  "y": 48,
+                  "tone": "ok",
+                  "w": 24,
+                  "delay": 1000
+                }
+              },
+              "term": [
+                "$ docker compose up -d",
+                "Network app_default  Created",
+                "Container web  Started",
+                "Container db   Started"
+              ],
+              "edges": [
+                [
+                  "db",
+                  "vol",
+                  "",
+                  "ok"
+                ]
+              ]
+            },
+            {
+              "say": "docker compose ps lists the running services.",
+              "actors": {
+                "out": {
+                  "k": "code",
+                  "lines": [
+                    "NAME   STATUS",
+                    "web    running",
+                    "db     running"
+                  ],
+                  "x": 50,
+                  "y": 84,
+                  "title": "docker compose ps"
+                }
+              },
+              "term": [
+                "$ docker compose ps"
+              ]
+            },
+            {
+              "say": "docker compose logs shows the application logs.",
+              "actors": {
+                "out": {
+                  "title": "docker compose logs",
+                  "lines": [
+                    "web-1  | start worker process",
+                    "db-1   | ready for connections"
+                  ]
+                }
+              },
+              "term": [
+                "$ docker compose logs"
+              ]
+            },
+            {
+              "say": "docker compose down removes the containers and the network. Named volumes are kept by default.",
+              "actors": {
+                "web": null,
+                "db": null,
+                "out": {
+                  "title": "docker compose down",
+                  "lines": [
+                    [
+                      "containers + network removed",
+                      "dim"
+                    ]
+                  ]
+                },
+                "keep": {
+                  "k": "pill",
+                  "text": "db-data volume is retained",
+                  "x": 71.1,
+                  "y": 34,
+                  "tone": "ok",
+                  "ic": "\u2713"
+                }
+              },
+              "term": [
+                "$ docker compose down"
+              ],
+              "edges": []
+            }
+          ]
+        },
+        {
+          "id": "05.5",
+          "title": "Service Dependencies and Configuration",
+          "stage": {
+            "w": 360,
+            "h": 640
+          },
+          "steps": [
+            {
+              "say": "depends_on controls start order: the backend waits for the database service.",
+              "actors": {
+                "k": {
+                  "k": "code",
+                  "lines": [
+                    [
+                      "backend:",
+                      "hl"
+                    ],
+                    [
+                      "  depends_on:",
+                      "hl"
+                    ],
+                    [
+                      "    - db",
+                      "hl"
+                    ]
+                  ],
+                  "x": 50,
+                  "y": 26,
+                  "title": "compose.yaml"
+                },
+                "zn": {
+                  "k": "zone",
+                  "text": "Shared network",
+                  "x": 50,
+                  "y": 74,
+                  "w": 92,
+                  "h": 40
+                },
+                "be": {
+                  "k": "box",
+                  "text": "backend",
+                  "x": 18,
+                  "y": 74,
+                  "w": 24,
+                  "tone": "brand"
+                },
+                "db": {
+                  "k": "box",
+                  "text": "db",
+                  "x": 82,
+                  "y": 74,
+                  "w": 24,
+                  "tone": "brand",
+                  "sub": "database"
+                }
+              },
+              "edges": [
+                [
+                  "db",
+                  "be",
+                  "starts first",
+                  "ok"
+                ]
+              ]
+            },
+            {
+              "say": "Environment variables supply configuration, such as the database host and port.",
+              "actors": {
+                "k": {
+                  "lines": [
+                    "backend:",
+                    "  depends_on:",
+                    "    - db",
+                    "  environment:",
+                    [
+                      "    DB_HOST: db",
+                      "hl"
+                    ],
+                    [
+                      "    DB_PORT: 3306",
+                      "hl"
+                    ]
+                  ]
+                }
+              },
+              "edges": [
+                [
+                  "db",
+                  "be",
+                  "starts first",
+                  "ok"
+                ]
+              ]
+            },
+            {
+              "say": "Both services share a network, so the database is reachable using its service name db as the hostname.",
+              "actors": {
+                "pl": {
+                  "k": "pill",
+                  "text": "hostname db \u2192 database container",
+                  "x": 50,
+                  "y": 44,
+                  "tone": "ok"
+                }
+              },
+              "edges": [
+                [
+                  "be",
+                  "db",
+                  "DB_HOST: db  \u00b7  3306",
+                  "ok"
+                ]
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "06",
+      "title": "Docker Hub, Image Distribution & Best Practices",
+      "subtopics": [
+        {
+          "id": "06.1",
+          "title": "Why Do We Need Docker Hub?",
+          "stage": {
+            "w": 360,
+            "h": 640
+          },
+          "steps": [
+            {
+              "say": "You built a Docker image on your computer.",
+              "actors": {
+                "dev": {
+                  "k": "box",
+                  "text": "Your computer",
+                  "x": 50,
+                  "y": 14,
+                  "w": 36,
+                  "sub": "image built here"
+                }
+              }
+            },
+            {
+              "say": "Teammates and servers need it too. Rebuilding on every machine is unnecessary work.",
+              "actors": {
+                "tm": {
+                  "k": "box",
+                  "text": "Teammate",
+                  "x": 24,
+                  "y": 86,
+                  "w": 32,
+                  "tone": "warn",
+                  "sub": "rebuild the image"
+                },
+                "sv": {
+                  "k": "box",
+                  "text": "Server",
+                  "x": 76,
+                  "y": 86,
+                  "w": 32,
+                  "tone": "warn",
+                  "sub": "rebuild the image"
+                }
+              },
+              "edges": [
+                [
+                  "dev",
+                  "tm",
+                  "rebuild separately",
+                  "warn"
+                ],
+                [
+                  "dev",
+                  "sv",
+                  "rebuild separately",
+                  "warn"
+                ]
+              ]
+            },
+            {
+              "say": "A container registry stores images centrally. Docker Hub is a popular one.",
+              "actors": {
+                "hub": {
+                  "k": "box",
+                  "text": "Docker Hub",
+                  "x": 50,
+                  "y": 50,
+                  "w": 40,
+                  "tone": "brand",
+                  "sub": "container registry"
+                },
+                "tm": {
+                  "tone": "ok",
+                  "sub": "pulls the image"
+                },
+                "sv": {
+                  "tone": "ok",
+                  "sub": "pulls the image"
+                }
+              },
+              "edges": [
+                [
+                  "dev",
+                  "hub",
+                  "push",
+                  "ok"
+                ],
+                [
+                  "hub",
+                  "tm",
+                  "pull",
+                  "ok"
+                ],
+                [
+                  "hub",
+                  "sv",
+                  "pull",
+                  "ok"
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "id": "06.2",
+          "title": "Understand Docker Hub",
+          "stage": {
+            "w": 360,
+            "h": 640
+          },
+          "steps": [
+            {
+              "say": "A repository is a collection of related images. Tags identify versions or variants.",
+              "actors": {
+                "zr": {
+                  "k": "zone",
+                  "text": "Repository: my-node-app",
+                  "x": 50,
+                  "y": 24,
+                  "w": 92,
+                  "h": 36
+                },
+                "t1": {
+                  "k": "box",
+                  "text": "v1",
+                  "x": 22,
+                  "y": 24,
+                  "w": 24,
+                  "tone": "soft",
+                  "sub": "tag"
+                },
+                "t2": {
+                  "k": "box",
+                  "text": "v2",
+                  "x": 50,
+                  "y": 24,
+                  "w": 24,
+                  "tone": "soft",
+                  "sub": "tag"
+                },
+                "t3": {
+                  "k": "box",
+                  "text": "latest",
+                  "x": 78,
+                  "y": 24,
+                  "w": 24,
+                  "tone": "soft",
+                  "sub": "tag"
+                }
+              }
+            },
+            {
+              "say": "Push uploads an image to the registry; pull downloads it.",
+              "actors": {
+                "lc": {
+                  "k": "box",
+                  "text": "Local image",
+                  "x": 20,
+                  "y": 58,
+                  "w": 34
+                },
+                "an": {
+                  "k": "box",
+                  "text": "Another machine",
+                  "x": 80,
+                  "y": 58,
+                  "w": 34
+                }
+              },
+              "edges": [
+                [
+                  "lc",
+                  "zr",
+                  "push",
+                  "ok"
+                ],
+                [
+                  "zr",
+                  "an",
+                  "pull",
+                  "ok"
+                ]
+              ]
+            },
+            {
+              "say": "Public repositories allow open access; private repositories restrict it to authorized users.",
+              "actors": {
+                "pu": {
+                  "k": "pill",
+                  "text": "Public repository \u00b7 open access",
+                  "x": 50,
+                  "y": 74,
+                  "tone": "ok"
+                },
+                "pv": {
+                  "k": "pill",
+                  "text": "Private repository \u00b7 authorized users only",
+                  "x": 50,
+                  "y": 84,
+                  "tone": "soft"
+                }
+              },
+              "edges": [
+                [
+                  "lc",
+                  "zr",
+                  "push",
+                  "ok"
+                ],
+                [
+                  "zr",
+                  "an",
+                  "pull",
+                  "ok"
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "id": "06.3",
+          "title": "Upload an Image to Docker Hub",
+          "stage": {
+            "w": 360,
+            "h": 640
+          },
+          "steps": [
+            {
+              "say": "Create an account on hub.docker.com and a repository named my-node-app.",
+              "actors": {
+                "loc": {
+                  "k": "box",
+                  "text": "my-node-app:latest",
+                  "x": 50,
+                  "y": 10,
+                  "w": 44,
+                  "sub": "local image"
+                },
+                "rp": {
+                  "k": "box",
+                  "text": "YOUR-USERNAME/my-node-app",
+                  "x": 50,
+                  "y": 66,
+                  "w": 56,
+                  "tone": "dim",
+                  "sub": "empty repository"
+                }
+              }
+            },
+            {
+              "say": "Authenticate with Docker Hub.",
+              "actors": {
+                "au": {
+                  "k": "pill",
+                  "text": "Logged in",
+                  "x": 50,
+                  "y": 84,
+                  "tone": "ok",
+                  "ic": "\u2713"
+                }
+              },
+              "term": [
+                "$ docker login"
+              ]
+            },
+            {
+              "say": "Tag the image with your username \u2014 the same image gets a registry-ready name and version.",
+              "actors": {
+                "tg": {
+                  "k": "box",
+                  "text": "YOUR-USERNAME/my-node-app:v1",
+                  "x": 50,
+                  "y": 38,
+                  "w": 60,
+                  "tone": "soft",
+                  "sub": "new name, same image"
+                }
+              },
+              "term": [
+                "$ docker tag my-node-app:latest YOUR-USERNAME/my-node-app:v1"
+              ],
+              "edges": [
+                [
+                  "loc",
+                  "tg",
+                  "docker tag",
+                  "ok"
+                ]
+              ]
+            },
+            {
+              "say": "Push it. The image is now in the registry for users with the required permissions.",
+              "actors": {
+                "rp": {
+                  "tone": "ok",
+                  "ic": "\u2713",
+                  "sub": "v1 available"
+                }
+              },
+              "term": [
+                "$ docker push YOUR-USERNAME/my-node-app:v1"
+              ],
+              "edges": [
+                [
+                  "loc",
+                  "tg",
+                  "docker tag",
+                  "ok"
+                ],
+                [
+                  "tg",
+                  "rp",
+                  "docker push",
+                  "ok"
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "id": "06.4",
+          "title": "Download and Run a Published Image",
+          "stage": {
+            "w": 360,
+            "h": 640
+          },
+          "steps": [
+            {
+              "say": "The image is published on Docker Hub.",
+              "actors": {
+                "hub": {
+                  "k": "box",
+                  "text": "Docker Hub",
+                  "x": 45,
+                  "y": 12,
+                  "w": 32,
+                  "tone": "brand",
+                  "sub": "my-node-app:v1"
+                },
+                "zs": {
+                  "k": "zone",
+                  "text": "Another machine / deployment server",
+                  "x": 50,
+                  "y": 62,
+                  "w": 88,
+                  "h": 66
+                }
+              }
+            },
+            {
+              "say": "docker pull downloads the published image.",
+              "actors": {
+                "img": {
+                  "k": "box",
+                  "text": "my-node-app:v1",
+                  "x": 34,
+                  "y": 48,
+                  "w": 40,
+                  "tone": "soft"
+                }
+              },
+              "term": [
+                "$ docker pull YOUR-USERNAME/my-node-app:v1"
+              ],
+              "edges": [
+                [
+                  "hub",
+                  "img",
+                  "docker pull",
+                  "ok"
+                ]
+              ]
+            },
+            {
+              "say": "docker run creates a container from it.",
+              "actors": {
+                "ctr": {
+                  "k": "box",
+                  "text": "Container",
+                  "x": 34,
+                  "y": 82,
+                  "w": 32,
+                  "tone": "brand",
+                  "sub": "port 3000"
+                }
+              },
+              "term": [
+                "$ docker run -d -p 3000:3000 YOUR-USERNAME/my-node-app:v1"
+              ],
+              "edges": [
+                [
+                  "hub",
+                  "img",
+                  "docker pull",
+                  "ok"
+                ],
+                [
+                  "img",
+                  "ctr",
+                  "docker run",
+                  "ok"
+                ]
+              ]
+            },
+            {
+              "say": "The same packaged application runs on another machine, with no manual environment setup.",
+              "actors": {
+                "ok": {
+                  "k": "pill",
+                  "text": "Same app \u00b7 no manual setup",
+                  "x": 71.1,
+                  "y": 62,
+                  "tone": "ok",
+                  "ic": "\u2713"
+                }
+              },
+              "edges": [
+                [
+                  "hub",
+                  "img",
+                  "docker pull",
+                  "ok"
+                ],
+                [
+                  "img",
+                  "ctr",
+                  "docker run",
+                  "ok"
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "id": "06.5",
+          "title": "Docker Best Practices",
+          "stage": {
+            "w": 360,
+            "h": 640
+          },
+          "steps": [
+            {
+              "say": "Use trusted base images with a specific version, not whatever \u201clatest\u201d currently means.",
+              "actors": {
+                "pl": {
+                  "k": "pill",
+                  "text": "Use trusted, appropriately versioned base images",
+                  "x": 46.2,
+                  "y": 50,
+                  "tone": "soft"
+                },
+                "g1": {
+                  "k": "box",
+                  "text": "node:20",
+                  "x": 46,
+                  "y": 30,
+                  "w": 40,
+                  "tone": "ok",
+                  "ic": "\u2713",
+                  "sub": "trusted \u00b7 pinned version"
+                },
+                "g2": {
+                  "k": "box",
+                  "text": "node:latest",
+                  "x": 46,
+                  "y": 70,
+                  "w": 40,
+                  "tone": "warn",
+                  "sub": "changes over time"
+                }
+              }
+            },
+            {
+              "say": "Keep credentials out of Dockerfiles, and run as a non-root user where possible.",
+              "actors": {
+                "pl": null,
+                "g1": null,
+                "g2": null,
+                "ka": {
+                  "k": "code",
+                  "lines": [
+                    [
+                      "ENV DB_PASSWORD=secret123",
+                      "del"
+                    ],
+                    [
+                      "# runs as root",
+                      "del"
+                    ]
+                  ],
+                  "x": 48.5,
+                  "y": 27,
+                  "title": "Avoid"
+                },
+                "kb": {
+                  "k": "code",
+                  "lines": [
+                    [
+                      "# secrets supplied at runtime",
+                      "add"
+                    ],
+                    [
+                      "USER node",
+                      "add"
+                    ]
+                  ],
+                  "x": 48.5,
+                  "y": 73,
+                  "title": "Prefer"
+                },
+                "p2": {
+                  "k": "pill",
+                  "text": "No credentials in Dockerfiles \u00b7 non-root users",
+                  "x": 55.6,
+                  "y": 50,
+                  "tone": "soft"
+                }
+              }
+            },
+            {
+              "say": ".dockerignore keeps unneeded files \u2014 dependencies, Git history, logs, env files \u2014 out of the build context.",
+              "actors": {
+                "ka": null,
+                "kb": null,
+                "p2": null,
+                "zc": {
+                  "k": "zone",
+                  "text": "Build context",
+                  "x": 50,
+                  "y": 24,
+                  "w": 90,
+                  "h": 40
+                },
+                "nm": {
+                  "k": "file",
+                  "text": "node_modules",
+                  "x": 28,
+                  "y": 14,
+                  "tone": "dim",
+                  "ic": "\u2715",
+                  "sub": "excluded"
+                },
+                "gt": {
+                  "k": "file",
+                  "text": ".git",
+                  "x": 28,
+                  "y": 34,
+                  "tone": "dim",
+                  "ic": "\u2715",
+                  "sub": "excluded"
+                },
+                "ev": {
+                  "k": "file",
+                  "text": ".env",
+                  "x": 52,
+                  "y": 14,
+                  "tone": "dim",
+                  "ic": "\u2715",
+                  "sub": "excluded"
+                },
+                "lg": {
+                  "k": "file",
+                  "text": "app.log",
+                  "x": 52,
+                  "y": 34,
+                  "tone": "dim",
+                  "ic": "\u2715",
+                  "sub": "excluded"
+                },
+                "sr": {
+                  "k": "file",
+                  "text": "server.js",
+                  "x": 76,
+                  "y": 24,
+                  "tone": "ok",
+                  "sub": "included"
+                },
+                "ki": {
+                  "k": "code",
+                  "lines": [
+                    "node_modules",
+                    ".git",
+                    ".env",
+                    "*.log"
+                  ],
+                  "x": 48.5,
+                  "y": 72,
+                  "title": ".dockerignore"
+                }
+              }
+            },
+            {
+              "say": "Multi-stage builds separate the build environment from the runtime environment, reducing the final image size.",
+              "actors": {
+                "zc": null,
+                "nm": null,
+                "gt": null,
+                "ev": null,
+                "lg": null,
+                "sr": null,
+                "ki": null,
+                "bs": {
+                  "k": "box",
+                  "text": "Build stage",
+                  "x": 40,
+                  "y": 25,
+                  "w": 48,
+                  "tone": "warn",
+                  "bar": 90,
+                  "sub": "compilers \u00b7 dev dependencies"
+                },
+                "rs": {
+                  "k": "box",
+                  "text": "Runtime stage",
+                  "x": 40,
+                  "y": 75,
+                  "w": 48,
+                  "tone": "ok",
+                  "bar": 30,
+                  "sub": "only what the app needs"
+                },
+                "sm": {
+                  "k": "pill",
+                  "text": "Smaller final image \u00b7 fewer unnecessary dependencies",
+                  "x": 53.5,
+                  "y": 50,
+                  "tone": "ok"
+                }
+              },
+              "edges": [
+                [
+                  "bs",
+                  "rs",
+                  "copy build output",
+                  "ok"
+                ]
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "07",
+      "title": "Docker in a Real DevOps Workflow",
+      "subtopics": [
+        {
+          "id": "07.1",
+          "title": "Connect Docker to the DevOps Lifecycle",
+          "stage": {
+            "w": 360,
+            "h": 640
+          },
+          "steps": [
+            {
+              "say": "Git manages the source code and GitHub supports collaboration.",
+              "actors": {
+                "n0": {
+                  "k": "box",
+                  "text": "Code",
+                  "x": 28,
+                  "y": 6,
+                  "w": 24,
+                  "sub": "develop"
+                },
+                "n1": {
+                  "k": "box",
+                  "text": "Commit",
+                  "x": 28,
+                  "y": 20,
+                  "w": 24,
+                  "sub": "Git"
+                },
+                "n2": {
+                  "k": "box",
+                  "text": "GitHub",
+                  "x": 28,
+                  "y": 34,
+                  "w": 24,
+                  "sub": "collaborate",
+                  "tone": "soft"
+                }
+              },
+              "edges": [
+                [
+                  "n0",
+                  "n1"
+                ],
+                [
+                  "n1",
+                  "n2"
+                ]
+              ]
+            },
+            {
+              "say": "Automation tests the application\u2026",
+              "actors": {
+                "n3": {
+                  "k": "box",
+                  "text": "Test",
+                  "x": 28,
+                  "y": 48,
+                  "w": 24,
+                  "sub": "automated",
+                  "tone": "soft"
+                }
+              },
+              "edges": [
+                [
+                  "n0",
+                  "n1"
+                ],
+                [
+                  "n1",
+                  "n2"
+                ],
+                [
+                  "n2",
+                  "n3"
+                ]
+              ]
+            },
+            {
+              "say": "\u2026builds a Docker image, publishes it to a registry and deploys it.",
+              "actors": {
+                "n4": {
+                  "k": "box",
+                  "text": "Build image",
+                  "x": 28,
+                  "y": 62,
+                  "w": 24,
+                  "sub": "Docker",
+                  "tone": "brand"
+                },
+                "n5": {
+                  "k": "box",
+                  "text": "Publish",
+                  "x": 28,
+                  "y": 76,
+                  "w": 24,
+                  "sub": "Docker Hub",
+                  "tone": "brand"
+                },
+                "n6": {
+                  "k": "box",
+                  "text": "Deploy",
+                  "x": 28,
+                  "y": 85,
+                  "w": 24,
+                  "sub": "container",
+                  "tone": "brand"
+                }
+              },
+              "edges": [
+                [
+                  "n0",
+                  "n1"
+                ],
+                [
+                  "n1",
+                  "n2"
+                ],
+                [
+                  "n2",
+                  "n3"
+                ],
+                [
+                  "n3",
+                  "n4"
+                ],
+                [
+                  "n4",
+                  "n5"
+                ],
+                [
+                  "n5",
+                  "n6"
+                ]
+              ]
+            },
+            {
+              "say": "Docker packages the app and its dependencies so it runs consistently in every environment.",
+              "actors": {
+                "pl": {
+                  "k": "pill",
+                  "text": "Same image \u2192 development \u00b7 testing \u00b7 production",
+                  "x": 72,
+                  "y": 50,
+                  "tone": "ok",
+                  "w": 44
+                }
+              },
+              "edges": [
+                [
+                  "n0",
+                  "n1"
+                ],
+                [
+                  "n1",
+                  "n2"
+                ],
+                [
+                  "n2",
+                  "n3"
+                ],
+                [
+                  "n3",
+                  "n4"
+                ],
+                [
+                  "n4",
+                  "n5"
+                ],
+                [
+                  "n5",
+                  "n6"
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "id": "07.2",
+          "title": "Build and Test the Application",
+          "stage": {
+            "w": 360,
+            "h": 640
+          },
+          "steps": [
+            {
+              "say": "After changing the code, stage, commit and push it.",
+              "actors": {
+                "f": {
+                  "k": "file",
+                  "text": "server.js",
+                  "x": 28,
+                  "y": 8,
+                  "tone": "plain",
+                  "w": 20
+                },
+                "cm": {
+                  "k": "commit",
+                  "text": "a1b2c3d",
+                  "x": 28,
+                  "y": 26,
+                  "tone": "soft",
+                  "sub": "Add user authentication",
+                  "side": "r"
+                },
+                "gh": {
+                  "k": "box",
+                  "text": "GitHub",
+                  "x": 28,
+                  "y": 52,
+                  "w": 28,
+                  "sub": "origin/main"
+                }
+              },
+              "term": [
+                "$ git add .",
+                "$ git commit -m \"Add user authentication\"",
+                "$ git push origin main"
+              ],
+              "edges": [
+                [
+                  "f",
+                  "cm"
+                ],
+                [
+                  "cm",
+                  "gh",
+                  "push",
+                  "ok"
+                ]
+              ]
+            },
+            {
+              "say": "Package the app using its Dockerfile.",
+              "actors": {
+                "df": {
+                  "k": "file",
+                  "text": "Dockerfile",
+                  "x": 68,
+                  "y": 8,
+                  "tone": "brand",
+                  "w": 20
+                },
+                "im": {
+                  "k": "box",
+                  "text": "my-node-app:v1",
+                  "x": 68,
+                  "y": 34,
+                  "w": 40,
+                  "tone": "soft",
+                  "sub": "image"
+                }
+              },
+              "clear": true,
+              "term": [
+                "$ docker build -t my-node-app:v1 ."
+              ],
+              "edges": [
+                [
+                  "f",
+                  "cm"
+                ],
+                [
+                  "cm",
+                  "gh",
+                  "push",
+                  "ok"
+                ],
+                [
+                  "df",
+                  "im",
+                  "docker build",
+                  "ok"
+                ]
+              ]
+            },
+            {
+              "say": "Run a container to confirm the app works in the environment the Dockerfile defines.",
+              "actors": {
+                "ct": {
+                  "k": "box",
+                  "text": "Container",
+                  "x": 68,
+                  "y": 62,
+                  "w": 32,
+                  "tone": "brand",
+                  "sub": "port 3000"
+                },
+                "ok": {
+                  "k": "pill",
+                  "text": "App runs in the Dockerfile\u2019s environment",
+                  "x": 59.1,
+                  "y": 74,
+                  "tone": "ok",
+                  "ic": "\u2713"
+                }
+              },
+              "clear": true,
+              "term": [
+                "$ docker run -d -p 3000:3000 my-node-app:v1"
+              ],
+              "edges": [
+                [
+                  "f",
+                  "cm"
+                ],
+                [
+                  "cm",
+                  "gh",
+                  "push",
+                  "ok"
+                ],
+                [
+                  "df",
+                  "im",
+                  "docker build",
+                  "ok"
+                ],
+                [
+                  "im",
+                  "ct",
+                  "docker run",
+                  "ok"
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "id": "07.3",
+          "title": "CI/CD Integration with Docker",
+          "stage": {
+            "w": 360,
+            "h": 640
+          },
+          "steps": [
+            {
+              "say": "GitHub Actions can run whenever code is pushed or a pull request is created.",
+              "actors": {
+                "tr": {
+                  "k": "pill",
+                  "text": "push or pull request",
+                  "x": 22,
+                  "y": 12,
+                  "tone": "brand",
+                  "w": 34
+                },
+                "n1": {
+                  "k": "box",
+                  "text": "Check out the repository",
+                  "x": 62,
+                  "y": 9,
+                  "w": 30,
+                  "sub": "waiting"
+                },
+                "n2": {
+                  "k": "box",
+                  "text": "Install dependencies",
+                  "x": 62,
+                  "y": 25,
+                  "w": 30,
+                  "sub": "waiting"
+                },
+                "n3": {
+                  "k": "box",
+                  "text": "Run automated tests",
+                  "x": 62,
+                  "y": 41,
+                  "w": 30,
+                  "sub": "waiting"
+                },
+                "n4": {
+                  "k": "box",
+                  "text": "Build a Docker image",
+                  "x": 62,
+                  "y": 57,
+                  "w": 30,
+                  "sub": "waiting"
+                },
+                "n5": {
+                  "k": "box",
+                  "text": "Authenticate with the registry",
+                  "x": 62,
+                  "y": 73,
+                  "w": 30,
+                  "sub": "waiting"
+                },
+                "n6": {
+                  "k": "box",
+                  "text": "Push the image to Docker Hub",
+                  "x": 62,
+                  "y": 85,
+                  "w": 30,
+                  "sub": "waiting"
+                }
+              },
+              "edges": [
+                [
+                  "tr",
+                  "n1",
+                  "",
+                  "ok"
+                ],
+                [
+                  "n1",
+                  "n2"
+                ],
+                [
+                  "n2",
+                  "n3"
+                ],
+                [
+                  "n3",
+                  "n4"
+                ],
+                [
+                  "n4",
+                  "n5"
+                ],
+                [
+                  "n5",
+                  "n6"
+                ]
+              ]
+            },
+            {
+              "say": "It checks out the code, installs dependencies and runs the automated tests.",
+              "actors": {
+                "n1": {
+                  "tone": "ok",
+                  "bar": 100,
+                  "ic": "\u2713",
+                  "sub": "done"
+                },
+                "n2": {
+                  "tone": "ok",
+                  "bar": 100,
+                  "ic": "\u2713",
+                  "sub": "done"
+                },
+                "n3": {
+                  "tone": "ok",
+                  "bar": 100,
+                  "ic": "\u2713",
+                  "sub": "passed"
+                }
+              }
+            },
+            {
+              "say": "Then it builds the Docker image.",
+              "actors": {
+                "n4": {
+                  "tone": "ok",
+                  "bar": 100,
+                  "ic": "\u2713",
+                  "sub": "built"
+                }
+              }
+            },
+            {
+              "say": "Registry credentials come from GitHub Actions secrets \u2014 never hard-coded in workflow files.",
+              "actors": {
+                "sc": {
+                  "k": "box",
+                  "text": "GitHub Actions secrets",
+                  "x": 22,
+                  "y": 73,
+                  "w": 34,
+                  "tone": "soft",
+                  "sub": "credentials stored securely"
+                },
+                "n5": {
+                  "tone": "ok",
+                  "bar": 100,
+                  "ic": "\u2713",
+                  "sub": "logged in"
+                },
+                "wn": {
+                  "k": "pill",
+                  "text": "No hard-coded credentials in workflow files",
+                  "x": 22,
+                  "y": 44,
+                  "tone": "warn",
+                  "w": 34
+                }
+              },
+              "edges": [
+                [
+                  "tr",
+                  "n1",
+                  "",
+                  "ok"
+                ],
+                [
+                  "n1",
+                  "n2"
+                ],
+                [
+                  "n2",
+                  "n3"
+                ],
+                [
+                  "n3",
+                  "n4"
+                ],
+                [
+                  "n4",
+                  "n5"
+                ],
+                [
+                  "n5",
+                  "n6"
+                ],
+                [
+                  "sc",
+                  "n5",
+                  "",
+                  "ok"
+                ]
+              ]
+            },
+            {
+              "say": "Finally the image is pushed to Docker Hub.",
+              "actors": {
+                "n6": {
+                  "tone": "ok",
+                  "bar": 100,
+                  "ic": "\u2713",
+                  "sub": "pushed"
+                },
+                "hub": {
+                  "k": "box",
+                  "text": "Docker Hub",
+                  "x": 22,
+                  "y": 85,
+                  "w": 34,
+                  "tone": "ok",
+                  "sub": "image published"
+                },
+                "wn": null
+              },
+              "edges": [
+                [
+                  "tr",
+                  "n1",
+                  "",
+                  "ok"
+                ],
+                [
+                  "n1",
+                  "n2"
+                ],
+                [
+                  "n2",
+                  "n3"
+                ],
+                [
+                  "n3",
+                  "n4"
+                ],
+                [
+                  "n4",
+                  "n5"
+                ],
+                [
+                  "n5",
+                  "n6"
+                ],
+                [
+                  "sc",
+                  "n5",
+                  "",
+                  "ok"
+                ],
+                [
+                  "n6",
+                  "hub",
+                  "",
+                  "ok"
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "id": "07.4",
+          "title": "Deploy a Containerized Application",
+          "stage": {
+            "w": 360,
+            "h": 640
+          },
+          "steps": [
+            {
+              "say": "Once the image is published, a deployment server can retrieve it from Docker Hub.",
+              "actors": {
+                "hub": {
+                  "k": "box",
+                  "text": "Docker Hub",
+                  "x": 40,
+                  "y": 10,
+                  "w": 28,
+                  "tone": "brand",
+                  "sub": "my-node-app:v1"
+                },
+                "zs": {
+                  "k": "zone",
+                  "text": "Deployment server",
+                  "x": 46,
+                  "y": 62,
+                  "w": 82,
+                  "h": 68
+                }
+              }
+            },
+            {
+              "say": "Download the image\u2026",
+              "actors": {
+                "img": {
+                  "k": "box",
+                  "text": "my-node-app:v1",
+                  "x": 28,
+                  "y": 44,
+                  "w": 36,
+                  "tone": "soft"
+                }
+              },
+              "term": [
+                "$ docker pull YOUR-USERNAME/my-node-app:v1"
+              ],
+              "edges": [
+                [
+                  "hub",
+                  "img",
+                  "docker pull",
+                  "ok"
+                ]
+              ]
+            },
+            {
+              "say": "\u2026and run it. The application now runs inside a container on the server.",
+              "actors": {
+                "ctr": {
+                  "k": "box",
+                  "text": "production-app",
+                  "x": 28,
+                  "y": 80,
+                  "w": 36,
+                  "tone": "brand",
+                  "sub": "port 3000"
+                }
+              },
+              "term": [
+                "$ docker run -d --name production-app -p 3000:3000 YOUR-USERNAME/my-node-app:v1"
+              ],
+              "edges": [
+                [
+                  "hub",
+                  "img",
+                  "docker pull",
+                  "ok"
+                ],
+                [
+                  "img",
+                  "ctr",
+                  "docker run",
+                  "ok"
+                ]
+              ]
+            },
+            {
+              "say": "Production may also need persistent storage, environment variables, monitoring, health checks and extra security.",
+              "actors": {
+                "cons": {
+                  "k": "code",
+                  "lines": [
+                    "Persistent storage",
+                    "Environment variables",
+                    "Monitoring",
+                    "Health checks",
+                    "Additional security"
+                  ],
+                  "x": 51.5,
+                  "y": 62,
+                  "title": "Production also needs"
+                }
+              },
+              "edges": [
+                [
+                  "hub",
+                  "img",
+                  "docker pull",
+                  "ok"
+                ],
+                [
+                  "img",
+                  "ctr",
+                  "docker run",
+                  "ok"
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "id": "07.5",
+          "title": "The Complete DevOps Workflow",
+          "stage": {
+            "w": 360,
+            "h": 640
+          },
+          "steps": [
+            {
+              "say": "A developer adds a feature to the task management app and pushes it to GitHub.",
+              "actors": {
+                "n0": {
+                  "k": "box",
+                  "text": "Developer push",
+                  "x": 36,
+                  "y": 9,
+                  "w": 26,
+                  "sub": "feature \u2192 GitHub"
+                }
+              }
+            },
+            {
+              "say": "GitHub Actions automatically runs the tests and builds a Docker image.",
+              "actors": {
+                "n1": {
+                  "k": "box",
+                  "text": "GitHub Actions",
+                  "x": 36,
+                  "y": 26,
+                  "w": 26,
+                  "tone": "soft",
+                  "sub": "tests + build image"
+                }
+              },
+              "edges": [
+                [
+                  "n0",
+                  "n1",
+                  "",
+                  "ok"
+                ]
+              ]
+            },
+            {
+              "say": "The changes pass the required checks.",
+              "actors": {
+                "n2": {
+                  "k": "box",
+                  "text": "Checks pass",
+                  "x": 36,
+                  "y": 43,
+                  "w": 26,
+                  "tone": "ok",
+                  "ic": "\u2713"
+                }
+              },
+              "edges": [
+                [
+                  "n0",
+                  "n1",
+                  "",
+                  "ok"
+                ],
+                [
+                  "n1",
+                  "n2",
+                  "",
+                  "ok"
+                ]
+              ]
+            },
+            {
+              "say": "The image is published to Docker Hub.",
+              "actors": {
+                "n3": {
+                  "k": "box",
+                  "text": "Docker Hub",
+                  "x": 36,
+                  "y": 59,
+                  "w": 26,
+                  "tone": "brand",
+                  "sub": "image published"
+                }
+              },
+              "edges": [
+                [
+                  "n0",
+                  "n1",
+                  "",
+                  "ok"
+                ],
+                [
+                  "n1",
+                  "n2",
+                  "",
+                  "ok"
+                ],
+                [
+                  "n2",
+                  "n3",
+                  "",
+                  "ok"
+                ]
+              ]
+            },
+            {
+              "say": "The deployment server pulls the image and starts a container with the required configuration.",
+              "actors": {
+                "n4": {
+                  "k": "box",
+                  "text": "Server",
+                  "x": 36,
+                  "y": 75,
+                  "w": 26,
+                  "tone": "brand",
+                  "sub": "pulls image \u00b7 starts container"
+                }
+              },
+              "edges": [
+                [
+                  "n0",
+                  "n1",
+                  "",
+                  "ok"
+                ],
+                [
+                  "n1",
+                  "n2",
+                  "",
+                  "ok"
+                ],
+                [
+                  "n2",
+                  "n3",
+                  "",
+                  "ok"
+                ],
+                [
+                  "n3",
+                  "n4",
+                  "",
+                  "ok"
+                ]
+              ]
+            },
+            {
+              "say": "The updated application becomes available to users.",
+              "actors": {
+                "n5": {
+                  "k": "box",
+                  "text": "Users",
+                  "x": 36,
+                  "y": 85,
+                  "w": 26,
+                  "tone": "ok",
+                  "ic": "\u2713",
+                  "sub": "updated app live"
+                },
+                "sm": {
+                  "k": "pill",
+                  "text": "Git \u00b7 GitHub \u00b7 Docker \u00b7 Docker Hub \u00b7 CI/CD = one delivery process",
+                  "x": 53.5,
+                  "y": 50,
+                  "tone": "brand"
+                }
+              },
+              "edges": [
+                [
+                  "n0",
+                  "n1",
+                  "",
+                  "ok"
+                ],
+                [
+                  "n1",
+                  "n2",
+                  "",
+                  "ok"
+                ],
+                [
+                  "n2",
+                  "n3",
+                  "",
+                  "ok"
+                ],
+                [
+                  "n3",
+                  "n4",
+                  "",
+                  "ok"
+                ],
+                [
+                  "n4",
+                  "n5",
+                  "",
+                  "ok"
+                ]
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

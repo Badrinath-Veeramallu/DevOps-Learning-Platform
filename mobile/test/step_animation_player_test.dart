@@ -16,8 +16,17 @@ import 'package:devops_learning_app/models/curriculum_model.dart';
 
 Widget _wrapWidget({
   required Widget child,
-  Size screenSize = const Size(800, 1200),
+  WidgetTester? tester,
+  Size screenSize = const Size(800, 2400),
 }) {
+  if (tester != null) {
+    tester.view.devicePixelRatio = 1.0;
+    tester.view.physicalSize = screenSize;
+    addTearDown(() {
+      tester.view.resetDevicePixelRatio();
+      tester.view.resetPhysicalSize();
+    });
+  }
   return MediaQuery(
     data: MediaQueryData(size: screenSize),
     child: MaterialApp(
@@ -127,6 +136,7 @@ void main() {
 
       await tester.pumpWidget(
         _wrapWidget(
+          tester: tester,
           child: StepAnimationPlayer(animation: anim),
         ),
       );
@@ -159,6 +169,7 @@ void main() {
 
       await tester.pumpWidget(
         _wrapWidget(
+          tester: tester,
           child: StepAnimationPlayer(
             animation: anim,
             stepMs: 500, // Accelerated for testing
@@ -187,6 +198,7 @@ void main() {
 
       await tester.pumpWidget(
         _wrapWidget(
+          tester: tester,
           child: StepAnimationPlayer(animation: anim),
         ),
       );
@@ -304,6 +316,13 @@ void main() {
     testWidgets('10. Switching between subtopics resets player state cleanly', (
       WidgetTester tester,
     ) async {
+      tester.view.devicePixelRatio = 1.0;
+      tester.view.physicalSize = const Size(800, 2400);
+      addTearDown(() {
+        tester.view.resetDevicePixelRatio();
+        tester.view.resetPhysicalSize();
+      });
+
       final anim1 = allSubtopics.firstWhere((s) => s.id == '01.1');
       final anim2 = allSubtopics.firstWhere((s) => s.id == '01.2');
 

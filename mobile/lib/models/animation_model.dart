@@ -188,6 +188,8 @@ class SubtopicAnimation {
   final List<AnimationStep> steps;
   final String? moduleId;
   final String? moduleTitle;
+  final double stageWidth;
+  final double stageHeight;
 
   const SubtopicAnimation({
     required this.id,
@@ -195,13 +197,27 @@ class SubtopicAnimation {
     required this.steps,
     this.moduleId,
     this.moduleTitle,
+    this.stageWidth = 1000.0,
+    this.stageHeight = 400.0,
   });
 
   factory SubtopicAnimation.fromJson(
     Map<String, dynamic> json, {
     String? moduleId,
     String? moduleTitle,
+    double defaultStageWidth = 1000.0,
+    double defaultStageHeight = 400.0,
   }) {
+    double sw = defaultStageWidth;
+    double sh = defaultStageHeight;
+    if (json['stage'] is Map<String, dynamic>) {
+      final s = json['stage'] as Map<String, dynamic>;
+      final rawW = s['w'] ?? s['width'];
+      final rawH = s['h'] ?? s['height'];
+      if (rawW is num) sw = rawW.toDouble();
+      if (rawH is num) sh = rawH.toDouble();
+    }
+
     return SubtopicAnimation(
       id: (json['id'] ?? '').toString(),
       title: (json['title'] ?? '').toString(),
@@ -210,6 +226,8 @@ class SubtopicAnimation {
           .toList(),
       moduleId: moduleId,
       moduleTitle: moduleTitle,
+      stageWidth: sw,
+      stageHeight: sh,
     );
   }
 }
@@ -225,9 +243,23 @@ class AnimationModule {
     required this.subtopics,
   });
 
-  factory AnimationModule.fromJson(Map<String, dynamic> json) {
+  factory AnimationModule.fromJson(
+    Map<String, dynamic> json, {
+    double defaultStageWidth = 1000.0,
+    double defaultStageHeight = 400.0,
+  }) {
     final modId = (json['id'] ?? '').toString();
     final modTitle = (json['title'] ?? '').toString();
+
+    double modSw = defaultStageWidth;
+    double modSh = defaultStageHeight;
+    if (json['stage'] is Map<String, dynamic>) {
+      final s = json['stage'] as Map<String, dynamic>;
+      final rawW = s['w'] ?? s['width'];
+      final rawH = s['h'] ?? s['height'];
+      if (rawW is num) modSw = rawW.toDouble();
+      if (rawH is num) modSh = rawH.toDouble();
+    }
 
     return AnimationModule(
       id: modId,
@@ -238,6 +270,8 @@ class AnimationModule {
               s as Map<String, dynamic>,
               moduleId: modId,
               moduleTitle: modTitle,
+              defaultStageWidth: modSw,
+              defaultStageHeight: modSh,
             ),
           )
           .toList(),

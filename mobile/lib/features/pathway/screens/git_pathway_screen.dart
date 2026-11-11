@@ -45,6 +45,12 @@ class _GitPathwayScreenState extends State<GitPathwayScreen> {
   @override
   void initState() {
     super.initState();
+    final cached = widget.initialModules ?? GitCurriculumRepository.cachedModules;
+    if (cached != null && cached.isNotEmpty) {
+      _modules = cached;
+      _completedIds = widget.initialCompletedIds ?? const {};
+      _isLoading = false;
+    }
     _loadData();
     ProgressService().addListener(_onProgressChanged);
   }
@@ -75,9 +81,24 @@ class _GitPathwayScreenState extends State<GitPathwayScreen> {
       return;
     }
 
+    final cached = GitCurriculumRepository.cachedModules;
+    if (_modules.isEmpty && cached != null && cached.isNotEmpty) {
+      setState(() {
+        _modules = cached;
+        _isLoading = false;
+      });
+    }
+
     try {
       final authProvider = context.read<AuthProvider>();
       final userId = authProvider.user?.id ?? 'guest';
+
+      // Warm local completed set immediately
+      final localCompleted = await ProgressService().getCompletedModules(userId);
+      if (mounted && localCompleted.isNotEmpty && _completedIds.isEmpty) {
+        setState(() => _completedIds = localCompleted);
+      }
+
       final modules = await GitCurriculumRepository.loadCurriculum();
       final completed = widget.initialCompletedIds ??
           await ProgressService().fetchUserProgress(userId);
@@ -91,10 +112,12 @@ class _GitPathwayScreenState extends State<GitPathwayScreen> {
       }
     } catch (e) {
       if (mounted) {
-        setState(() {
-          _error = 'Failed to load Git curriculum: $e';
-          _isLoading = false;
-        });
+        if (_modules.isEmpty) {
+          setState(() {
+            _error = 'Failed to load Git curriculum: $e';
+            _isLoading = false;
+          });
+        }
       }
     }
   }
@@ -117,7 +140,7 @@ class _GitPathwayScreenState extends State<GitPathwayScreen> {
         context.go(RouteNames.dashboard);
         break;
       case 1:
-        // Already on Git Pathway
+        context.go(RouteNames.learningPaths);
         break;
       case 2:
         context.push(RouteNames.profile);

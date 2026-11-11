@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../models/curriculum_model.dart';
+import 'pathway_track_painter.dart';
 
 enum StopStatus { completed, current, upcoming }
 
@@ -15,6 +16,7 @@ class PathwayStopNode extends StatelessWidget {
   final StopStatus status;
   final ValueChanged<String> onSelectModule;
   final bool isNodeOnly;
+  final bool showContinuousRoad;
 
   const PathwayStopNode({
     super.key,
@@ -22,6 +24,7 @@ class PathwayStopNode extends StatelessWidget {
     required this.status,
     required this.onSelectModule,
     this.isNodeOnly = false,
+    this.showContinuousRoad = true,
   });
 
   @override
@@ -404,12 +407,15 @@ class PathwayStopNode extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                label,
-                style: AppTypography.buttonText.copyWith(
-                  color: textColor,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
+              Flexible(
+                child: Text(
+                  label,
+                  style: AppTypography.buttonText.copyWith(
+                    color: textColor,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
               const SizedBox(width: 5),
@@ -426,16 +432,52 @@ class PathwayStopNode extends StatelessWidget {
       return buildNodeCircle();
     }
 
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 8),
-          child: buildNodeCircle(),
-        ),
-        const SizedBox(width: 14),
-        Expanded(child: buildStopCard(context)),
-      ],
+    if (!showContinuousRoad) {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: buildNodeCircle(),
+          ),
+          const SizedBox(width: 14),
+          Expanded(child: buildStopCard(context)),
+        ],
+      );
+    }
+
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          SizedBox(
+            width: PathwayRoadGeometry.laneWidth,
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: CustomPaint(
+                    painter: ContinuousRoadSegmentPainter(
+                      moduleIndex: module.order - 1,
+                    ),
+                  ),
+                ),
+                Positioned(
+                  left: PathwayRoadGeometry.getNodeX(module.order - 1) - 24,
+                  top: 8,
+                  child: buildNodeCircle(),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 20),
+              child: buildStopCard(context),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -115,7 +115,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         context.push(RouteNames.dashboard);
         break;
       case 1:
-        context.push(RouteNames.gitPathway);
+        context.push(RouteNames.learningPaths);
         break;
       case 2:
         // Already on Profile

@@ -16,6 +16,10 @@ class PathwayHeaderCard extends StatelessWidget {
   final List<CurriculumModule> modules;
   final Set<String> completedIds;
   final VoidCallback onBack;
+  final String title;
+  final String description;
+  final String badgeText;
+  final String? allDoneText;
 
   const PathwayHeaderCard({
     super.key,
@@ -24,6 +28,11 @@ class PathwayHeaderCard extends StatelessWidget {
     required this.modules,
     required this.completedIds,
     required this.onBack,
+    this.title = 'Git & GitHub Learning Pathway',
+    this.description =
+        'A structured, visual journey from fundamental version control commands to team collaboration, conflict resolution, and automated DevOps delivery pipelines.',
+    this.badgeText = 'Foundational Pathway',
+    this.allDoneText,
   });
 
   @override
@@ -114,7 +123,7 @@ class PathwayHeaderCard extends StatelessWidget {
                       ),
                     ),
                     child: Text(
-                      'Foundational Pathway',
+                      badgeText,
                       style: AppTypography.badgeText.copyWith(
                         color: AppColors.lightAccent,
                         fontWeight: FontWeight.w700,
@@ -148,7 +157,7 @@ class PathwayHeaderCard extends StatelessWidget {
 
               // Title
               Text(
-                'Git & GitHub Learning Pathway',
+                title,
                 style: AppTypography.displayMedium.copyWith(
                   fontWeight: FontWeight.w700,
                   color: AppColors.textMain,
@@ -160,7 +169,7 @@ class PathwayHeaderCard extends StatelessWidget {
 
               // Description
               Text(
-                'A structured, visual journey from fundamental version control commands to team collaboration, conflict resolution, and automated DevOps delivery pipelines.',
+                description,
                 style: AppTypography.bodyMedium.copyWith(
                   color: AppColors.textMuted,
                   height: 1.5,
@@ -235,7 +244,7 @@ class PathwayHeaderCard extends StatelessWidget {
                     // Foot Hint
                     Text(
                       isAllDone
-                          ? "🎉 You've completed all $totalCount Git & GitHub stops!"
+                          ? (allDoneText ?? "🎉 You've completed all $totalCount stops!")
                           : (nextModule != null
                               ? 'Next: Stop $nextIndex · ${nextModule.shortTitle}'
                               : 'All stops completed!'),

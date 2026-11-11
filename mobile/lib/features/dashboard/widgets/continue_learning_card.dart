@@ -20,7 +20,7 @@ class ContinueLearningCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isGit = track.id == 'git';
+    final hasPathway = track.hasPathway;
 
     return AppCard(
       padding: const EdgeInsets.all(20),
@@ -43,9 +43,9 @@ class ContinueLearningCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
-                  isGit ? 'Interactive Pathway Active' : 'Module in progress',
+                  hasPathway ? 'Interactive Pathway Active' : 'Module in progress',
                   style: AppTypography.bodySmall.copyWith(
-                    color: isGit ? AppColors.lightAccent : AppColors.textMuted,
+                    color: hasPathway ? AppColors.lightAccent : AppColors.textMuted,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -70,7 +70,7 @@ class ContinueLearningCard extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           AppButton(
-            text: isGit ? 'Open Pathway' : 'Continue',
+            text: hasPathway ? 'Open Pathway' : 'Continue',
             icon: const Icon(Icons.arrow_forward_rounded, size: 18),
             variant: ButtonVariant.primary,
             onPressed: onContinue,

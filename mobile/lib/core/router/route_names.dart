@@ -8,7 +8,10 @@ class RouteNames {
   static const String register = '/register';
   static const String verifyOtp = '/verify-otp';
   static const String dashboard = '/dashboard';
+  static const String learningPaths = '/learning-paths';
   static const String gitPathway = '/pathways/git';
   static const String gitModule = '/pathways/git/:moduleId';
+  static const String dockerPathway = '/pathways/docker';
+  static const String dockerModule = '/pathways/docker/:moduleId';
   static const String profile = '/profile';
 }

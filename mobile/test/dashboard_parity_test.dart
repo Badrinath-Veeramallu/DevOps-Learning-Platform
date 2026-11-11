@@ -86,7 +86,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Dashboard'), findsOneWidget);
-      expect(find.text('Git Pathway'), findsOneWidget);
+      expect(find.text('Learning Paths'), findsOneWidget);
       expect(find.text('Profile'), findsOneWidget);
     });
   });

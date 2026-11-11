@@ -246,8 +246,12 @@ class _StepAnimationPlayerState extends State<StepAnimationPlayer> {
             ),
           ),
 
-          // 3. Stage Canvas (Interactive Git visual objects, zones, edges)
-          StageCanvas(frame: frame),
+          // 3. Stage Canvas (Interactive visual objects, zones, edges)
+          StageCanvas(
+            frame: frame,
+            stageWidth: widget.animation.stageWidth,
+            stageHeight: widget.animation.stageHeight,
+          ),
 
           // 4. Terminal Output (if present in frame)
           if (frame.term.isNotEmpty)

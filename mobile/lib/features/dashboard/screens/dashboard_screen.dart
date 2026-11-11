@@ -9,7 +9,6 @@ import '../../../core/widgets/app_bottom_nav_bar.dart';
 import '../../../core/widgets/app_header_bar.dart';
 import '../../../providers/auth_provider.dart';
 import '../../pathway/data/progress_service.dart';
-import '../../profile/widgets/activity_heatmap.dart';
 import '../models/learning_path_track.dart';
 import '../widgets/continue_learning_card.dart';
 import '../widgets/learning_track_card.dart';
@@ -49,12 +48,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
     setState(() => _activeTrackId = trackId);
     if (trackId == 'git') {
       context.push(RouteNames.gitPathway);
+    } else if (trackId == 'docker') {
+      context.push(RouteNames.dockerPathway);
     }
   }
 
   void _handleContinue(LearningPathTrack track) {
     if (track.id == 'git') {
       context.push(RouteNames.gitPathway);
+    } else if (track.id == 'docker') {
+      context.push(RouteNames.dockerPathway);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -72,7 +75,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         // Already on Dashboard
         break;
       case 1:
-        context.push(RouteNames.gitPathway);
+        context.push(RouteNames.learningPaths);
         break;
       case 2:
         context.push(RouteNames.profile);
@@ -141,10 +144,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 track: activeTrack,
                 onContinue: () => _handleContinue(activeTrack),
               ),
-              const SizedBox(height: 24),
-
-              // Activity Heatmap
-              ActivityHeatmap(apiClient: authProvider.apiClient),
               const SizedBox(height: 32),
 
               // Available Learning Paths Section

@@ -59,6 +59,12 @@ class _GitModuleScreenState extends State<GitModuleScreen> {
   void initState() {
     super.initState();
     _selectedSubtopicIndex = widget.initialSubtopicIndex;
+    final cached = widget.initialModules ?? GitCurriculumRepository.cachedModules;
+    if (cached != null && cached.isNotEmpty) {
+      _modules = cached;
+      _resolveCurrentModule();
+      _isLoading = false;
+    }
     _loadData();
     ProgressService().addListener(_onProgressChanged);
   }
@@ -125,6 +131,13 @@ class _GitModuleScreenState extends State<GitModuleScreen> {
       setState(() => _isLoading = false);
       _logLessonViewed();
       return;
+    }
+
+    final cached = GitCurriculumRepository.cachedModules;
+    if (_modules.isEmpty && cached != null && cached.isNotEmpty) {
+      _modules = cached;
+      _resolveCurrentModule();
+      setState(() => _isLoading = false);
     }
 
     try {
@@ -237,7 +250,7 @@ class _GitModuleScreenState extends State<GitModuleScreen> {
         context.go(RouteNames.dashboard);
         break;
       case 1:
-        context.go(RouteNames.gitPathway);
+        context.go(RouteNames.learningPaths);
         break;
       case 2:
         context.push(RouteNames.profile);
