@@ -550,7 +550,7 @@ export const LinuxModulePage = () => {
                 <div className="section-animation-container">
                   <LinuxAnimation
                     key={`${currentModule.id}-anim-${section.number}`}
-                    id={`${currentModule.number}.${section.number}`}
+                    id={section.subtopicId || `${currentModule.number}.${section.number}`}
                     fallbackTitle={
                       section.title
                         ? section.title.replace(/^\d+\.\s*/, "")

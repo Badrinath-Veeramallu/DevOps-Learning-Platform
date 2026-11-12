@@ -1,4 +1,4698 @@
 {
-  "modules": []
+ "course": "Linux Essentials",
+ "version": 1,
+ "stage": {
+  "width": 1000,
+  "height": 400
+ },
+ "modules": [
+  {
+   "id": "01",
+   "title": "Linux Fundamentals & File System Navigation",
+   "subtopics": [
+    {
+     "id": "01.1",
+     "title": "Why Linux Matters for DevOps",
+     "steps": [
+      {
+       "say": "Linux is an open-source operating system used across servers, cloud infrastructure and development environments.",
+       "actors": {
+        "lx": {
+         "k": "box",
+         "text": "Linux",
+         "x": 50,
+         "y": 46,
+         "tone": "brand",
+         "sub": "open-source OS",
+         "w": 20
+        },
+        "sv": {
+         "k": "box",
+         "text": "Servers",
+         "x": 15,
+         "y": 20,
+         "tone": "soft",
+         "w": 16
+        },
+        "cl": {
+         "k": "box",
+         "text": "Cloud infrastructure",
+         "x": 85,
+         "y": 20,
+         "tone": "soft",
+         "w": 20
+        },
+        "dv": {
+         "k": "box",
+         "text": "Development environments",
+         "x": 50,
+         "y": 86,
+         "tone": "soft",
+         "w": 24
+        }
+       },
+       "edges": [
+        [
+         "lx",
+         "sv"
+        ],
+        [
+         "lx",
+         "cl"
+        ],
+        [
+         "lx",
+         "dv"
+        ]
+       ]
+      },
+      {
+       "say": "Many DevOps tools, including Docker and Kubernetes, commonly run on Linux.",
+       "actors": {
+        "dv": null,
+        "dk": {
+         "k": "box",
+         "text": "Docker",
+         "x": 28,
+         "y": 84,
+         "tone": "plain",
+         "w": 16
+        },
+        "kb": {
+         "k": "box",
+         "text": "Kubernetes",
+         "x": 72,
+         "y": 84,
+         "tone": "plain",
+         "w": 16
+        }
+       },
+       "edges": [
+        [
+         "lx",
+         "sv"
+        ],
+        [
+         "lx",
+         "cl"
+        ],
+        [
+         "lx",
+         "dk"
+        ],
+        [
+         "lx",
+         "kb"
+        ]
+       ]
+      },
+      {
+       "say": "The terminal gives direct control of the system, which makes Linux an essential skill on remote servers.",
+       "actors": {
+        "ok": {
+         "k": "pill",
+         "text": "Essential for remote servers and deployment environments",
+         "x": 50,
+         "y": 96,
+         "tone": "ok",
+         "ic": "✓"
+        }
+       },
+       "edges": [
+        [
+         "lx",
+         "sv"
+        ],
+        [
+         "lx",
+         "cl"
+        ],
+        [
+         "lx",
+         "dk"
+        ],
+        [
+         "lx",
+         "kb"
+        ]
+       ],
+       "term": [
+        "$ uname -s",
+        "Linux"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "01.2",
+     "title": "The Terminal and the Shell",
+     "steps": [
+      {
+       "say": "The terminal is a text window where you type commands instead of clicking.",
+       "actors": {
+        "you": {
+         "k": "box",
+         "text": "You",
+         "x": 14,
+         "y": 50,
+         "tone": "plain",
+         "w": 14
+        },
+        "tm": {
+         "k": "box",
+         "text": "Terminal",
+         "x": 50,
+         "y": 50,
+         "tone": "brand",
+         "sub": "bash shell",
+         "w": 18
+        }
+       },
+       "edges": [
+        [
+         "you",
+         "tm",
+         "types a command"
+        ]
+       ]
+      },
+      {
+       "say": "The shell reads the command and asks the operating system to carry it out.",
+       "actors": {
+        "os": {
+         "k": "box",
+         "text": "Operating system",
+         "x": 86,
+         "y": 50,
+         "tone": "soft",
+         "sub": "files · apps · network",
+         "w": 22
+        }
+       },
+       "edges": [
+        [
+         "you",
+         "tm",
+         "types"
+        ],
+        [
+         "tm",
+         "os",
+         "runs"
+        ]
+       ],
+       "term": [
+        "$ ls",
+        "notes.txt  projects"
+       ]
+      },
+      {
+       "say": "The result comes back as plain text in the same window.",
+       "actors": {
+        "out": {
+         "k": "pill",
+         "text": "Output: notes.txt  projects",
+         "x": 50,
+         "y": 82,
+         "tone": "ok",
+         "ic": "✓"
+        }
+       }
+      },
+      {
+       "say": "Because commands are just text, they can be saved and automated later.",
+       "actors": {
+        "out": null,
+        "auto": {
+         "k": "pill",
+         "text": "Commands can be saved in a script and repeated",
+         "x": 50,
+         "y": 82,
+         "tone": "brand"
+        }
+       }
+      }
+     ]
+    },
+    {
+     "id": "01.3",
+     "title": "The Linux File System Tree",
+     "steps": [
+      {
+       "say": "Linux organizes everything in a single tree that starts at the root directory, written /.",
+       "actors": {
+        "root": {
+         "k": "box",
+         "text": "/",
+         "x": 50,
+         "y": 14,
+         "tone": "brand",
+         "sub": "root directory",
+         "w": 16
+        }
+       }
+      },
+      {
+       "say": "User files live in /home.",
+       "actors": {
+        "home": {
+         "k": "box",
+         "text": "/home",
+         "x": 14,
+         "y": 58,
+         "tone": "soft",
+         "sub": "user files",
+         "w": 18
+        }
+       },
+       "edges": [
+        [
+         "root",
+         "home"
+        ]
+       ],
+       "term": [
+        "$ ls /",
+        "bin  etc  home  tmp  usr  var"
+       ]
+      },
+      {
+       "say": "/etc holds configuration, while /var holds logs and application data.",
+       "actors": {
+        "etc": {
+         "k": "box",
+         "text": "/etc",
+         "x": 38,
+         "y": 58,
+         "tone": "soft",
+         "sub": "configuration",
+         "w": 18
+        },
+        "vr": {
+         "k": "box",
+         "text": "/var",
+         "x": 62,
+         "y": 58,
+         "tone": "soft",
+         "sub": "logs & app data",
+         "w": 18
+        }
+       },
+       "edges": [
+        [
+         "root",
+         "home"
+        ],
+        [
+         "root",
+         "etc"
+        ],
+        [
+         "root",
+         "vr"
+        ]
+       ]
+      },
+      {
+       "say": "/tmp is for temporary files. Every file in the system hangs from the one root.",
+       "actors": {
+        "tmp": {
+         "k": "box",
+         "text": "/tmp",
+         "x": 86,
+         "y": 58,
+         "tone": "soft",
+         "sub": "temporary files",
+         "w": 18
+        },
+        "all": {
+         "k": "pill",
+         "text": "One tree · one root",
+         "x": 50,
+         "y": 90,
+         "tone": "ok",
+         "ic": "✓"
+        }
+       },
+       "edges": [
+        [
+         "root",
+         "home"
+        ],
+        [
+         "root",
+         "etc"
+        ],
+        [
+         "root",
+         "vr"
+        ],
+        [
+         "root",
+         "tmp"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "01.4",
+     "title": "Absolute vs Relative Paths",
+     "steps": [
+      {
+       "say": "Every file has a path. Here the current directory is /home/student.",
+       "actors": {
+        "r": {
+         "k": "box",
+         "text": "/",
+         "x": 12,
+         "y": 42,
+         "tone": "plain",
+         "w": 10
+        },
+        "h": {
+         "k": "box",
+         "text": "home",
+         "x": 37,
+         "y": 42,
+         "tone": "plain",
+         "w": 12
+        },
+        "s": {
+         "k": "box",
+         "text": "student",
+         "x": 62,
+         "y": 42,
+         "tone": "brand",
+         "sub": "you are here",
+         "w": 16
+        },
+        "p": {
+         "k": "box",
+         "text": "projects",
+         "x": 87,
+         "y": 42,
+         "tone": "plain",
+         "w": 14
+        }
+       },
+       "edges": [
+        [
+         "r",
+         "h"
+        ],
+        [
+         "h",
+         "s"
+        ],
+        [
+         "s",
+         "p"
+        ]
+       ]
+      },
+      {
+       "say": "An absolute path starts at / and walks down from the top of the tree.",
+       "actors": {
+        "r": {
+         "tone": "ok"
+        },
+        "h": {
+         "tone": "ok"
+        },
+        "s": {
+         "tone": "ok",
+         "sub": ""
+        },
+        "p": {
+         "tone": "ok"
+        },
+        "abs": {
+         "k": "pill",
+         "text": "/home/student/projects",
+         "x": 50,
+         "y": 80,
+         "tone": "ok",
+         "ic": "✓"
+        }
+       },
+       "edges": [
+        [
+         "r",
+         "h",
+         "",
+         "ok"
+        ],
+        [
+         "h",
+         "s",
+         "",
+         "ok"
+        ],
+        [
+         "s",
+         "p",
+         "",
+         "ok"
+        ]
+       ],
+       "term": [
+        "$ cd /home/student/projects"
+       ]
+      },
+      {
+       "say": "A relative path starts from where you are now, so it is usually shorter.",
+       "actors": {
+        "r": {
+         "tone": "plain"
+        },
+        "h": {
+         "tone": "plain"
+        },
+        "s": {
+         "tone": "brand",
+         "sub": "you are here"
+        },
+        "p": {
+         "tone": "soft"
+        },
+        "abs": {
+         "text": "projects",
+         "tone": "soft",
+         "ic": ""
+        }
+       },
+       "edges": [
+        [
+         "r",
+         "h"
+        ],
+        [
+         "h",
+         "s"
+        ],
+        [
+         "s",
+         "p",
+         "",
+         "ok"
+        ]
+       ],
+       "clear": true,
+       "term": [
+        "$ cd /home/student",
+        "$ cd projects"
+       ]
+      },
+      {
+       "say": ".. means the parent directory and ~ means your home directory.",
+       "actors": {
+        "abs": null,
+        "up": {
+         "k": "pill",
+         "text": "..  =  one level up",
+         "x": 28,
+         "y": 80,
+         "tone": "soft"
+        },
+        "hm": {
+         "k": "pill",
+         "text": "~  =  /home/student",
+         "x": 72,
+         "y": 80,
+         "tone": "soft"
+        }
+       },
+       "edges": [
+        [
+         "r",
+         "h"
+        ],
+        [
+         "h",
+         "s"
+        ],
+        [
+         "s",
+         "p"
+        ]
+       ],
+       "term": [
+        "$ cd ..",
+        "$ cd ~"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "01.5",
+     "title": "Navigate with pwd, ls and cd",
+     "steps": [
+      {
+       "say": "pwd prints the directory you are in right now.",
+       "actors": {
+        "a": {
+         "k": "box",
+         "text": "/home/student",
+         "x": 17,
+         "y": 40,
+         "tone": "brand",
+         "sub": "current directory",
+         "w": 22
+        },
+        "b": {
+         "k": "box",
+         "text": "projects",
+         "x": 52,
+         "y": 40,
+         "tone": "plain",
+         "w": 16
+        },
+        "c": {
+         "k": "box",
+         "text": "linux",
+         "x": 84,
+         "y": 40,
+         "tone": "plain",
+         "w": 14
+        },
+        "you": {
+         "k": "pill",
+         "text": "you are here",
+         "x": 17,
+         "y": 14,
+         "tone": "ok"
+        }
+       },
+       "edges": [
+        [
+         "a",
+         "b"
+        ],
+        [
+         "b",
+         "c"
+        ]
+       ],
+       "term": [
+        "$ pwd",
+        "/home/student"
+       ]
+      },
+      {
+       "say": "ls -la lists everything here, including hidden files and permissions.",
+       "actors": {
+        "ls": {
+         "k": "code",
+         "title": "ls -la",
+         "lines": [
+          "drwxr-xr-x  projects",
+          "-rw-r--r--  notes.txt",
+          "-rw-r--r--  .bashrc"
+         ],
+         "x": 50,
+         "y": 76,
+         "w": 40
+        }
+       },
+       "term": [
+        "$ ls -la"
+       ]
+      },
+      {
+       "say": "cd projects moves you into that directory.",
+       "actors": {
+        "ls": null,
+        "you": {
+         "x": 52
+        },
+        "a": {
+         "tone": "plain",
+         "sub": ""
+        },
+        "b": {
+         "tone": "brand",
+         "sub": "current directory"
+        }
+       },
+       "edges": [
+        [
+         "a",
+         "b",
+         "",
+         "ok"
+        ],
+        [
+         "b",
+         "c"
+        ]
+       ],
+       "term": [
+        "$ cd projects"
+       ]
+      },
+      {
+       "say": "cd .. goes back up one level, and cd ~ always takes you home.",
+       "actors": {
+        "you": {
+         "x": 17
+        },
+        "a": {
+         "tone": "brand",
+         "sub": "current directory"
+        },
+        "b": {
+         "tone": "plain",
+         "sub": ""
+        },
+        "tip": {
+         "k": "pill",
+         "text": "cd ~ works from anywhere",
+         "x": 50,
+         "y": 84,
+         "tone": "ok",
+         "ic": "✓"
+        }
+       },
+       "edges": [
+        [
+         "a",
+         "b"
+        ],
+        [
+         "b",
+         "c"
+        ]
+       ],
+       "term": [
+        "$ cd .."
+       ]
+      }
+     ]
+    },
+    {
+     "id": "01.6",
+     "title": "Create Directories and Files",
+     "steps": [
+      {
+       "say": "mkdir -p creates a directory together with any missing parent directories.",
+       "actors": {
+        "pr": {
+         "k": "box",
+         "text": "projects",
+         "x": 22,
+         "y": 28,
+         "tone": "dim",
+         "sub": "missing",
+         "w": 18
+        },
+        "ln": {
+         "k": "box",
+         "text": "linux",
+         "x": 62,
+         "y": 28,
+         "tone": "dim",
+         "sub": "missing",
+         "w": 18
+        }
+       },
+       "edges": [
+        [
+         "pr",
+         "ln"
+        ]
+       ]
+      },
+      {
+       "say": "One command created the whole path: projects and projects/linux now exist.",
+       "actors": {
+        "pr": {
+         "tone": "ok",
+         "sub": "created"
+        },
+        "ln": {
+         "tone": "ok",
+         "sub": "created"
+        }
+       },
+       "edges": [
+        [
+         "pr",
+         "ln",
+         "",
+         "ok"
+        ]
+       ],
+       "term": [
+        "$ mkdir -p projects/linux"
+       ]
+      },
+      {
+       "say": "touch creates a new, empty file.",
+       "actors": {
+        "nt": {
+         "k": "file",
+         "text": "notes.txt",
+         "x": 62,
+         "y": 74,
+         "tone": "ok",
+         "sub": "new, empty file",
+         "w": 14
+        }
+       },
+       "edges": [
+        [
+         "pr",
+         "ln",
+         "",
+         "ok"
+        ],
+        [
+         "ln",
+         "nt",
+         "",
+         "ok"
+        ]
+       ],
+       "term": [
+        "$ touch projects/linux/notes.txt"
+       ]
+      },
+      {
+       "say": "Directories keep your work organised; files hold the content.",
+       "actors": {
+        "tip": {
+         "k": "pill",
+         "text": "Organise first, then create files",
+         "x": 22,
+         "y": 74,
+         "tone": "soft"
+        }
+       },
+       "edges": [
+        [
+         "pr",
+         "ln"
+        ],
+        [
+         "ln",
+         "nt"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "01.7",
+     "title": "Copy, Move and Rename Files",
+     "steps": [
+      {
+       "say": "A project file, notes.txt, sits in the current directory next to an empty projects folder.",
+       "actors": {
+        "zp": {
+         "k": "zone",
+         "text": "projects/",
+         "x": 80,
+         "y": 50,
+         "w": 32,
+         "h": 86
+        },
+        "n": {
+         "k": "file",
+         "text": "notes.txt",
+         "x": 20,
+         "y": 42,
+         "tone": "plain",
+         "w": 12
+        }
+       }
+      },
+      {
+       "say": "cp makes a copy. The original stays where it was.",
+       "actors": {
+        "b": {
+         "k": "file",
+         "text": "backup.txt",
+         "x": 48,
+         "y": 42,
+         "tone": "ok",
+         "sub": "copy",
+         "w": 12
+        }
+       },
+       "edges": [
+        [
+         "n",
+         "b",
+         "cp",
+         "dash"
+        ]
+       ],
+       "term": [
+        "$ cp notes.txt backup.txt"
+       ]
+      },
+      {
+       "say": "mv moves a file, here into the projects directory.",
+       "actors": {
+        "n": {
+         "x": 80,
+         "tone": "ok",
+         "sub": "moved"
+        }
+       },
+       "term": [
+        "$ mv notes.txt projects/"
+       ]
+      },
+      {
+       "say": "mv also renames: it is the same file under a new name.",
+       "actors": {
+        "b": {
+         "text": "old.txt",
+         "tone": "soft",
+         "sub": "renamed"
+        }
+       },
+       "term": [
+        "$ mv backup.txt old.txt"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "01.8",
+     "title": "Remove Files Carefully",
+     "steps": [
+      {
+       "say": "Two things to clean up: a file, and a directory that contains another file.",
+       "actors": {
+        "b": {
+         "k": "file",
+         "text": "backup.txt",
+         "x": 20,
+         "y": 45,
+         "tone": "plain",
+         "w": 12
+        },
+        "zp": {
+         "k": "zone",
+         "text": "projects/",
+         "x": 74,
+         "y": 50,
+         "w": 40,
+         "h": 86
+        },
+        "n": {
+         "k": "file",
+         "text": "notes.txt",
+         "x": 74,
+         "y": 52,
+         "tone": "plain",
+         "w": 12
+        }
+       }
+      },
+      {
+       "say": "rm deletes a file. There is no recycle bin, so it generally cannot be undone.",
+       "actors": {
+        "b": null,
+        "w": {
+         "k": "pill",
+         "text": "Deleted for good",
+         "x": 20,
+         "y": 45,
+         "tone": "bad",
+         "ic": "!"
+        }
+       },
+       "term": [
+        "$ rm backup.txt"
+       ]
+      },
+      {
+       "say": "rm -r removes a directory and everything inside it.",
+       "actors": {
+        "zp": null,
+        "n": null,
+        "w2": {
+         "k": "pill",
+         "text": "Directory and contents removed",
+         "x": 74,
+         "y": 50,
+         "tone": "bad",
+         "ic": "!"
+        }
+       },
+       "term": [
+        "$ rm -r projects"
+       ]
+      },
+      {
+       "say": "Always double-check the path before pressing Enter.",
+       "actors": {
+        "w": null,
+        "w2": null,
+        "chk": {
+         "k": "pill",
+         "text": "Verify the path before you delete",
+         "x": 50,
+         "y": 50,
+         "tone": "warn",
+         "ic": "✋"
+        }
+       }
+      }
+     ]
+    },
+    {
+     "id": "01.9",
+     "title": "Read Files: cat, less, head and tail",
+     "steps": [
+      {
+       "say": "cat prints a whole file to the terminal in one go.",
+       "actors": {
+        "nf": {
+         "k": "file",
+         "text": "application.log",
+         "x": 14,
+         "y": 50,
+         "tone": "plain",
+         "w": 15
+        },
+        "p": {
+         "k": "code",
+         "title": "cat application.log",
+         "lines": [
+          "10:00 INFO  server started",
+          "10:02 INFO  user login",
+          "10:05 ERROR database timeout",
+          "10:06 INFO  retrying",
+          "10:07 INFO  connected",
+          "10:09 WARN  slow query"
+         ],
+         "x": 68,
+         "y": 50,
+         "w": 46
+        }
+       },
+       "edges": [
+        [
+         "nf",
+         "p",
+         "read",
+         "dash"
+        ]
+       ],
+       "term": [
+        "$ cat application.log"
+       ]
+      },
+      {
+       "say": "less opens a long file one page at a time: Space for next page, q to quit.",
+       "actors": {
+        "p": {
+         "title": "less application.log",
+         "lines": [
+          "10:00 INFO  server started",
+          "10:02 INFO  user login",
+          "10:05 ERROR database timeout",
+          "10:06 INFO  retrying",
+          [
+           "(Space: next page · q: quit)",
+           "dim"
+          ]
+         ]
+        }
+       },
+       "edges": [
+        [
+         "nf",
+         "p",
+         "read",
+         "dash"
+        ]
+       ],
+       "term": [
+        "$ less application.log"
+       ]
+      },
+      {
+       "say": "head shows the first lines of a file; -n 5 limits it to five.",
+       "actors": {
+        "p": {
+         "title": "head -n 5 application.log",
+         "lines": [
+          [
+           "10:00 INFO  server started",
+           "hl"
+          ],
+          [
+           "10:02 INFO  user login",
+           "hl"
+          ],
+          [
+           "10:05 ERROR database timeout",
+           "hl"
+          ],
+          [
+           "10:06 INFO  retrying",
+           "hl"
+          ],
+          [
+           "10:07 INFO  connected",
+           "hl"
+          ],
+          [
+           "…",
+           "dim"
+          ]
+         ]
+        }
+       },
+       "edges": [
+        [
+         "nf",
+         "p",
+         "first lines",
+         "dash"
+        ]
+       ],
+       "term": [
+        "$ head -n 5 application.log"
+       ]
+      },
+      {
+       "say": "tail shows the end of a file; -f keeps following new lines as they arrive.",
+       "actors": {
+        "p": {
+         "title": "tail -f application.log",
+         "lines": [
+          "10:05 ERROR database timeout",
+          "10:06 INFO  retrying",
+          "10:07 INFO  connected",
+          "10:09 WARN  slow query",
+          [
+           "10:11 INFO  request served",
+           "add"
+          ]
+         ]
+        }
+       },
+       "edges": [
+        [
+         "nf",
+         "p",
+         "last lines",
+         "dash"
+        ]
+       ],
+       "term": [
+        "$ tail -f application.log"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "01.10",
+     "title": "Search Logs with grep",
+     "steps": [
+      {
+       "say": "Large log files make problems hard to spot by eye.",
+       "actors": {
+        "a": {
+         "k": "code",
+         "title": "application.log",
+         "lines": [
+          "10:00 INFO  server started",
+          "10:02 INFO  user login",
+          "10:05 ERROR database timeout",
+          "10:06 INFO  retrying",
+          "10:07 INFO  connected",
+          "10:09 WARN  slow query"
+         ],
+         "x": 26,
+         "y": 50,
+         "w": 44
+        }
+       }
+      },
+      {
+       "say": "grep prints only the lines that match. -i ignores upper and lower case.",
+       "actors": {
+        "a": {
+         "lines": [
+          [
+           "10:00 INFO  server started",
+           "dim"
+          ],
+          [
+           "10:02 INFO  user login",
+           "dim"
+          ],
+          [
+           "10:05 ERROR database timeout",
+           "hl"
+          ],
+          [
+           "10:06 INFO  retrying",
+           "dim"
+          ],
+          [
+           "10:07 INFO  connected",
+           "dim"
+          ],
+          [
+           "10:09 WARN  slow query",
+           "dim"
+          ]
+         ]
+        },
+        "o": {
+         "k": "code",
+         "title": "matches",
+         "lines": [
+          [
+           "10:05 ERROR database timeout",
+           "hl"
+          ]
+         ],
+         "x": 78,
+         "y": 50,
+         "w": 36
+        }
+       },
+       "edges": [
+        [
+         "a",
+         "o",
+         "grep",
+         "ok"
+        ]
+       ],
+       "term": [
+        "$ grep -i \"error\" application.log"
+       ]
+      },
+      {
+       "say": "grep -r searches every file in a directory, here for the word database.",
+       "actors": {
+        "a": null,
+        "o": null,
+        "zl": {
+         "k": "zone",
+         "text": "logs/",
+         "x": 26,
+         "y": 50,
+         "w": 30,
+         "h": 90
+        },
+        "g1": {
+         "k": "file",
+         "text": "app.log",
+         "x": 26,
+         "y": 28,
+         "tone": "ok",
+         "sub": "1 match",
+         "w": 14
+        },
+        "g2": {
+         "k": "file",
+         "text": "db.log",
+         "x": 26,
+         "y": 52,
+         "tone": "ok",
+         "sub": "3 matches",
+         "w": 14
+        },
+        "g3": {
+         "k": "file",
+         "text": "auth.log",
+         "x": 26,
+         "y": 76,
+         "tone": "dim",
+         "sub": "no match",
+         "w": 14
+        },
+        "gr": {
+         "k": "box",
+         "text": "grep -r",
+         "x": 78,
+         "y": 50,
+         "tone": "brand",
+         "sub": "searches every file inside",
+         "w": 22
+        }
+       },
+       "edges": [
+        [
+         "gr",
+         "g1",
+         "",
+         "ok"
+        ],
+        [
+         "gr",
+         "g2",
+         "",
+         "ok"
+        ]
+       ],
+       "term": [
+        "$ grep -r \"database\" ./logs"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "02",
+   "title": "Linux Permissions & User Management",
+   "subtopics": [
+    {
+     "id": "02.1",
+     "title": "Users, Groups and Ownership",
+     "steps": [
+      {
+       "say": "Linux is multi-user: every user has an identity, and users can belong to groups.",
+       "actors": {
+        "u": {
+         "k": "box",
+         "text": "student",
+         "x": 22,
+         "y": 26,
+         "tone": "brand",
+         "sub": "user · uid 1000",
+         "w": 20
+        },
+        "g": {
+         "k": "box",
+         "text": "developers",
+         "x": 78,
+         "y": 26,
+         "tone": "soft",
+         "sub": "group",
+         "w": 20
+        }
+       },
+       "edges": [
+        [
+         "u",
+         "g",
+         "member of"
+        ]
+       ],
+       "term": [
+        "$ whoami",
+        "student",
+        "$ id",
+        "uid=1000(student) gid=1000(student) groups=1000(student),1001(developers)"
+       ]
+      },
+      {
+       "say": "Every file has an owner and an associated group.",
+       "actors": {
+        "f": {
+         "k": "file",
+         "text": "notes.txt",
+         "x": 50,
+         "y": 76,
+         "tone": "plain",
+         "w": 14
+        }
+       },
+       "edges": [
+        [
+         "u",
+         "f",
+         "owner"
+        ],
+        [
+         "g",
+         "f",
+         "group"
+        ]
+       ],
+       "clear": true,
+       "term": [
+        "$ ls -l notes.txt",
+        "-rw-r--r-- 1 student developers 0 notes.txt"
+       ]
+      },
+      {
+       "say": "Permissions then decide what the owner, the group and everyone else may do.",
+       "actors": {
+        "o": {
+         "k": "box",
+         "text": "others",
+         "x": 50,
+         "y": 26,
+         "tone": "plain",
+         "sub": "everyone else",
+         "w": 16
+        }
+       },
+       "edges": [
+        [
+         "u",
+         "f",
+         "owner"
+        ],
+        [
+         "g",
+         "f",
+         "group"
+        ],
+        [
+         "o",
+         "f",
+         "others"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "02.2",
+     "title": "Read the Permission String",
+     "steps": [
+      {
+       "say": "ls -l prints a string of ten characters for every file, for example -rwxr-xr--.",
+       "actors": {
+        "hd": {
+         "k": "pill",
+         "text": "-rwxr-xr--",
+         "x": 50,
+         "y": 9,
+         "tone": "brand"
+        },
+        "c0": {
+         "k": "commit",
+         "text": "-",
+         "x": 8,
+         "y": 52,
+         "tone": "plain"
+        },
+        "c1": {
+         "k": "commit",
+         "text": "r",
+         "x": 22,
+         "y": 52,
+         "tone": "plain"
+        },
+        "c2": {
+         "k": "commit",
+         "text": "w",
+         "x": 30,
+         "y": 52,
+         "tone": "plain"
+        },
+        "c3": {
+         "k": "commit",
+         "text": "x",
+         "x": 38,
+         "y": 52,
+         "tone": "plain"
+        },
+        "c4": {
+         "k": "commit",
+         "text": "r",
+         "x": 50,
+         "y": 52,
+         "tone": "plain"
+        },
+        "c5": {
+         "k": "commit",
+         "text": "-",
+         "x": 58,
+         "y": 52,
+         "tone": "plain"
+        },
+        "c6": {
+         "k": "commit",
+         "text": "x",
+         "x": 66,
+         "y": 52,
+         "tone": "plain"
+        },
+        "c7": {
+         "k": "commit",
+         "text": "r",
+         "x": 78,
+         "y": 52,
+         "tone": "plain"
+        },
+        "c8": {
+         "k": "commit",
+         "text": "-",
+         "x": 86,
+         "y": 52,
+         "tone": "plain"
+        },
+        "c9": {
+         "k": "commit",
+         "text": "-",
+         "x": 94,
+         "y": 52,
+         "tone": "plain"
+        }
+       },
+       "term": [
+        "$ ls -l deploy.sh",
+        "-rwxr-xr-- 1 student developers 482 deploy.sh"
+       ]
+      },
+      {
+       "say": "The first character is the file type. The next nine form three groups: owner, group and others.",
+       "actors": {
+        "zo": {
+         "k": "zone",
+         "text": "Owner",
+         "x": 30,
+         "y": 52,
+         "w": 25,
+         "h": 62
+        },
+        "zg": {
+         "k": "zone",
+         "text": "Group",
+         "x": 58,
+         "y": 52,
+         "w": 25,
+         "h": 62
+        },
+        "zt": {
+         "k": "zone",
+         "text": "Others",
+         "x": 86,
+         "y": 52,
+         "w": 25,
+         "h": 62
+        },
+        "c0": {
+         "sub": "file"
+        }
+       }
+      },
+      {
+       "say": "In each group r means read, w means write and x means execute. A dash means that permission is missing.",
+       "actors": {
+        "c0": {
+         "tone": "dim"
+        },
+        "c1": {
+         "sub": "read"
+        },
+        "c2": {
+         "sub": "write"
+        },
+        "c3": {
+         "sub": "execute"
+        },
+        "c4": {
+         "tone": "ok"
+        },
+        "c5": {
+         "tone": "dim"
+        },
+        "c6": {
+         "tone": "ok"
+        },
+        "c7": {
+         "tone": "ok"
+        },
+        "c8": {
+         "tone": "dim"
+        },
+        "c9": {
+         "tone": "dim"
+        }
+       }
+      },
+      {
+       "say": "Here the owner can read, write and run; the group can read and run; others can only read.",
+       "actors": {
+        "po": {
+         "k": "pill",
+         "text": "read, write, run",
+         "x": 30,
+         "y": 92,
+         "tone": "ok"
+        },
+        "pg": {
+         "k": "pill",
+         "text": "read and run",
+         "x": 58,
+         "y": 92,
+         "tone": "soft"
+        },
+        "pt": {
+         "k": "pill",
+         "text": "read only",
+         "x": 86,
+         "y": 92,
+         "tone": "warn"
+        }
+       }
+      }
+     ]
+    },
+    {
+     "id": "02.3",
+     "title": "Numeric Permissions",
+     "steps": [
+      {
+       "say": "Each permission has a number: read is 4, write is 2 and execute is 1.",
+       "actors": {
+        "r": {
+         "k": "box",
+         "text": "r = 4",
+         "x": 25,
+         "y": 40,
+         "tone": "soft",
+         "sub": "read",
+         "w": 16
+        },
+        "w": {
+         "k": "box",
+         "text": "w = 2",
+         "x": 50,
+         "y": 40,
+         "tone": "soft",
+         "sub": "write",
+         "w": 16
+        },
+        "x": {
+         "k": "box",
+         "text": "x = 1",
+         "x": 75,
+         "y": 40,
+         "tone": "soft",
+         "sub": "execute",
+         "w": 16
+        }
+       }
+      },
+      {
+       "say": "Add the values for each class: rwx is 4 + 2 + 1 = 7, while r-x is 4 + 0 + 1 = 5.",
+       "actors": {
+        "s1": {
+         "k": "pill",
+         "text": "rwx  →  4 + 2 + 1 = 7",
+         "x": 30,
+         "y": 76,
+         "tone": "ok"
+        },
+        "s2": {
+         "k": "pill",
+         "text": "r-x  →  4 + 0 + 1 = 5",
+         "x": 70,
+         "y": 76,
+         "tone": "soft"
+        }
+       }
+      },
+      {
+       "say": "Three digits give owner, group and others. 755 means rwxr-xr-x and 644 means rw-r--r--.",
+       "actors": {
+        "r": null,
+        "w": null,
+        "x": null,
+        "s1": null,
+        "s2": null,
+        "a": {
+         "k": "box",
+         "text": "755",
+         "x": 25,
+         "y": 40,
+         "tone": "brand",
+         "sub": "rwxr-xr-x",
+         "w": 20
+        },
+        "b": {
+         "k": "box",
+         "text": "644",
+         "x": 75,
+         "y": 40,
+         "tone": "brand",
+         "sub": "rw-r--r--",
+         "w": 20
+        },
+        "pa": {
+         "k": "pill",
+         "text": "scripts and programs",
+         "x": 25,
+         "y": 76,
+         "tone": "soft"
+        },
+        "pb": {
+         "k": "pill",
+         "text": "regular files",
+         "x": 75,
+         "y": 76,
+         "tone": "soft"
+        }
+       }
+      }
+     ]
+    },
+    {
+     "id": "02.4",
+     "title": "Change Permissions with chmod",
+     "steps": [
+      {
+       "say": "deploy.sh was just created, so it is readable but not executable.",
+       "actors": {
+        "f": {
+         "k": "file",
+         "text": "deploy.sh",
+         "x": 25,
+         "y": 40,
+         "tone": "bad",
+         "sub": "-rw-r--r--",
+         "w": 14
+        },
+        "st": {
+         "k": "pill",
+         "text": "cannot run yet",
+         "x": 25,
+         "y": 70,
+         "tone": "bad",
+         "ic": "!"
+        }
+       }
+      },
+      {
+       "say": "chmod u+x adds execute permission for the owner (u = user, g = group, o = others).",
+       "actors": {
+        "f": {
+         "tone": "ok",
+         "sub": "-rwxr--r--"
+        },
+        "st": {
+         "text": "owner can run it",
+         "tone": "ok",
+         "ic": "✓"
+        },
+        "lg": {
+         "k": "pill",
+         "text": "u = owner · g = group · o = others",
+         "x": 50,
+         "y": 92,
+         "tone": "soft"
+        }
+       },
+       "term": [
+        "$ chmod u+x deploy.sh"
+       ]
+      },
+      {
+       "say": "Numeric mode sets all three classes at once: 755 gives rwxr-xr-x.",
+       "actors": {
+        "f": {
+         "sub": "-rwxr-xr-x"
+        },
+        "st": {
+         "text": "everyone can read and run"
+        },
+        "n": {
+         "k": "file",
+         "text": "notes.txt",
+         "x": 75,
+         "y": 40,
+         "tone": "warn",
+         "sub": "-rw-rw-rw-",
+         "w": 14
+        }
+       },
+       "term": [
+        "$ chmod 755 deploy.sh"
+       ]
+      },
+      {
+       "say": "644 is a common choice for regular files: the owner edits, everyone else reads.",
+       "actors": {
+        "n": {
+         "tone": "ok",
+         "sub": "-rw-r--r--"
+        }
+       },
+       "term": [
+        "$ chmod 644 notes.txt"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "02.5",
+     "title": "Change Ownership with chown",
+     "steps": [
+      {
+       "say": "Every file belongs to one owner and one group. Here notes.txt belongs to root.",
+       "actors": {
+        "f": {
+         "k": "file",
+         "text": "notes.txt",
+         "x": 50,
+         "y": 68,
+         "tone": "warn",
+         "sub": "root:root",
+         "w": 14
+        },
+        "o": {
+         "k": "box",
+         "text": "root",
+         "x": 22,
+         "y": 26,
+         "tone": "plain",
+         "sub": "owner",
+         "w": 16
+        },
+        "g": {
+         "k": "box",
+         "text": "root",
+         "x": 78,
+         "y": 26,
+         "tone": "plain",
+         "sub": "group",
+         "w": 16
+        }
+       },
+       "edges": [
+        [
+         "o",
+         "f"
+        ],
+        [
+         "g",
+         "f"
+        ]
+       ],
+       "term": [
+        "$ ls -l notes.txt",
+        "-rw-r--r-- 1 root root 0 notes.txt"
+       ]
+      },
+      {
+       "say": "chown changes ownership. It needs elevated rights, so it is run with sudo.",
+       "actors": {
+        "f": {
+         "tone": "ok",
+         "sub": "student:developers"
+        },
+        "o": {
+         "text": "student",
+         "tone": "brand"
+        },
+        "g": {
+         "text": "developers",
+         "tone": "brand"
+        }
+       },
+       "edges": [
+        [
+         "o",
+         "f",
+         "",
+         "ok"
+        ],
+        [
+         "g",
+         "f",
+         "",
+         "ok"
+        ]
+       ],
+       "term": [
+        "$ sudo chown student:developers notes.txt"
+       ]
+      },
+      {
+       "say": "The pattern is chown owner:group file.",
+       "actors": {
+        "pt": {
+         "k": "pill",
+         "text": "chown  owner:group  file",
+         "x": 50,
+         "y": 92,
+         "tone": "brand"
+        }
+       },
+       "edges": [
+        [
+         "o",
+         "f"
+        ],
+        [
+         "g",
+         "f"
+        ]
+       ],
+       "term": [
+        "$ ls -l notes.txt",
+        "-rw-r--r-- 1 student developers 0 notes.txt"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "02.6",
+     "title": "sudo and the Root User",
+     "steps": [
+      {
+       "say": "root is the all-powerful administrator account. Regular users have limited rights.",
+       "actors": {
+        "u": {
+         "k": "box",
+         "text": "student",
+         "x": 18,
+         "y": 24,
+         "tone": "plain",
+         "sub": "regular user",
+         "w": 18
+        },
+        "rt": {
+         "k": "box",
+         "text": "root",
+         "x": 82,
+         "y": 24,
+         "tone": "brand",
+         "sub": "full control",
+         "w": 18
+        },
+        "z": {
+         "k": "zone",
+         "text": "Protected system files",
+         "x": 50,
+         "y": 72,
+         "w": 70,
+         "h": 38
+        },
+        "f1": {
+         "k": "file",
+         "text": "/etc/nginx",
+         "x": 30,
+         "y": 76,
+         "tone": "plain",
+         "w": 13
+        },
+        "f2": {
+         "k": "file",
+         "text": "/var/log",
+         "x": 50,
+         "y": 76,
+         "tone": "plain",
+         "w": 13
+        },
+        "f3": {
+         "k": "file",
+         "text": "/usr/bin",
+         "x": 70,
+         "y": 76,
+         "tone": "plain",
+         "w": 13
+        }
+       }
+      },
+      {
+       "say": "Without sudo, a regular user is denied access to protected files.",
+       "actors": {
+        "u": {
+         "tone": "bad"
+        }
+       },
+       "edges": [
+        [
+         "u",
+         "z",
+         "denied",
+         "warn"
+        ]
+       ],
+       "term": [
+        "$ apt update",
+        "!E: Could not open lock file - Permission denied"
+       ]
+      },
+      {
+       "say": "sudo runs a single command with root privileges for users who are authorized.",
+       "actors": {
+        "u": {
+         "tone": "ok"
+        }
+       },
+       "edges": [
+        [
+         "u",
+         "z",
+         "allowed",
+         "ok"
+        ]
+       ],
+       "term": [
+        "$ sudo apt update",
+        "+Reading package lists... Done"
+       ]
+      },
+      {
+       "say": "Elevated commands can change or delete protected files, so verify every command and path first.",
+       "actors": {
+        "w": {
+         "k": "pill",
+         "text": "Verify commands and paths before using sudo",
+         "x": 50,
+         "y": 8,
+         "tone": "warn",
+         "ic": "!"
+        }
+       },
+       "edges": [
+        [
+         "u",
+         "z",
+         "allowed",
+         "ok"
+        ]
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "03",
+   "title": "Processes, Services & System Logs",
+   "subtopics": [
+    {
+     "id": "03.1",
+     "title": "Processes and Resource Monitoring",
+     "steps": [
+      {
+       "say": "Whenever a program runs, Linux creates a process and gives it a unique Process ID (PID).",
+       "actors": {
+        "c1": {
+         "k": "commit",
+         "text": "1204",
+         "x": 20,
+         "y": 26,
+         "tone": "soft",
+         "sub": "nginx"
+        },
+        "c2": {
+         "k": "commit",
+         "text": "2450",
+         "x": 50,
+         "y": 26,
+         "tone": "soft",
+         "sub": "node app"
+        },
+        "c3": {
+         "k": "commit",
+         "text": "3871",
+         "x": 80,
+         "y": 26,
+         "tone": "soft",
+         "sub": "bash"
+        },
+        "pd": {
+         "k": "pill",
+         "text": "Every process gets its own PID",
+         "x": 50,
+         "y": 52,
+         "tone": "brand"
+        }
+       }
+      },
+      {
+       "say": "ps aux takes a snapshot of every running process.",
+       "actors": {
+        "p": {
+         "k": "code",
+         "title": "ps aux",
+         "lines": [
+          "USER     PID  %CPU %MEM COMMAND",
+          "www     1204   0.3  1.2 nginx",
+          "student  2450  12.5  8.4 node app.js",
+          "student  3871   0.0  0.2 bash"
+         ],
+         "x": 50,
+         "y": 78,
+         "w": 46
+        }
+       },
+       "term": [
+        "$ ps aux"
+       ]
+      },
+      {
+       "say": "top shows CPU and memory usage live and keeps refreshing.",
+       "actors": {
+        "p": {
+         "title": "top · live view",
+         "lines": [
+          "PID    %CPU %MEM COMMAND",
+          [
+           "2450   13.1  8.4 node app.js",
+           "hl"
+          ],
+          "1204    0.3  1.2 nginx",
+          "3871    0.0  0.2 bash"
+         ]
+        },
+        "c2": {
+         "tone": "warn",
+         "sub": "node app · busiest"
+        }
+       },
+       "term": [
+        "$ top"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "03.2",
+     "title": "Stop an Unresponsive Process",
+     "steps": [
+      {
+       "say": "A frozen program keeps its PID but no longer responds.",
+       "actors": {
+        "you": {
+         "k": "box",
+         "text": "You",
+         "x": 18,
+         "y": 46,
+         "tone": "plain",
+         "w": 14
+        },
+        "app": {
+         "k": "box",
+         "text": "myapp",
+         "x": 74,
+         "y": 46,
+         "tone": "bad",
+         "sub": "PID 2450 · not responding",
+         "w": 24
+        }
+       }
+      },
+      {
+       "say": "kill sends a polite request to stop. The process gets a chance to shut down cleanly.",
+       "actors": {
+        "app": {
+         "sub": "asked to stop…"
+        }
+       },
+       "edges": [
+        [
+         "you",
+         "app",
+         "kill 2450 · graceful",
+         "ok"
+        ]
+       ],
+       "term": [
+        "$ kill 2450"
+       ]
+      },
+      {
+       "say": "If the process ignores the request, it keeps running.",
+       "actors": {
+        "app": {
+         "sub": "still running!"
+        },
+        "ig": {
+         "k": "pill",
+         "text": "Request ignored",
+         "x": 74,
+         "y": 82,
+         "tone": "bad",
+         "ic": "!"
+        }
+       },
+       "edges": [
+        [
+         "you",
+         "app",
+         "kill 2450",
+         "dash"
+        ]
+       ]
+      },
+      {
+       "say": "kill -9 forces termination immediately. Use it only when necessary: nothing is cleaned up.",
+       "actors": {
+        "app": null,
+        "ig": {
+         "text": "Process terminated · no cleanup",
+         "tone": "warn",
+         "ic": "!"
+        }
+       },
+       "edges": [
+        [
+         "you",
+         "app",
+         "kill -9 2450 · forced",
+         "warn"
+        ]
+       ],
+       "term": [
+        "$ kill -9 2450"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "03.3",
+     "title": "Services and systemd",
+     "steps": [
+      {
+       "say": "Services are background programs: web hosting, database access, remote connections.",
+       "actors": {
+        "sd": {
+         "k": "box",
+         "text": "systemd",
+         "x": 20,
+         "y": 50,
+         "tone": "brand",
+         "sub": "service manager",
+         "w": 20
+        },
+        "s1": {
+         "k": "box",
+         "text": "nginx",
+         "x": 78,
+         "y": 20,
+         "tone": "soft",
+         "sub": "web hosting",
+         "w": 22
+        },
+        "s2": {
+         "k": "box",
+         "text": "postgresql",
+         "x": 78,
+         "y": 50,
+         "tone": "soft",
+         "sub": "database access",
+         "w": 22
+        },
+        "s3": {
+         "k": "box",
+         "text": "sshd",
+         "x": 78,
+         "y": 80,
+         "tone": "soft",
+         "sub": "remote connections",
+         "w": 22
+        }
+       },
+       "edges": [
+        [
+         "sd",
+         "s1"
+        ],
+        [
+         "sd",
+         "s2"
+        ],
+        [
+         "sd",
+         "s3"
+        ]
+       ]
+      },
+      {
+       "say": "On systems that use systemd, services are managed with systemctl.",
+       "actors": {
+        "tip": {
+         "k": "pill",
+         "text": "systemctl = remote control for services",
+         "x": 20,
+         "y": 86,
+         "tone": "soft"
+        }
+       },
+       "edges": [
+        [
+         "sd",
+         "s1"
+        ],
+        [
+         "sd",
+         "s2"
+        ],
+        [
+         "sd",
+         "s3"
+        ]
+       ]
+      },
+      {
+       "say": "systemctl status reports whether a service is running.",
+       "actors": {
+        "s1": {
+         "tone": "ok",
+         "sub": "active (running)"
+        }
+       },
+       "edges": [
+        [
+         "sd",
+         "s1",
+         "",
+         "ok"
+        ],
+        [
+         "sd",
+         "s2"
+        ],
+        [
+         "sd",
+         "s3"
+        ]
+       ],
+       "term": [
+        "$ systemctl status nginx",
+        "● nginx.service - A high performance web server",
+        "+   Active: active (running)"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "03.4",
+     "title": "Start, Stop and Restart a Service",
+     "steps": [
+      {
+       "say": "A service is either running or stopped. nginx is stopped right now.",
+       "actors": {
+        "n": {
+         "k": "box",
+         "text": "nginx",
+         "x": 50,
+         "y": 36,
+         "tone": "dim",
+         "sub": "stopped",
+         "w": 22
+        },
+        "a": {
+         "k": "pill",
+         "text": "start",
+         "x": 20,
+         "y": 80,
+         "tone": "soft"
+        },
+        "b": {
+         "k": "pill",
+         "text": "stop",
+         "x": 40,
+         "y": 80,
+         "tone": "soft"
+        },
+        "c": {
+         "k": "pill",
+         "text": "restart",
+         "x": 60,
+         "y": 80,
+         "tone": "soft"
+        },
+        "d": {
+         "k": "pill",
+         "text": "status",
+         "x": 80,
+         "y": 80,
+         "tone": "soft"
+        }
+       }
+      },
+      {
+       "say": "start launches the service.",
+       "actors": {
+        "n": {
+         "tone": "ok",
+         "sub": "running"
+        },
+        "a": {
+         "tone": "brand"
+        }
+       },
+       "term": [
+        "$ sudo systemctl start nginx"
+       ]
+      },
+      {
+       "say": "stop shuts it down.",
+       "actors": {
+        "n": {
+         "tone": "dim",
+         "sub": "stopped"
+        },
+        "a": {
+         "tone": "soft"
+        },
+        "b": {
+         "tone": "brand"
+        }
+       },
+       "term": [
+        "$ sudo systemctl stop nginx"
+       ]
+      },
+      {
+       "say": "restart stops and starts it again, for example to load new configuration.",
+       "actors": {
+        "n": {
+         "tone": "ok",
+         "sub": "running again"
+        },
+        "b": {
+         "tone": "soft"
+        },
+        "c": {
+         "tone": "brand"
+        }
+       },
+       "term": [
+        "$ sudo systemctl restart nginx"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "03.5",
+     "title": "Start Now vs Start at Boot",
+     "steps": [
+      {
+       "say": "Starting a service only changes its current state.",
+       "actors": {
+        "n": {
+         "k": "box",
+         "text": "Running now",
+         "x": 25,
+         "y": 40,
+         "tone": "dim",
+         "sub": "no",
+         "w": 20
+        },
+        "b": {
+         "k": "box",
+         "text": "Starts at boot",
+         "x": 75,
+         "y": 40,
+         "tone": "dim",
+         "sub": "no",
+         "w": 20
+        }
+       }
+      },
+      {
+       "say": "systemctl start turns it on now, but it will not come back after a reboot.",
+       "actors": {
+        "n": {
+         "tone": "ok",
+         "sub": "yes"
+        }
+       },
+       "term": [
+        "$ sudo systemctl start nginx"
+       ]
+      },
+      {
+       "say": "systemctl enable configures automatic startup during system boot.",
+       "actors": {
+        "b": {
+         "tone": "ok",
+         "sub": "yes"
+        }
+       },
+       "edges": [
+        [
+         "b",
+         "n",
+         "starts it at boot",
+         "dash"
+        ]
+       ],
+       "term": [
+        "$ sudo systemctl enable nginx"
+       ]
+      },
+      {
+       "say": "After a reboot, an enabled service starts again on its own.",
+       "actors": {
+        "n": {
+         "sub": "started automatically"
+        },
+        "ok": {
+         "k": "pill",
+         "text": "After reboot: nginx is running again",
+         "x": 50,
+         "y": 82,
+         "tone": "ok",
+         "ic": "✓"
+        }
+       },
+       "edges": [
+        [
+         "b",
+         "n",
+         "starts it at boot",
+         "ok"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "03.6",
+     "title": "Read Service Logs with journalctl",
+     "steps": [
+      {
+       "say": "systemd collects the output of every service in one place: the journal.",
+       "actors": {
+        "ng": {
+         "k": "box",
+         "text": "nginx",
+         "x": 15,
+         "y": 24,
+         "tone": "soft",
+         "sub": "writes log messages",
+         "w": 20
+        },
+        "jr": {
+         "k": "box",
+         "text": "systemd journal",
+         "x": 15,
+         "y": 72,
+         "tone": "brand",
+         "sub": "collects them",
+         "w": 22
+        }
+       },
+       "edges": [
+        [
+         "ng",
+         "jr",
+         "",
+         "ok"
+        ]
+       ]
+      },
+      {
+       "say": "journalctl -u nginx shows the logs of one service.",
+       "actors": {
+        "p": {
+         "k": "code",
+         "title": "journalctl -u nginx",
+         "lines": [
+          "Nov 11 10:01 nginx[812]: started",
+          "Nov 11 10:03 nginx[812]: GET /",
+          "Nov 11 10:04 nginx[812]: GET /login",
+          "Nov 11 10:09 nginx[812]: reload"
+         ],
+         "x": 66,
+         "y": 48,
+         "w": 50
+        }
+       },
+       "edges": [
+        [
+         "ng",
+         "jr",
+         "",
+         "ok"
+        ]
+       ],
+       "term": [
+        "$ journalctl -u nginx"
+       ]
+      },
+      {
+       "say": "-n 20 limits the output to the 20 most recent entries.",
+       "actors": {
+        "p": {
+         "title": "journalctl -u nginx -n 20",
+         "lines": [
+          [
+           "Nov 11 10:04 nginx[812]: GET /login",
+           "hl"
+          ],
+          [
+           "Nov 11 10:09 nginx[812]: reload",
+           "hl"
+          ],
+          [
+           "(only the latest entries)",
+           "dim"
+          ]
+         ]
+        }
+       },
+       "edges": [
+        [
+         "ng",
+         "jr",
+         "",
+         "ok"
+        ]
+       ],
+       "term": [
+        "$ journalctl -u nginx -n 20"
+       ]
+      },
+      {
+       "say": "-f follows the log and prints new messages as they arrive.",
+       "actors": {
+        "p": {
+         "title": "journalctl -u nginx -f",
+         "lines": [
+          "Nov 11 10:09 nginx[812]: reload",
+          [
+           "Nov 11 10:12 nginx[812]: GET /health",
+           "add"
+          ]
+         ]
+        }
+       },
+       "edges": [
+        [
+         "ng",
+         "jr",
+         "live",
+         "dash"
+        ]
+       ],
+       "term": [
+        "$ journalctl -u nginx -f"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "03.7",
+     "title": "Troubleshoot a Failing Service",
+     "steps": [
+      {
+       "say": "nginx stopped working. Start with its status.",
+       "actors": {
+        "s1": {
+         "k": "box",
+         "text": "1 · Check status",
+         "x": 20,
+         "y": 20,
+         "tone": "brand",
+         "w": 22
+        },
+        "s2": {
+         "k": "box",
+         "text": "2 · Read the logs",
+         "x": 50,
+         "y": 20,
+         "tone": "plain",
+         "w": 22
+        },
+        "s3": {
+         "k": "box",
+         "text": "3 · Fix and restart",
+         "x": 80,
+         "y": 20,
+         "tone": "plain",
+         "w": 22
+        },
+        "p": {
+         "k": "code",
+         "title": "systemctl status nginx",
+         "lines": [
+          "● nginx.service",
+          [
+           "   Active: failed (Result: exit-code)",
+           "del"
+          ],
+          "   Main PID: 903 (code=exited)"
+         ],
+         "x": 50,
+         "y": 66,
+         "w": 62
+        }
+       },
+       "edges": [
+        [
+         "s1",
+         "s2"
+        ],
+        [
+         "s2",
+         "s3"
+        ]
+       ],
+       "term": [
+        "$ systemctl status nginx"
+       ]
+      },
+      {
+       "say": "Then read the recent logs to find the reason.",
+       "actors": {
+        "s1": {
+         "tone": "ok"
+        },
+        "s2": {
+         "tone": "brand"
+        },
+        "p": {
+         "title": "journalctl -u nginx -n 20",
+         "lines": [
+          "nginx[903]: starting up",
+          [
+           "nginx[903]: bind() to 0.0.0.0:80 failed (98: Address already in use)",
+           "hl"
+          ],
+          "nginx[903]: exiting"
+         ]
+        }
+       },
+       "edges": [
+        [
+         "s1",
+         "s2",
+         "",
+         "ok"
+        ],
+        [
+         "s2",
+         "s3"
+        ]
+       ],
+       "term": [
+        "$ journalctl -u nginx -n 20"
+       ]
+      },
+      {
+       "say": "Fix the cause (free port 80), restart the service and confirm it is running.",
+       "actors": {
+        "s2": {
+         "tone": "ok"
+        },
+        "s3": {
+         "tone": "brand"
+        },
+        "p": {
+         "title": "systemctl status nginx",
+         "lines": [
+          "● nginx.service",
+          [
+           "   Active: active (running)",
+           "add"
+          ],
+          "   Main PID: 1177 (nginx)"
+         ]
+        }
+       },
+       "edges": [
+        [
+         "s1",
+         "s2",
+         "",
+         "ok"
+        ],
+        [
+         "s2",
+         "s3",
+         "",
+         "ok"
+        ]
+       ],
+       "term": [
+        "$ sudo systemctl restart nginx",
+        "$ systemctl status nginx"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "04",
+   "title": "Networking & Remote Access",
+   "subtopics": [
+    {
+     "id": "04.1",
+     "title": "IP Addresses, Ports and DNS",
+     "steps": [
+      {
+       "say": "An IP address identifies a device or network interface.",
+       "actors": {
+        "lp": {
+         "k": "box",
+         "text": "Your laptop",
+         "x": 14,
+         "y": 50,
+         "tone": "plain",
+         "sub": "192.168.1.10",
+         "w": 20
+        },
+        "sv": {
+         "k": "box",
+         "text": "Server",
+         "x": 84,
+         "y": 50,
+         "tone": "brand",
+         "sub": "192.168.1.50",
+         "w": 22
+        }
+       },
+       "edges": [
+        [
+         "lp",
+         "sv",
+         "IP address"
+        ]
+       ]
+      },
+      {
+       "say": "A port identifies a communication endpoint on that device: SSH uses 22, HTTP 80 and HTTPS 443.",
+       "actors": {
+        "sv": null,
+        "zs": {
+         "k": "zone",
+         "text": "192.168.1.50",
+         "x": 78,
+         "y": 50,
+         "w": 38,
+         "h": 88
+        },
+        "p1": {
+         "k": "pill",
+         "text": "22 · SSH",
+         "x": 78,
+         "y": 26,
+         "tone": "soft"
+        },
+        "p2": {
+         "k": "pill",
+         "text": "80 · HTTP",
+         "x": 78,
+         "y": 50,
+         "tone": "soft"
+        },
+        "p3": {
+         "k": "pill",
+         "text": "443 · HTTPS",
+         "x": 78,
+         "y": 74,
+         "tone": "soft"
+        }
+       },
+       "edges": [
+        [
+         "lp",
+         "p2",
+         "port 80",
+         "ok"
+        ]
+       ]
+      },
+      {
+       "say": "DNS translates a domain name into an IP address, so you never need to remember numbers.",
+       "actors": {
+        "dns": {
+         "k": "box",
+         "text": "DNS",
+         "x": 38,
+         "y": 14,
+         "tone": "brand",
+         "sub": "name → IP address",
+         "w": 20
+        }
+       },
+       "edges": [
+        [
+         "lp",
+         "dns",
+         "example.com ?"
+        ],
+        [
+         "dns",
+         "zs",
+         "192.168.1.50",
+         "ok"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "04.2",
+     "title": "Test Connectivity with ping",
+     "steps": [
+      {
+       "say": "ping sends a small request to a host to see whether it answers.",
+       "actors": {
+        "lp": {
+         "k": "box",
+         "text": "Your laptop",
+         "x": 16,
+         "y": 50,
+         "tone": "plain",
+         "w": 20
+        },
+        "h": {
+         "k": "box",
+         "text": "google.com",
+         "x": 84,
+         "y": 50,
+         "tone": "soft",
+         "sub": "remote host",
+         "w": 20
+        }
+       },
+       "edges": [
+        [
+         "lp",
+         "h",
+         "echo request",
+         "dash"
+        ]
+       ],
+       "term": [
+        "$ ping -c 4 google.com"
+       ]
+      },
+      {
+       "say": "A reply means the host is reachable. -c 4 stops after four requests.",
+       "actors": {
+        "h": {
+         "tone": "ok",
+         "sub": "replied · 12 ms"
+        }
+       },
+       "edges": [
+        [
+         "h",
+         "lp",
+         "echo reply",
+         "ok"
+        ]
+       ],
+       "term": [
+        "64 bytes from google.com: time=12 ms",
+        "64 bytes from google.com: time=11 ms"
+       ]
+      },
+      {
+       "say": "No reply can mean the host is down, blocked by a firewall or unreachable.",
+       "actors": {
+        "h": {
+         "tone": "bad",
+         "sub": "no reply"
+        }
+       },
+       "edges": [
+        [
+         "lp",
+         "h",
+         "timeout",
+         "warn"
+        ]
+       ],
+       "term": [
+        "!Request timeout for icmp_seq 1"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "04.3",
+     "title": "Make HTTP Requests with curl",
+     "steps": [
+      {
+       "say": "curl fetches a URL and prints what comes back: ideal for testing websites and APIs.",
+       "actors": {
+        "cu": {
+         "k": "box",
+         "text": "curl",
+         "x": 14,
+         "y": 46,
+         "tone": "brand",
+         "w": 14
+        },
+        "ex": {
+         "k": "box",
+         "text": "example.com",
+         "x": 50,
+         "y": 24,
+         "tone": "soft",
+         "sub": "website",
+         "w": 18
+        },
+        "p": {
+         "k": "code",
+         "title": "response",
+         "lines": [
+          "<!doctype html>",
+          "<html>",
+          "  <h1>Example Domain</h1>",
+          "</html>"
+         ],
+         "x": 82,
+         "y": 50,
+         "w": 32
+        }
+       },
+       "edges": [
+        [
+         "cu",
+         "ex",
+         "GET",
+         "ok"
+        ]
+       ],
+       "term": [
+        "$ curl https://example.com"
+       ]
+      },
+      {
+       "say": "curl -I asks only for the response headers, such as the status code.",
+       "actors": {
+        "p": {
+         "title": "response headers",
+         "lines": [
+          [
+           "HTTP/2 200",
+           "hl"
+          ],
+          "content-type: text/html",
+          "content-length: 1256"
+         ]
+        }
+       },
+       "edges": [
+        [
+         "cu",
+         "ex",
+         "HEAD",
+         "ok"
+        ]
+       ],
+       "term": [
+        "$ curl -I https://example.com"
+       ]
+      },
+      {
+       "say": "Point curl at localhost to check that your own backend is answering.",
+       "actors": {
+        "ex": null,
+        "lc": {
+         "k": "box",
+         "text": "localhost:3000",
+         "x": 50,
+         "y": 72,
+         "tone": "ok",
+         "sub": "your backend",
+         "w": 20
+        },
+        "p": {
+         "title": "response",
+         "lines": [
+          "{ \"status\": \"ok\" }"
+         ]
+        }
+       },
+       "edges": [
+        [
+         "cu",
+         "lc",
+         "GET /",
+         "ok"
+        ]
+       ],
+       "term": [
+        "$ curl http://localhost:3000"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "04.4",
+     "title": "Inspect Listening Ports with ss",
+     "steps": [
+      {
+       "say": "ss -tuln lists the TCP and UDP ports that are listening for connections.",
+       "actors": {
+        "p": {
+         "k": "code",
+         "title": "ss -tuln",
+         "lines": [
+          "Netid State  Local Address:Port",
+          "tcp   LISTEN 0.0.0.0:22",
+          "tcp   LISTEN 0.0.0.0:80",
+          "tcp   LISTEN 127.0.0.1:3000"
+         ],
+         "x": 26,
+         "y": 50,
+         "w": 42
+        },
+        "a1": {
+         "k": "box",
+         "text": "sshd",
+         "x": 78,
+         "y": 22,
+         "tone": "plain",
+         "sub": "port 22",
+         "w": 22
+        },
+        "a2": {
+         "k": "box",
+         "text": "nginx",
+         "x": 78,
+         "y": 50,
+         "tone": "plain",
+         "sub": "port 80",
+         "w": 22
+        },
+        "a3": {
+         "k": "box",
+         "text": "node app",
+         "x": 78,
+         "y": 78,
+         "tone": "plain",
+         "sub": "port 3000",
+         "w": 22
+        }
+       },
+       "term": [
+        "$ ss -tuln"
+       ]
+      },
+      {
+       "say": "With sudo and -p, ss also shows which process owns each port.",
+       "actors": {
+        "p": {
+         "title": "sudo ss -tulpn",
+         "lines": [
+          "State  Local Address:Port  Process",
+          "LISTEN 0.0.0.0:22          sshd",
+          "LISTEN 0.0.0.0:80          nginx",
+          "LISTEN 127.0.0.1:3000      node"
+         ]
+        },
+        "a1": {
+         "tone": "soft"
+        },
+        "a2": {
+         "tone": "soft"
+        },
+        "a3": {
+         "tone": "soft"
+        }
+       },
+       "term": [
+        "$ sudo ss -tulpn"
+       ]
+      },
+      {
+       "say": "If your app is missing from the list, it is not listening on its expected port.",
+       "actors": {
+        "p": {
+         "title": "ss -tuln",
+         "lines": [
+          "Netid State  Local Address:Port",
+          "tcp   LISTEN 0.0.0.0:22",
+          "tcp   LISTEN 0.0.0.0:80",
+          [
+           "(nothing on port 3000)",
+           "del"
+          ]
+         ]
+        },
+        "a3": {
+         "tone": "bad",
+         "sub": "not listening"
+        }
+       },
+       "term": [
+        "$ ss -tuln"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "04.5",
+     "title": "Connect to a Server with SSH",
+     "steps": [
+      {
+       "say": "Secure Shell (SSH) opens an encrypted connection to a remote Linux machine, usually on port 22.",
+       "actors": {
+        "lp": {
+         "k": "box",
+         "text": "Your laptop",
+         "x": 16,
+         "y": 50,
+         "tone": "plain",
+         "sub": "student",
+         "w": 20
+        },
+        "sv": {
+         "k": "box",
+         "text": "Cloud server",
+         "x": 84,
+         "y": 50,
+         "tone": "soft",
+         "sub": "192.168.1.50",
+         "w": 22
+        }
+       },
+       "edges": [
+        [
+         "lp",
+         "sv",
+         "SSH · port 22",
+         "dash"
+        ]
+       ]
+      },
+      {
+       "say": "The connection is encrypted, so commands and passwords cannot be read on the way.",
+       "actors": {
+        "en": {
+         "k": "pill",
+         "text": "Encrypted connection",
+         "x": 50,
+         "y": 22,
+         "tone": "ok",
+         "ic": "✓"
+        }
+       },
+       "edges": [
+        [
+         "lp",
+         "sv",
+         "encrypted",
+         "ok"
+        ]
+       ],
+       "term": [
+        "$ ssh student@192.168.1.50",
+        "student@192.168.1.50's password: ",
+        "+Welcome to Ubuntu 24.04 LTS"
+       ]
+      },
+      {
+       "say": "From now on, every command you type runs on the remote server.",
+       "actors": {
+        "sv": {
+         "tone": "brand",
+         "sub": "you are logged in"
+        },
+        "pr": {
+         "k": "pill",
+         "text": "student@server:~$",
+         "x": 50,
+         "y": 82,
+         "tone": "ok"
+        }
+       },
+       "edges": [
+        [
+         "lp",
+         "sv",
+         "encrypted",
+         "ok"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "04.6",
+     "title": "SSH Key Authentication",
+     "steps": [
+      {
+       "say": "ssh-keygen creates a key pair: a private key and a matching public key.",
+       "actors": {
+        "pk": {
+         "k": "box",
+         "text": "Private key",
+         "x": 22,
+         "y": 26,
+         "tone": "brand",
+         "sub": "id_ed25519 · keep secret",
+         "w": 24
+        },
+        "pb": {
+         "k": "box",
+         "text": "Public key",
+         "x": 78,
+         "y": 26,
+         "tone": "soft",
+         "sub": "id_ed25519.pub · shareable",
+         "w": 24
+        }
+       },
+       "edges": [
+        [
+         "pk",
+         "pb",
+         "matching pair"
+        ]
+       ],
+       "term": [
+        "$ ssh-keygen -t ed25519 -C \"student@example.com\""
+       ]
+      },
+      {
+       "say": "ssh-copy-id installs the public key on the server.",
+       "actors": {
+        "sv": {
+         "k": "box",
+         "text": "Server",
+         "x": 78,
+         "y": 74,
+         "tone": "plain",
+         "sub": "~/.ssh/authorized_keys",
+         "w": 24
+        }
+       },
+       "edges": [
+        [
+         "pk",
+         "pb",
+         "matching pair"
+        ],
+        [
+         "pb",
+         "sv",
+         "ssh-copy-id",
+         "dash"
+        ]
+       ],
+       "term": [
+        "$ ssh-copy-id student@192.168.1.50"
+       ]
+      },
+      {
+       "say": "Now the private key proves who you are: no password needed.",
+       "actors": {
+        "sv": {
+         "tone": "ok",
+         "sub": "key matches · access granted"
+        }
+       },
+       "edges": [
+        [
+         "pk",
+         "sv",
+         "authenticates",
+         "ok"
+        ]
+       ],
+       "term": [
+        "$ ssh student@192.168.1.50",
+        "+Welcome to Ubuntu 24.04 LTS"
+       ]
+      },
+      {
+       "say": "The private key must stay secret and should never be committed to GitHub.",
+       "actors": {
+        "w": {
+         "k": "pill",
+         "text": "Never commit your private key",
+         "x": 22,
+         "y": 62,
+         "tone": "bad",
+         "ic": "✋"
+        }
+       },
+       "edges": [
+        [
+         "pk",
+         "sv",
+         "authenticates",
+         "ok"
+        ]
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "05",
+   "title": "Package Management & Text Editing",
+   "subtopics": [
+    {
+     "id": "05.1",
+     "title": "Package Managers: apt and dnf",
+     "steps": [
+      {
+       "say": "A package manager installs, updates and removes software, and takes care of dependencies.",
+       "actors": {
+        "pm": {
+         "k": "box",
+         "text": "Package manager",
+         "x": 50,
+         "y": 20,
+         "tone": "brand",
+         "w": 22
+        },
+        "a": {
+         "k": "pill",
+         "text": "install",
+         "x": 14,
+         "y": 66,
+         "tone": "soft"
+        },
+        "b": {
+         "k": "pill",
+         "text": "update",
+         "x": 38,
+         "y": 66,
+         "tone": "soft"
+        },
+        "c": {
+         "k": "pill",
+         "text": "dependencies",
+         "x": 64,
+         "y": 66,
+         "tone": "soft"
+        },
+        "d": {
+         "k": "pill",
+         "text": "remove",
+         "x": 87,
+         "y": 66,
+         "tone": "soft"
+        }
+       },
+       "edges": [
+        [
+         "pm",
+         "a"
+        ],
+        [
+         "pm",
+         "b"
+        ],
+        [
+         "pm",
+         "c"
+        ],
+        [
+         "pm",
+         "d"
+        ]
+       ]
+      },
+      {
+       "say": "Ubuntu and Debian use apt. Red Hat-based systems use dnf, or yum on older ones.",
+       "actors": {
+        "pm": null,
+        "a": null,
+        "b": null,
+        "c": null,
+        "d": null,
+        "d1": {
+         "k": "box",
+         "text": "Ubuntu · Debian",
+         "x": 16,
+         "y": 28,
+         "tone": "plain",
+         "w": 20
+        },
+        "a1": {
+         "k": "box",
+         "text": "apt",
+         "x": 50,
+         "y": 28,
+         "tone": "brand",
+         "w": 14
+        },
+        "d2": {
+         "k": "box",
+         "text": "Red Hat-based",
+         "x": 16,
+         "y": 72,
+         "tone": "plain",
+         "w": 20
+        },
+        "a2": {
+         "k": "box",
+         "text": "dnf",
+         "x": 50,
+         "y": 72,
+         "tone": "brand",
+         "sub": "yum on older systems",
+         "w": 22
+        },
+        "rp": {
+         "k": "box",
+         "text": "Software repositories",
+         "x": 86,
+         "y": 50,
+         "tone": "soft",
+         "w": 20
+        }
+       },
+       "edges": [
+        [
+         "d1",
+         "a1"
+        ],
+        [
+         "d2",
+         "a2"
+        ],
+        [
+         "a1",
+         "rp"
+        ],
+        [
+         "a2",
+         "rp"
+        ]
+       ]
+      },
+      {
+       "say": "The available package manager depends on your distribution: check it first.",
+       "actors": {
+        "d1": {
+         "tone": "ok",
+         "sub": "detected"
+        },
+        "a1": {
+         "tone": "ok"
+        }
+       },
+       "edges": [
+        [
+         "d1",
+         "a1",
+         "",
+         "ok"
+        ],
+        [
+         "d2",
+         "a2"
+        ],
+        [
+         "a1",
+         "rp",
+         "",
+         "ok"
+        ],
+        [
+         "a2",
+         "rp"
+        ]
+       ],
+       "term": [
+        "$ cat /etc/os-release",
+        "NAME=\"Ubuntu\"",
+        "VERSION=\"24.04 LTS\""
+       ]
+      }
+     ]
+    },
+    {
+     "id": "05.2",
+     "title": "Install, Update and Remove with apt",
+     "steps": [
+      {
+       "say": "Your system keeps a list of available packages. Right now it is out of date.",
+       "actors": {
+        "zs": {
+         "k": "zone",
+         "text": "Your system",
+         "x": 30,
+         "y": 50,
+         "w": 52,
+         "h": 88
+        },
+        "pl": {
+         "k": "box",
+         "text": "Package list",
+         "x": 30,
+         "y": 28,
+         "tone": "warn",
+         "sub": "outdated",
+         "w": 22
+        },
+        "rp": {
+         "k": "box",
+         "text": "Repository",
+         "x": 84,
+         "y": 50,
+         "tone": "soft",
+         "sub": "latest packages",
+         "w": 20
+        }
+       }
+      },
+      {
+       "say": "sudo apt update refreshes the package list from the repository.",
+       "actors": {
+        "pl": {
+         "tone": "ok",
+         "sub": "up to date"
+        }
+       },
+       "edges": [
+        [
+         "rp",
+         "pl",
+         "refresh",
+         "dash"
+        ]
+       ],
+       "term": [
+        "$ sudo apt update"
+       ]
+      },
+      {
+       "say": "sudo apt install downloads nginx and the dependencies it needs.",
+       "actors": {
+        "ng": {
+         "k": "layer",
+         "text": "nginx",
+         "x": 30,
+         "y": 52,
+         "tone": "brand",
+         "w": 40
+        },
+        "d1": {
+         "k": "layer",
+         "text": "libssl (dependency)",
+         "x": 30,
+         "y": 66,
+         "tone": "soft",
+         "w": 40
+        },
+        "d2": {
+         "k": "layer",
+         "text": "libpcre2 (dependency)",
+         "x": 30,
+         "y": 80,
+         "tone": "soft",
+         "w": 40
+        }
+       },
+       "edges": [
+        [
+         "rp",
+         "ng",
+         "download",
+         "dash"
+        ]
+       ],
+       "term": [
+        "$ sudo apt install nginx"
+       ]
+      },
+      {
+       "say": "sudo apt upgrade brings installed packages up to date.",
+       "actors": {
+        "ng": {
+         "tone": "ok",
+         "sub": "updated"
+        }
+       },
+       "term": [
+        "$ sudo apt upgrade"
+       ]
+      },
+      {
+       "say": "sudo apt remove uninstalls a package you no longer need.",
+       "actors": {
+        "ng": null,
+        "rm": {
+         "k": "pill",
+         "text": "nginx removed",
+         "x": 30,
+         "y": 52,
+         "tone": "bad"
+        }
+       },
+       "term": [
+        "$ sudo apt remove nginx"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "05.3",
+     "title": "apt vs dnf: Same Idea, Different Command",
+     "steps": [
+      {
+       "say": "On Red Hat-based systems the same tasks are done with dnf instead of apt.",
+       "actors": {
+        "a": {
+         "k": "code",
+         "title": "Ubuntu · apt",
+         "lines": [
+          "sudo apt install nginx",
+          "sudo apt update",
+          "sudo apt remove nginx"
+         ],
+         "x": 26,
+         "y": 44,
+         "w": 42
+        },
+        "b": {
+         "k": "code",
+         "title": "Red Hat · dnf",
+         "lines": [
+          "sudo dnf install nginx",
+          "sudo dnf update",
+          "sudo dnf remove nginx"
+         ],
+         "x": 74,
+         "y": 44,
+         "w": 42
+        }
+       }
+      },
+      {
+       "say": "Install, update and remove map one-to-one, so only the command name changes.",
+       "actors": {
+        "a": {
+         "lines": [
+          [
+           "sudo apt install nginx",
+           "hl"
+          ],
+          [
+           "sudo apt update",
+           "hl"
+          ],
+          [
+           "sudo apt remove nginx",
+           "hl"
+          ]
+         ]
+        },
+        "b": {
+         "lines": [
+          [
+           "sudo dnf install nginx",
+           "hl"
+          ],
+          [
+           "sudo dnf update",
+           "hl"
+          ],
+          [
+           "sudo dnf remove nginx",
+           "hl"
+          ]
+         ]
+        },
+        "ok": {
+         "k": "pill",
+         "text": "Same tasks · different tool",
+         "x": 50,
+         "y": 84,
+         "tone": "ok",
+         "ic": "✓"
+        }
+       },
+       "term": [
+        "$ sudo dnf install nginx"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "05.4",
+     "title": "Edit Files with Nano",
+     "steps": [
+      {
+       "say": "nano opens a simple text editor inside the terminal, handy on remote servers.",
+       "actors": {
+        "p": {
+         "k": "code",
+         "title": "nano · app.conf",
+         "lines": [
+          "port=8080",
+          "debug=false",
+          "log_level=info"
+         ],
+         "x": 50,
+         "y": 36,
+         "w": 44
+        },
+        "sv": {
+         "k": "pill",
+         "text": "Ctrl + O   save",
+         "x": 32,
+         "y": 84,
+         "tone": "soft"
+        },
+        "ex": {
+         "k": "pill",
+         "text": "Ctrl + X   exit",
+         "x": 68,
+         "y": 84,
+         "tone": "soft"
+        }
+       },
+       "term": [
+        "$ nano app.conf"
+       ]
+      },
+      {
+       "say": "Type directly into the file. Here the port changes from 8080 to 9090.",
+       "actors": {
+        "p": {
+         "lines": [
+          [
+           "port=9090",
+           "hl"
+          ],
+          "debug=false",
+          "log_level=info"
+         ]
+        }
+       }
+      },
+      {
+       "say": "Ctrl + O saves (\"writes out\") the file.",
+       "actors": {
+        "sv": {
+         "tone": "brand"
+        },
+        "st": {
+         "k": "pill",
+         "text": "Wrote 3 lines",
+         "x": 50,
+         "y": 62,
+         "tone": "ok",
+         "ic": "✓"
+        }
+       }
+      },
+      {
+       "say": "Ctrl + X leaves nano and returns you to the shell.",
+       "actors": {
+        "p": null,
+        "st": null,
+        "sv": {
+         "tone": "soft"
+        },
+        "ex": {
+         "tone": "brand"
+        }
+       }
+      }
+     ]
+    },
+    {
+     "id": "05.5",
+     "title": "Edit Files with Vim",
+     "steps": [
+      {
+       "say": "Vim is a modal editor: what a key does depends on the mode. It starts in Normal mode.",
+       "actors": {
+        "nm": {
+         "k": "box",
+         "text": "Normal mode",
+         "x": 25,
+         "y": 30,
+         "tone": "brand",
+         "sub": "navigate and run commands",
+         "w": 26
+        },
+        "im": {
+         "k": "box",
+         "text": "Insert mode",
+         "x": 75,
+         "y": 30,
+         "tone": "plain",
+         "sub": "type text",
+         "w": 22
+        }
+       },
+       "term": [
+        "$ vim app.conf"
+       ]
+      },
+      {
+       "say": "Press i to enter Insert mode, where typing changes the text.",
+       "actors": {
+        "nm": {
+         "tone": "plain"
+        },
+        "im": {
+         "tone": "brand"
+        }
+       },
+       "edges": [
+        [
+         "nm",
+         "im",
+         "press  i",
+         "ok"
+        ]
+       ]
+      },
+      {
+       "say": "Press Esc to go back to Normal mode.",
+       "actors": {
+        "nm": {
+         "tone": "brand"
+        },
+        "im": {
+         "tone": "plain"
+        }
+       },
+       "edges": [
+        [
+         "im",
+         "nm",
+         "press  Esc",
+         "ok"
+        ]
+       ]
+      },
+      {
+       "say": "From Normal mode, colon commands save and quit.",
+       "actors": {
+        "a": {
+         "k": "pill",
+         "text": ":w  save",
+         "x": 14,
+         "y": 78,
+         "tone": "soft"
+        },
+        "b": {
+         "k": "pill",
+         "text": ":q  quit",
+         "x": 36,
+         "y": 78,
+         "tone": "soft"
+        },
+        "c": {
+         "k": "pill",
+         "text": ":wq  save and quit",
+         "x": 62,
+         "y": 78,
+         "tone": "ok",
+         "ic": "✓"
+        },
+        "d": {
+         "k": "pill",
+         "text": ":q!  quit without saving",
+         "x": 88,
+         "y": 78,
+         "tone": "warn"
+        }
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "06",
+   "title": "Shell Scripting & Automation",
+   "subtopics": [
+    {
+     "id": "06.1",
+     "title": "Your First Bash Script",
+     "steps": [
+      {
+       "say": "A script is a text file of commands. It begins with a shebang that names the interpreter.",
+       "actors": {
+        "p": {
+         "k": "code",
+         "title": "hello.sh",
+         "lines": [
+          "#!/bin/bash",
+          "",
+          "echo \"Welcome to Linux Shell Scripting\""
+         ],
+         "x": 34,
+         "y": 38,
+         "w": 52
+        },
+        "sb": {
+         "k": "pill",
+         "text": "#!/bin/bash picks the interpreter",
+         "x": 34,
+         "y": 66,
+         "tone": "brand"
+        }
+       }
+      },
+      {
+       "say": "chmod +x makes the script executable.",
+       "actors": {
+        "sb": null,
+        "f": {
+         "k": "file",
+         "text": "hello.sh",
+         "x": 84,
+         "y": 38,
+         "tone": "warn",
+         "sub": "-rw-r--r--",
+         "w": 14
+        }
+       },
+       "term": [
+        "$ chmod +x hello.sh"
+       ]
+      },
+      {
+       "say": "Now ./hello.sh runs it and prints the message.",
+       "actors": {
+        "f": {
+         "tone": "ok",
+         "sub": "-rwxr-xr-x"
+        },
+        "o": {
+         "k": "code",
+         "title": "output",
+         "lines": [
+          "Welcome to Linux Shell Scripting"
+         ],
+         "x": 66,
+         "y": 78,
+         "w": 44
+        }
+       },
+       "edges": [
+        [
+         "f",
+         "o",
+         "run",
+         "ok"
+        ]
+       ],
+       "term": [
+        "$ ./hello.sh",
+        "Welcome to Linux Shell Scripting"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "06.2",
+     "title": "Variables and Arguments",
+     "steps": [
+      {
+       "say": "Variables store values that you can reuse inside a script.",
+       "actors": {
+        "p": {
+         "k": "code",
+         "title": "greet.sh",
+         "lines": [
+          "#!/bin/bash",
+          "name=\"Student\"",
+          "echo \"Welcome, $name\""
+         ],
+         "x": 30,
+         "y": 42,
+         "w": 44
+        },
+        "vn": {
+         "k": "vol",
+         "text": "name",
+         "x": 78,
+         "y": 34,
+         "tone": "brand",
+         "sub": "\"Student\"",
+         "w": 14
+        }
+       }
+      },
+      {
+       "say": "echo reads the variable with $name and prints its value.",
+       "actors": {
+        "p": {
+         "lines": [
+          "#!/bin/bash",
+          "name=\"Student\"",
+          [
+           "echo \"Welcome, $name\"",
+           "hl"
+          ]
+         ]
+        },
+        "out": {
+         "k": "pill",
+         "text": "Welcome, Student",
+         "x": 78,
+         "y": 82,
+         "tone": "ok",
+         "ic": "✓"
+        }
+       },
+       "edges": [
+        [
+         "vn",
+         "out",
+         "$name",
+         "ok"
+        ]
+       ],
+       "term": [
+        "$ ./greet.sh",
+        "Welcome, Student"
+       ]
+      },
+      {
+       "say": "Command-line arguments such as $1 and $2 let users give different input on each run.",
+       "actors": {
+        "p": {
+         "title": "greet.sh",
+         "lines": [
+          "#!/bin/bash",
+          [
+           "echo \"Hello, $1\"",
+           "hl"
+          ]
+         ]
+        },
+        "vn": {
+         "text": "$1",
+         "sub": "\"Alice\""
+        },
+        "out": {
+         "text": "Hello, Alice"
+        }
+       },
+       "edges": [
+        [
+         "vn",
+         "out",
+         "$1",
+         "ok"
+        ]
+       ],
+       "clear": true,
+       "term": [
+        "$ ./greet.sh Alice",
+        "Hello, Alice"
+       ]
+      },
+      {
+       "say": "Run it again with another value and the same script gives a different result.",
+       "actors": {
+        "vn": {
+         "sub": "\"Bob\""
+        },
+        "out": {
+         "text": "Hello, Bob"
+        }
+       },
+       "edges": [
+        [
+         "vn",
+         "out",
+         "$1",
+         "ok"
+        ]
+       ],
+       "term": [
+        "$ ./greet.sh Bob",
+        "Hello, Bob"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "06.3",
+     "title": "Conditions: if and else",
+     "steps": [
+      {
+       "say": "Conditions let a script decide what to do. This one checks whether config.txt exists.",
+       "actors": {
+        "p": {
+         "k": "code",
+         "title": "check.sh",
+         "lines": [
+          "if [ -f \"config.txt\" ]; then",
+          "    echo \"Configuration file found\"",
+          "else",
+          "    echo \"Configuration file is missing\"",
+          "fi"
+         ],
+         "x": 24,
+         "y": 46,
+         "w": 40
+        },
+        "dc": {
+         "k": "box",
+         "text": "Does config.txt exist?",
+         "x": 72,
+         "y": 18,
+         "tone": "brand",
+         "sub": "[ -f \"config.txt\" ]",
+         "w": 24
+        },
+        "yes": {
+         "k": "box",
+         "text": "Configuration file found",
+         "x": 60,
+         "y": 68,
+         "tone": "plain",
+         "w": 20
+        },
+        "no": {
+         "k": "box",
+         "text": "Configuration file is missing",
+         "x": 88,
+         "y": 68,
+         "tone": "plain",
+         "w": 20
+        }
+       },
+       "edges": [
+        [
+         "dc",
+         "yes",
+         "true"
+        ],
+        [
+         "dc",
+         "no",
+         "false"
+        ]
+       ]
+      },
+      {
+       "say": "When the file exists, the test succeeds and the if branch runs.",
+       "actors": {
+        "p": {
+         "lines": [
+          "if [ -f \"config.txt\" ]; then",
+          [
+           "    echo \"Configuration file found\"",
+           "hl"
+          ],
+          "else",
+          "    echo \"Configuration file is missing\"",
+          "fi"
+         ]
+        },
+        "cf": {
+         "k": "file",
+         "text": "config.txt",
+         "x": 92,
+         "y": 18,
+         "tone": "ok",
+         "w": 12
+        },
+        "yes": {
+         "tone": "ok"
+        }
+       },
+       "edges": [
+        [
+         "dc",
+         "yes",
+         "true",
+         "ok"
+        ],
+        [
+         "dc",
+         "no",
+         "false",
+         "dash"
+        ]
+       ],
+       "term": [
+        "$ touch config.txt",
+        "$ ./check.sh",
+        "+Configuration file found"
+       ]
+      },
+      {
+       "say": "Remove the file and the else branch runs instead.",
+       "actors": {
+        "p": {
+         "lines": [
+          "if [ -f \"config.txt\" ]; then",
+          "    echo \"Configuration file found\"",
+          "else",
+          [
+           "    echo \"Configuration file is missing\"",
+           "hl"
+          ],
+          "fi"
+         ]
+        },
+        "cf": null,
+        "yes": {
+         "tone": "plain"
+        },
+        "no": {
+         "tone": "bad"
+        }
+       },
+       "edges": [
+        [
+         "dc",
+         "yes",
+         "true",
+         "dash"
+        ],
+        [
+         "dc",
+         "no",
+         "false",
+         "warn"
+        ]
+       ],
+       "term": [
+        "$ rm config.txt",
+        "$ ./check.sh",
+        "!Configuration file is missing"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "06.4",
+     "title": "Loops: Repeat Work with for",
+     "steps": [
+      {
+       "say": "A for loop repeats the same commands for each value in a list.",
+       "actors": {
+        "p": {
+         "k": "code",
+         "title": "loop.sh",
+         "lines": [
+          "for item in Git Linux Docker",
+          "do",
+          "    echo \"Learning: $item\"",
+          "done"
+         ],
+         "x": 28,
+         "y": 36,
+         "w": 44
+        },
+        "lp": {
+         "k": "pill",
+         "text": "item = ?",
+         "x": 78,
+         "y": 36,
+         "tone": "soft"
+        },
+        "i1": {
+         "k": "box",
+         "text": "Git",
+         "x": 18,
+         "y": 74,
+         "tone": "plain",
+         "w": 16
+        },
+        "i2": {
+         "k": "box",
+         "text": "Linux",
+         "x": 50,
+         "y": 74,
+         "tone": "plain",
+         "w": 16
+        },
+        "i3": {
+         "k": "box",
+         "text": "Docker",
+         "x": 82,
+         "y": 74,
+         "tone": "plain",
+         "w": 16
+        }
+       }
+      },
+      {
+       "say": "First pass: item is Git, so the loop prints Learning: Git.",
+       "actors": {
+        "lp": {
+         "text": "item = Git",
+         "tone": "brand"
+        },
+        "i1": {
+         "tone": "brand"
+        }
+       },
+       "term": [
+        "$ ./loop.sh",
+        "Learning: Git"
+       ]
+      },
+      {
+       "say": "Second pass: item becomes Linux.",
+       "actors": {
+        "lp": {
+         "text": "item = Linux"
+        },
+        "i1": {
+         "tone": "ok"
+        },
+        "i2": {
+         "tone": "brand"
+        }
+       },
+       "term": [
+        "Learning: Linux"
+       ]
+      },
+      {
+       "say": "Third pass: Docker. After the last value the loop ends by itself.",
+       "actors": {
+        "lp": {
+         "text": "loop finished",
+         "tone": "ok",
+         "ic": "✓"
+        },
+        "i2": {
+         "tone": "ok"
+        },
+        "i3": {
+         "tone": "ok"
+        }
+       },
+       "term": [
+        "Learning: Docker"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "06.5",
+     "title": "Mini Project: Backup Script Walkthrough",
+     "steps": [
+      {
+       "say": "backup.sh takes a project directory as its argument and copies it to a timestamped backup folder.",
+       "actors": {
+        "b1": {
+         "k": "box",
+         "text": "1 · Read the input",
+         "x": 14,
+         "y": 20,
+         "tone": "brand",
+         "w": 20
+        },
+        "b2": {
+         "k": "box",
+         "text": "2 · Validate it",
+         "x": 38,
+         "y": 20,
+         "tone": "plain",
+         "w": 20
+        },
+        "b3": {
+         "k": "box",
+         "text": "3 · Build the path",
+         "x": 62,
+         "y": 20,
+         "tone": "plain",
+         "w": 20
+        },
+        "b4": {
+         "k": "box",
+         "text": "4 · Copy with cp -r",
+         "x": 86,
+         "y": 20,
+         "tone": "plain",
+         "w": 20
+        },
+        "p": {
+         "k": "code",
+         "title": "backup.sh · inputs",
+         "lines": [
+          "SOURCE_DIR=\"$1\"",
+          "BACKUP_ROOT=\"$HOME/backups\""
+         ],
+         "x": 50,
+         "y": 62,
+         "w": 66
+        }
+       },
+       "edges": [
+        [
+         "b1",
+         "b2"
+        ],
+        [
+         "b2",
+         "b3"
+        ],
+        [
+         "b3",
+         "b4"
+        ]
+       ]
+      },
+      {
+       "say": "The script stops with a usage message when the argument is missing or not a directory.",
+       "actors": {
+        "b1": {
+         "tone": "ok"
+        },
+        "b2": {
+         "tone": "brand"
+        },
+        "p": {
+         "title": "backup.sh · validate",
+         "lines": [
+          "if [ -z \"$SOURCE_DIR\" ] || [ ! -d \"$SOURCE_DIR\" ]; then",
+          "    echo \"Usage: ./backup.sh <existing-directory>\"",
+          "    exit 1",
+          "fi"
+         ]
+        }
+       },
+       "edges": [
+        [
+         "b1",
+         "b2",
+         "",
+         "ok"
+        ],
+        [
+         "b2",
+         "b3"
+        ],
+        [
+         "b3",
+         "b4"
+        ]
+       ]
+      },
+      {
+       "say": "It creates the backup root and builds a name from the current date and time.",
+       "actors": {
+        "b2": {
+         "tone": "ok"
+        },
+        "b3": {
+         "tone": "brand"
+        },
+        "p": {
+         "title": "backup.sh · timestamp",
+         "lines": [
+          "mkdir -p \"$BACKUP_ROOT\"",
+          "TIMESTAMP=$(date +\"%Y-%m-%d_%H-%M-%S\")",
+          "BACKUP_DIR=\"$BACKUP_ROOT/backup_$TIMESTAMP\""
+         ]
+        }
+       },
+       "edges": [
+        [
+         "b1",
+         "b2",
+         "",
+         "ok"
+        ],
+        [
+         "b2",
+         "b3",
+         "",
+         "ok"
+        ],
+        [
+         "b3",
+         "b4"
+        ]
+       ]
+      },
+      {
+       "say": "cp -r copies the project, and the script reports success or failure.",
+       "actors": {
+        "b3": {
+         "tone": "ok"
+        },
+        "b4": {
+         "tone": "brand"
+        },
+        "p": {
+         "title": "backup.sh · copy",
+         "lines": [
+          "if cp -r \"$SOURCE_DIR\" \"$BACKUP_DIR\"; then",
+          "    echo \"Backup completed successfully.\"",
+          "else",
+          "    echo \"Backup failed.\"",
+          "    exit 1",
+          "fi"
+         ]
+        }
+       },
+       "edges": [
+        [
+         "b1",
+         "b2",
+         "",
+         "ok"
+        ],
+        [
+         "b2",
+         "b3",
+         "",
+         "ok"
+        ],
+        [
+         "b3",
+         "b4",
+         "",
+         "ok"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "06.6",
+     "title": "Mini Project: Run and Verify the Backup",
+     "steps": [
+      {
+       "say": "Create a sample project, then make backup.sh executable.",
+       "actors": {
+        "zp": {
+         "k": "zone",
+         "text": "my-project",
+         "x": 20,
+         "y": 50,
+         "w": 30,
+         "h": 62
+        },
+        "rd": {
+         "k": "file",
+         "text": "README.txt",
+         "x": 20,
+         "y": 56,
+         "tone": "plain",
+         "w": 14
+        },
+        "zb": {
+         "k": "zone",
+         "text": "~/backups",
+         "x": 68,
+         "y": 50,
+         "w": 52,
+         "h": 88
+        }
+       },
+       "term": [
+        "$ chmod +x backup.sh",
+        "$ mkdir -p my-project",
+        "$ touch my-project/README.txt"
+       ]
+      },
+      {
+       "say": "Run the script with the project as its argument. A timestamped copy appears in ~/backups.",
+       "actors": {
+        "b1": {
+         "k": "box",
+         "text": "backup_2026-11-12_10-30-12",
+         "x": 68,
+         "y": 32,
+         "tone": "ok",
+         "sub": "copy of my-project",
+         "w": 36
+        }
+       },
+       "edges": [
+        [
+         "zp",
+         "b1",
+         "cp -r",
+         "ok"
+        ]
+       ],
+       "term": [
+        "$ ./backup.sh my-project",
+        "+Backup completed successfully.",
+        "Location: /home/student/backups/backup_2026-11-12_10-30-12"
+       ]
+      },
+      {
+       "say": "Each execution creates a separate backup, so earlier copies are never overwritten.",
+       "actors": {
+        "b2": {
+         "k": "box",
+         "text": "backup_2026-11-12_10-45-40",
+         "x": 68,
+         "y": 68,
+         "tone": "ok",
+         "sub": "copy of my-project",
+         "w": 36
+        }
+       },
+       "edges": [
+        [
+         "zp",
+         "b1",
+         "",
+         "ok"
+        ],
+        [
+         "zp",
+         "b2",
+         "cp -r",
+         "ok"
+        ]
+       ],
+       "term": [
+        "$ ./backup.sh my-project",
+        "+Backup completed successfully."
+       ]
+      },
+      {
+       "say": "Without a valid directory, the script prints its usage message and exits.",
+       "actors": {
+        "w": {
+         "k": "pill",
+         "text": "exit 1 · nothing copied",
+         "x": 20,
+         "y": 90,
+         "tone": "bad",
+         "ic": "!"
+        }
+       },
+       "edges": [
+        [
+         "zp",
+         "b1",
+         "",
+         "ok"
+        ],
+        [
+         "zp",
+         "b2",
+         "",
+         "ok"
+        ]
+       ],
+       "term": [
+        "$ ./backup.sh missing-dir",
+        "!Usage: ./backup.sh <existing-directory>"
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
 }
-

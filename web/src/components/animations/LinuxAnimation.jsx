@@ -1,5 +1,7 @@
 import { useMemo } from "react";
 import data from "./linux-animations.json";
+// Phase 2 (phone layout): add  import mobileData from "./linux-animations.mobile.json";
+// and pass  mobileAnimation={findAnimation(mobileData, id)}  exactly like GitAnimation.jsx does.
 import StepAnimation from "./StepAnimation";
 import { findAnimation } from "./stepEngine";
 
