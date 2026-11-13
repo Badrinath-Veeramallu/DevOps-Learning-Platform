@@ -45,11 +45,14 @@ const register = async (req, res) => {
       });
     }
 
-    // 2. Validate password length
-    if (password.length < 8) {
+    // 2. Validate password strength (min 8 chars, upper, lower, digit, special)
+    const STRONG_PW_REGEX =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[@#$!%&*^()_+=\-{}[\]|\\:;"'<>,.?/~`]).{8,}$/;
+    if (!STRONG_PW_REGEX.test(password)) {
       return res.status(400).json({
         success: false,
-        message: "Password must be at least 8 characters long",
+        message:
+          "Password must be at least 8 characters and include an uppercase letter, a lowercase letter, a number, and a special character (e.g. @, #, $, !).",
       });
     }
 

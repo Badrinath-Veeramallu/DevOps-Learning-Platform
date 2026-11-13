@@ -1,14 +1,18 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { activityAPI } from "../services/api";
+import { LearningStreak } from "./LearningStreak";
+import { calculateStreaks } from "../utils/streakUtils";
 
 /**
- * ActivityHeatmap — Real GitHub/LeetCode-style 12-month calendar activity grid.
+ * ActivityHeatmap — Real GitHub/LeetCode-style 12-month calendar activity grid
+ * with integrated Learning Streak metrics.
  *
  * Fetches real authenticated activity history from /api/activity?tz=...
  * Displays real daily counts, responsive week columns, month labels without collisions,
- * exact-pixel weekday row alignments, and reactive updates on stop/module completion.
+ * exact-pixel weekday row alignments, reactive updates on stop/module completion,
+ * and current & longest learning streak statistics.
  */
-export const ActivityHeatmap = ({ className = "" }) => {
+export const ActivityHeatmap = ({ className = "", streak: streakProp = null }) => {
   const [activityData, setActivityData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -68,6 +72,22 @@ export const ActivityHeatmap = ({ className = "" }) => {
     }
     return map;
   }, [activityData]);
+
+  // Derived or backend-provided streak data
+  const streakData = useMemo(() => {
+    if (streakProp) return streakProp;
+    if (activityData && activityData.streak) {
+      return activityData.streak;
+    }
+    if (activityData && Array.isArray(activityData.days)) {
+      const tz =
+        typeof Intl !== "undefined" && Intl.DateTimeFormat
+          ? Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC"
+          : "UTC";
+      return calculateStreaks(activityData.days, tz);
+    }
+    return null;
+  }, [activityData, streakProp]);
 
   const totalActivities = activityData?.total ?? 0;
 
@@ -206,22 +226,30 @@ export const ActivityHeatmap = ({ className = "" }) => {
     <div className={`activity-heatmap-card ${className}`}>
       {/* Header Stat & Title */}
       <div className="heatmap-header-row">
-        <div>
+        <div className="heatmap-header-info">
           <div className="heatmap-title-wrap">
             <h3 className="heatmap-heading">Learning Activity</h3>
           </div>
           <p className="heatmap-subtitle">Your learning activity over the past year.</p>
         </div>
 
-        <div className="heatmap-summary-stat">
-          <span className="summary-stat-count">
-            {loading && !activityData ? "—" : totalActivities}
-          </span>
-          <span className="summary-stat-label">
-            {totalActivities === 1
-              ? "activity in the last year"
-              : "activities in the last year"}
-          </span>
+        <div className="heatmap-header-metrics">
+          <LearningStreak
+            streak={streakData}
+            loading={loading && !activityData}
+            variant="inline"
+          />
+
+          <div className="heatmap-summary-stat">
+            <span className="summary-stat-count">
+              {loading && !activityData ? "—" : totalActivities}
+            </span>
+            <span className="summary-stat-label">
+              {totalActivities === 1
+                ? "activity in the last year"
+                : "activities in the last year"}
+            </span>
+          </div>
         </div>
       </div>
 

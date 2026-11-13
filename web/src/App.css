@@ -1293,6 +1293,11 @@
 
 /* Welcome Section */
 .dashboard-welcome-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
   margin-bottom: 2.5rem;
 }
 
@@ -2214,6 +2219,11 @@
 }
 
 .dashboard-welcome-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
   margin-bottom: 2.5rem;
 }
 
@@ -2770,6 +2780,108 @@
   margin: 0;
 }
 
+.heatmap-header-metrics {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+/* Minimal Learning Streak Statistics (LeetCode style text statistics) */
+.heatmap-streak-stats {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  font-size: 0.9rem;
+  color: #797587;
+  padding: 0.25rem 0;
+}
+
+.streak-stat-item {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  white-space: nowrap;
+}
+
+.streak-stat-label {
+  font-weight: 500;
+  color: #797587;
+}
+
+.streak-stat-value {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: #171521;
+  font-size: 0.975rem;
+}
+
+/* Streak Pill (Compact Variant for Dashboard Header) */
+.streak-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.95rem;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.streak-pill.streak-active {
+  background: #fff4ed;
+  color: #9a3412;
+  border: 1px solid #fed7aa;
+  box-shadow: 0 1px 3px rgba(154, 52, 18, 0.08);
+}
+
+.streak-pill.streak-inactive {
+  background: #fcf8f9;
+  color: #60343d;
+  border: 1px solid #e8dde0;
+}
+
+.streak-pill-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.streak-pill.streak-active .streak-pill-icon {
+  color: #ea580c;
+}
+
+.streak-pill.streak-inactive .streak-pill-icon {
+  color: #a8a29e;
+}
+
+.streak-pill-count {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.streak-pill-label {
+  font-size: 0.775rem;
+  color: inherit;
+}
+
+.streak-pill-dot.pending {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #f59e0b;
+  margin-left: 0.15rem;
+}
+
+.streak-pill-skeleton {
+  width: 90px;
+  height: 24px;
+  border-radius: 9999px;
+  background: #f5ecef;
+  animation: pulse 1.5s infinite;
+}
+
 .heatmap-summary-stat {
   display: flex;
   flex-direction: column;
@@ -3054,6 +3166,19 @@
   .heatmap-header-row {
     flex-direction: column;
     align-items: flex-start;
+    gap: 1.25rem;
+  }
+
+  .heatmap-header-metrics {
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .heatmap-streak-stats {
+    flex-wrap: wrap;
+    gap: 1.25rem;
   }
 
   .heatmap-summary-stat {
@@ -4670,7 +4795,6 @@
   }
 }
 
-
 /* =========================================================
    PATHWAY SEQUENTIAL UNLOCKING & LOCKED STATE STYLES
    ========================================================= */
@@ -4875,3 +4999,136 @@
   color: #1f2937 !important;
   text-decoration: none;
 }
+
+/* ============================================================
+   Password Strength Panel
+   ============================================================ */
+
+.input-with-toggle {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-with-toggle input {
+  width: 100%;
+  padding-right: 2.6rem; /* make room for the toggle button */
+}
+
+.pw-toggle-btn {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: #9b8f92;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  transition: color 0.15s ease;
+}
+
+.pw-toggle-btn:hover {
+  color: #3B1F24;
+}
+
+/* Panel wrapper — no background, no border, just spacing */
+.pw-strength-panel {
+  margin-top: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+/* Criteria list */
+.pw-rule-list {
+  list-style: none;
+  margin: 0 0 0.6rem 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.pw-rule-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  transition: color 0.2s ease;
+}
+
+.pw-rule-item.met {
+  color: #15803d;
+}
+
+.pw-rule-item.unmet {
+  color: #9b8f92;
+}
+
+/* Strength bar */
+.pw-strength-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.pw-strength-bar {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+}
+
+.pw-strength-segment {
+  flex: 1;
+  height: 3px;
+  border-radius: 2px;
+  transition: background-color 0.3s ease;
+}
+
+/* Burgundy strength palette — all shades verified WCAG 2.1 AA
+   Weak   #A65D70  → 4.75:1 vs white (text ≥4.5 ✓, UI ≥3.0 ✓)
+   Medium #853B52  → 7.65:1 vs white (✓)
+   Strong #68263F  → 10.84:1 vs white (✓)
+   All three also clear 3.0:1 against the unfilled bar (#E8DDE0).
+*/
+.strength-empty   { background-color: #E8DDE0; }
+.strength-weak    { background-color: #A65D70; }
+.strength-medium  { background-color: #853B52; }
+.strength-strong  { background-color: #68263F; }
+
+.pw-strength-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  min-width: 3.5rem;
+  text-align: right;
+}
+
+.strength-label-weak   { color: #A65D70; }
+.strength-label-medium { color: #853B52; }
+.strength-label-strong { color: #68263F; }
+
+/* Password input border — applied when user is typing, keyed to strength */
+.form-group input.pw-border-weak {
+  border-color: #A65D70;
+  box-shadow: 0 0 0 3px rgba(166, 93, 112, 0.10);
+}
+
+.form-group input.pw-border-medium {
+  border-color: #853B52;
+  box-shadow: 0 0 0 3px rgba(133, 59, 82, 0.11);
+}
+
+.form-group input.pw-border-strong {
+  border-color: #68263F;
+  box-shadow: 0 0 0 3px rgba(104, 38, 63, 0.12);
+}
+
+/* Password field-error text — keyed to strength (overrides generic red) */
+.pw-error-weak   { font-size: 0.75rem; color: #A65D70; }
+.pw-error-medium { font-size: 0.75rem; color: #853B52; }
+.pw-error-strong { font-size: 0.75rem; color: #68263F; }

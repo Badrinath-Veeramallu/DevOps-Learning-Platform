@@ -1,11 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
-import {
-  isPathwayUnlocked,
-  getPathwayLockReason,
-  fetchAllPathwaysStatus,
-} from "../services/progressService";
+import { activityAPI } from "../services/api";
+import { LearningStreak } from "../components/LearningStreak";
 
 export const Dashboard = () => {
   const { user } = useAuth();
@@ -15,19 +12,41 @@ export const Dashboard = () => {
   const [activeTrackId, setActiveTrackId] = useState(() => {
     return localStorage.getItem("devops_active_track") || "git";
   });
-  const [, setProgressTick] = useState(0);
+  const [streak, setStreak] = useState(null);
+  const [loadingStreak, setLoadingStreak] = useState(true);
 
-  // Sync pathways progress on mount and listen to real-time progress events
+  const fetchStreak = useCallback(async () => {
+    try {
+      const tz =
+        typeof Intl !== "undefined" && Intl.DateTimeFormat
+          ? Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC"
+          : "UTC";
+      const res = await activityAPI.getStreak(tz);
+      if (res && res.streak) {
+        setStreak(res.streak);
+      }
+    } catch {
+      // Quiet fallback if offline or backend route pending
+    } finally {
+      setLoadingStreak(false);
+    }
+  }, []);
+
   useEffect(() => {
-    fetchAllPathwaysStatus(userId);
+    fetchStreak();
 
-    const onProgressUpdate = () => {
-      setProgressTick((t) => t + 1);
+    const handleUpdate = () => {
+      fetchStreak();
     };
 
-    window.addEventListener("devops_progress_updated", onProgressUpdate);
-    return () => window.removeEventListener("devops_progress_updated", onProgressUpdate);
-  }, [userId]);
+    window.addEventListener("devops_progress_updated", handleUpdate);
+    window.addEventListener("devops_activity_updated", handleUpdate);
+
+    return () => {
+      window.removeEventListener("devops_progress_updated", handleUpdate);
+      window.removeEventListener("devops_activity_updated", handleUpdate);
+    };
+  }, [fetchStreak]);
 
   const firstName = user?.name ? user.name.trim().split(" ")[0] : "Learner";
 
@@ -135,10 +154,17 @@ export const Dashboard = () => {
       <div className="dashboard-content-container">
         {/* Welcome Section */}
         <header className="dashboard-welcome-header">
-          <h1>Welcome back, {firstName}</h1>
-          <p className="dashboard-subtitle">
-            Master the DevOps lifecycle sequentially: Git &rarr; Docker &rarr; Linux
-          </p>
+          <div className="dashboard-welcome-content">
+            <h1>Welcome back, {firstName}</h1>
+            <p className="dashboard-subtitle">
+              Continue learning or choose a learning path to get started.
+            </p>
+          </div>
+          <LearningStreak
+            streak={streak}
+            loading={loadingStreak}
+            variant="pill"
+          />
         </header>
 
         {/* Continue Learning Section */}

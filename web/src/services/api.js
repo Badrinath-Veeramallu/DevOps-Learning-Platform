@@ -126,6 +126,11 @@ export const activityAPI = {
       method: "GET",
     }),
 
+  getStreak: (tz = "UTC") =>
+    request(`/activity/streak?tz=${encodeURIComponent(tz)}`, {
+      method: "GET",
+    }),
+
   logActivity: ({ type, pathwayId = "git", stopSlug }) =>
     request("/activity/log", {
       method: "POST",
