@@ -15,5 +15,6 @@ class RouteNames {
   static const String dockerModule = '/pathways/docker/:moduleId';
   static const String linuxPathway = '/pathways/linux';
   static const String linuxModule = '/pathways/linux/:moduleId';
+  static const String pathwayQuiz = '/pathways/:pathwayId/quiz';
   static const String profile = '/profile';
 }

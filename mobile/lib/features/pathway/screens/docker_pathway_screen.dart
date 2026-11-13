@@ -397,6 +397,8 @@ class _DockerPathwayScreenState extends State<DockerPathwayScreen> {
                           modules: _modules,
                           completedModuleIds: _completedIds,
                           onSelectModule: _handleSelectModule,
+                          onFinishTap: () =>
+                              context.push('/pathways/docker/quiz'),
                           finishText:
                               'Containerization & Docker Architecture Mastered!',
                         ),

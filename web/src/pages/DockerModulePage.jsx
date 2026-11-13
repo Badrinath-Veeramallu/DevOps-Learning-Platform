@@ -609,7 +609,27 @@ export const DockerModulePage = () => {
                 </div>
               </Link>
             ) : (
-              <div className="nav-module-spacer" />
+              <Link
+                to="/pathways/docker/quiz"
+                className="btn-nav-module btn-finish-pathway"
+                style={{
+                  background: "#15803d",
+                  borderColor: "#15803d",
+                  color: "#ffffff",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  padding: "0.75rem 1.25rem",
+                  borderRadius: "10px",
+                  textDecoration: "none",
+                  fontWeight: 700,
+                }}
+              >
+                <span>Take Final Quiz</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <polyline points="9 18 15 12 9 6" />
+                </svg>
+              </Link>
             )}
 
             <Link to="/pathways/docker" className="btn-return-pathway">
@@ -661,7 +681,27 @@ export const DockerModulePage = () => {
                 </div>
               )
             ) : (
-              <div className="nav-module-spacer" />
+              <Link
+                to="/pathways/docker/quiz"
+                className="btn-nav-module btn-finish-pathway"
+                style={{
+                  background: "#15803d",
+                  borderColor: "#15803d",
+                  color: "#ffffff",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  padding: "0.75rem 1.25rem",
+                  borderRadius: "10px",
+                  textDecoration: "none",
+                  fontWeight: 700,
+                }}
+              >
+                <span>Take Final Quiz</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <polyline points="9 18 15 12 9 6" />
+                </svg>
+              </Link>
             )}
           </div>
         </footer>

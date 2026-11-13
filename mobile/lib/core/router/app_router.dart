@@ -15,6 +15,7 @@ import '../../features/pathway/screens/docker_pathway_screen.dart';
 import '../../features/pathway/screens/git_pathway_screen.dart';
 import '../../features/pathway/screens/linux_pathway_screen.dart';
 import '../../features/profile/screens/profile_screen.dart';
+import '../../features/quiz/screens/pathway_quiz_screen.dart';
 import '../../providers/auth_provider.dart';
 import 'route_names.dart';
 
@@ -179,6 +180,14 @@ class AppRouter {
           builder: (BuildContext context, GoRouterState state) {
             final moduleId = state.pathParameters['moduleId'] ?? '';
             return LinuxModuleScreen(moduleId: moduleId);
+          },
+        ),
+        GoRoute(
+          path: RouteNames.pathwayQuiz,
+          name: 'pathwayQuiz',
+          builder: (BuildContext context, GoRouterState state) {
+            final pathwayId = state.pathParameters['pathwayId'] ?? 'git';
+            return PathwayQuizScreen(pathwayId: pathwayId);
           },
         ),
         GoRoute(

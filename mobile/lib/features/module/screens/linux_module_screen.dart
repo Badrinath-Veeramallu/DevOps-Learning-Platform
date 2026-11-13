@@ -531,6 +531,7 @@ class _LinuxModuleScreenState extends State<LinuxModuleScreen> {
               if (target != null) _navigateToModule(target);
             },
             onReturnToPathway: _handleBackToPathway,
+            onTakeQuiz: () => context.push('/pathways/linux/quiz'),
           ),
 
           const SizedBox(height: 40),

@@ -484,6 +484,7 @@ class _GitModuleScreenState extends State<GitModuleScreen> {
             onToggleComplete: _handleToggleComplete,
             onNavigateModule: _handleNavigateModule,
             onReturnToPathway: _handleBackToPathway,
+            onTakeQuiz: () => context.push('/pathways/git/quiz'),
           ),
         ],
       ),

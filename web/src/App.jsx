@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useParams } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { Navbar } from "./components/Navbar";
 import { ProtectedRoute } from "./components/ProtectedRoute";
@@ -14,7 +14,17 @@ import { LinuxPathwayPage } from "./pages/LinuxPathwayPage";
 import { LinuxModulePage } from "./pages/LinuxModulePage";
 import { DockerPathwayPage } from "./pages/DockerPathwayPage";
 import { DockerModulePage } from "./pages/DockerModulePage";
+import { PathwayQuizPage } from "./pages/PathwayQuizPage";
 import "./App.css";
+
+/**
+ * Redirects legacy /pathway/:pathwayId/quiz to /pathways/:pathwayId/quiz
+ * using the captured pathwayId parameter.
+ */
+function LegacyQuizRedirect() {
+  const { pathwayId } = useParams();
+  return <Navigate to={`/pathways/${pathwayId}/quiz`} replace />;
+}
 
 /**
  * Inner layout wrapper — hides the app Navbar on the root Kage landing page
@@ -132,6 +142,38 @@ function AppLayout() {
           <Route
             path="/pathway/docker/:moduleId"
             element={<Navigate to="/pathways/docker" replace />}
+          />
+
+          {/* Final Pathway Quiz Routes */}
+          <Route
+            path="/pathways/git/quiz"
+            element={
+              <ProtectedRoute>
+                <PathwayQuizPage pathwayId="git" />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/pathways/docker/quiz"
+            element={
+              <ProtectedRoute>
+                <PathwayQuizPage pathwayId="docker" />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/pathways/linux/quiz"
+            element={
+              <ProtectedRoute>
+                <PathwayQuizPage pathwayId="linux" />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Legacy Quiz Alias Redirect */}
+          <Route
+            path="/pathway/:pathwayId/quiz"
+            element={<LegacyQuizRedirect />}
           />
 
           {/* Catch-all fallback */}

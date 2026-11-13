@@ -442,6 +442,7 @@ class _LinuxPathwayScreenState extends State<LinuxPathwayScreen> {
               modules: _modules,
               completedModuleIds: _completedIds,
               onSelectModule: _handleSelectModule,
+              onFinishTap: () => context.push('/pathways/linux/quiz'),
               finishText: 'Linux System Administration Mastered!',
             ),
             const SizedBox(height: 48),

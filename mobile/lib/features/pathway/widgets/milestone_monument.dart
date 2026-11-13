@@ -11,11 +11,15 @@ enum MilestoneMonumentType { start, finish }
 class MilestoneMonument extends StatelessWidget {
   final MilestoneMonumentType type;
   final bool isAllCompleted;
+  final VoidCallback? onTap;
+  final String? label;
 
   const MilestoneMonument({
     super.key,
     required this.type,
     this.isAllCompleted = false,
+    this.onTap,
+    this.label,
   });
 
   @override
@@ -43,7 +47,7 @@ class MilestoneMonument extends StatelessWidget {
         ? const Color(0xFFE8DDE0)
         : (isFinishDone ? const Color(0xFF15803D) : AppColors.primary);
 
-    return Column(
+    final content = Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -94,7 +98,7 @@ class MilestoneMonument extends StatelessWidget {
             ],
           ),
           child: Text(
-            isStart ? 'START' : 'FINISH',
+            label ?? (isStart ? 'START' : 'FINISH'),
             textAlign: TextAlign.center,
             maxLines: 1,
             softWrap: false,
@@ -109,5 +113,15 @@ class MilestoneMonument extends StatelessWidget {
         ),
       ],
     );
+
+    if (onTap != null) {
+      return GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: content,
+      );
+    }
+
+    return content;
   }
 }

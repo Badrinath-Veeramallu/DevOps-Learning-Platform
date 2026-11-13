@@ -707,10 +707,22 @@ export const LinuxModulePage = () => {
               )
             ) : (
               <Link
-                to="/pathways/linux"
+                to="/pathways/linux/quiz"
                 className="btn-nav-module btn-finish-pathway"
+                style={{
+                  background: "#15803d",
+                  borderColor: "#15803d",
+                  color: "#ffffff",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  padding: "0.75rem 1.25rem",
+                  borderRadius: "10px",
+                  textDecoration: "none",
+                  fontWeight: 700,
+                }}
               >
-                <span>Complete Pathway</span>
+                <span>Take Final Quiz</span>
                 <svg
                   width="16"
                   height="16"
@@ -720,7 +732,7 @@ export const LinuxModulePage = () => {
                   strokeWidth="2.5"
                   aria-hidden="true"
                 >
-                  <polyline points="20 6 9 17 4 12" />
+                  <polyline points="9 18 15 12 9 6" />
                 </svg>
               </Link>
             )}

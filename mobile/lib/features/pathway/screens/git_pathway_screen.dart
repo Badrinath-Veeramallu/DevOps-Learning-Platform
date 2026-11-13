@@ -268,6 +268,7 @@ class _GitPathwayScreenState extends State<GitPathwayScreen> {
                           modules: _modules,
                           completedModuleIds: _completedIds,
                           onSelectModule: _handleSelectModule,
+                          onFinishTap: () => context.push('/pathways/git/quiz'),
                         ),
                         const SizedBox(height: 48),
                       ],

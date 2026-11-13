@@ -15,6 +15,7 @@ class GitPathwayMap extends StatefulWidget {
   final List<CurriculumModule> modules;
   final Set<String> completedModuleIds;
   final ValueChanged<String> onSelectModule;
+  final VoidCallback? onFinishTap;
   final String finishText;
 
   const GitPathwayMap({
@@ -22,6 +23,7 @@ class GitPathwayMap extends StatefulWidget {
     required this.modules,
     required this.completedModuleIds,
     required this.onSelectModule,
+    this.onFinishTap,
     this.finishText = 'DevOps Delivery Pipeline Mastered!',
   });
 
@@ -314,6 +316,10 @@ class _GitPathwayMapState extends State<GitPathwayMap> {
                             key: _finishMonumentKey,
                             type: MilestoneMonumentType.finish,
                             isAllCompleted: isAllCompleted,
+                            label: isAllCompleted && widget.onFinishTap != null
+                                ? 'FINAL QUIZ'
+                                : 'FINISH',
+                            onTap: isAllCompleted ? widget.onFinishTap : null,
                           ),
                           const SizedBox(height: 8),
                           ConstrainedBox(

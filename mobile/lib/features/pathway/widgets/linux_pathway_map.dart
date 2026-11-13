@@ -15,6 +15,7 @@ class LinuxPathwayMap extends StatefulWidget {
   final List<CurriculumModule> modules;
   final Set<String> completedModuleIds;
   final ValueChanged<String> onSelectModule;
+  final VoidCallback? onFinishTap;
   final String finishText;
 
   const LinuxPathwayMap({
@@ -22,6 +23,7 @@ class LinuxPathwayMap extends StatefulWidget {
     required this.modules,
     required this.completedModuleIds,
     required this.onSelectModule,
+    this.onFinishTap,
     this.finishText = 'Linux System Administration Mastered!',
   });
 
@@ -314,6 +316,10 @@ class _LinuxPathwayMapState extends State<LinuxPathwayMap> {
                             key: _finishMonumentKey,
                             type: MilestoneMonumentType.finish,
                             isAllCompleted: isAllCompleted,
+                            label: isAllCompleted && widget.onFinishTap != null
+                                ? 'FINAL QUIZ'
+                                : 'FINISH',
+                            onTap: isAllCompleted ? widget.onFinishTap : null,
                           ),
                           const SizedBox(height: 8),
                           ConstrainedBox(

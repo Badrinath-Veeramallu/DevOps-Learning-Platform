@@ -344,98 +344,194 @@ export const DockerPathwayMap = ({
           aria-label="Learning Pathway Finish"
         >
           <div className="pathway-endpoint-anchor">
-            <div
-              className={`pathway-endpoint-monument finish-monument ${
-                isAllCompleted ? "is-completed-all" : ""
-              }`}
-            >
-              <div
-                className="endpoint-icon-circle finish-circle"
-                title="Pathway Finish"
+            {isAllCompleted ? (
+              <Link
+                to="/pathways/docker/quiz"
+                className="pathway-endpoint-monument finish-monument is-completed-all"
+                title="All modules completed! Take the Final Quiz"
+                style={{ textDecoration: "none", cursor: "pointer" }}
               >
-                <svg
-                  width="28"
-                  height="28"
-                  viewBox="0 0 28 28"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  aria-hidden="true"
+                <div
+                  className="endpoint-icon-circle finish-circle"
+                  title="Final Quiz Available"
                 >
-                  <path
-                    d="M5 26V4"
-                    stroke="currentColor"
-                    strokeWidth="2.4"
-                    strokeLinecap="round"
-                  />
-                  <circle cx="5" cy="3.5" r="2" fill="currentColor" />
-                  <g transform="translate(6, 4)">
-                    <rect x="0" y="0" width="4.5" height="4.5" fill="#ffffff" />
-                    <rect
-                      x="4.5"
-                      y="0"
-                      width="4.5"
-                      height="4.5"
-                      fill="currentColor"
+                  <svg
+                    width="28"
+                    height="28"
+                    viewBox="0 0 28 28"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M5 26V4"
+                      stroke="currentColor"
+                      strokeWidth="2.4"
+                      strokeLinecap="round"
                     />
-                    <rect x="9" y="0" width="4.5" height="4.5" fill="#ffffff" />
-                    <rect
-                      x="13.5"
-                      y="0"
-                      width="4.5"
-                      height="4.5"
-                      fill="currentColor"
-                    />
+                    <circle cx="5" cy="3.5" r="2" fill="currentColor" />
+                    <g transform="translate(6, 4)">
+                      <rect x="0" y="0" width="4.5" height="4.5" fill="#ffffff" />
+                      <rect
+                        x="4.5"
+                        y="0"
+                        width="4.5"
+                        height="4.5"
+                        fill="currentColor"
+                      />
+                      <rect x="9" y="0" width="4.5" height="4.5" fill="#ffffff" />
+                      <rect
+                        x="13.5"
+                        y="0"
+                        width="4.5"
+                        height="4.5"
+                        fill="currentColor"
+                      />
 
-                    <rect
-                      x="0"
-                      y="4.5"
-                      width="4.5"
-                      height="4.5"
-                      fill="currentColor"
-                    />
-                    <rect
-                      x="4.5"
-                      y="4.5"
-                      width="4.5"
-                      height="4.5"
-                      fill="#ffffff"
-                    />
-                    <rect
-                      x="9"
-                      y="4.5"
-                      width="4.5"
-                      height="4.5"
-                      fill="currentColor"
-                    />
-                    <rect
-                      x="13.5"
-                      y="4.5"
-                      width="4.5"
-                      height="4.5"
-                      fill="#ffffff"
-                    />
+                      <rect
+                        x="0"
+                        y="4.5"
+                        width="4.5"
+                        height="4.5"
+                        fill="currentColor"
+                      />
+                      <rect
+                        x="4.5"
+                        y="4.5"
+                        width="4.5"
+                        height="4.5"
+                        fill="#ffffff"
+                      />
+                      <rect
+                        x="9"
+                        y="4.5"
+                        width="4.5"
+                        height="4.5"
+                        fill="currentColor"
+                      />
+                      <rect
+                        x="13.5"
+                        y="4.5"
+                        width="4.5"
+                        height="4.5"
+                        fill="#ffffff"
+                      />
 
-                    <rect x="0" y="9" width="4.5" height="4.5" fill="#ffffff" />
-                    <rect
-                      x="4.5"
-                      y="9"
-                      width="4.5"
-                      height="4.5"
-                      fill="currentColor"
+                      <rect x="0" y="9" width="4.5" height="4.5" fill="#ffffff" />
+                      <rect
+                        x="4.5"
+                        y="9"
+                        width="4.5"
+                        height="4.5"
+                        fill="currentColor"
+                      />
+                      <rect x="9" y="9" width="4.5" height="4.5" fill="#ffffff" />
+                      <rect
+                        x="13.5"
+                        y="9"
+                        width="4.5"
+                        height="4.5"
+                        fill="currentColor"
+                      />
+                    </g>
+                  </svg>
+                </div>
+                <span className="endpoint-label finish-label" style={{ background: "#15803d", borderColor: "#15803d" }}>
+                  FINAL QUIZ
+                </span>
+              </Link>
+            ) : (
+              <div
+                className="pathway-endpoint-monument finish-monument"
+              >
+                <div
+                  className="endpoint-icon-circle finish-circle"
+                  title="Pathway Finish"
+                >
+                  <svg
+                    width="28"
+                    height="28"
+                    viewBox="0 0 28 28"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M5 26V4"
+                      stroke="currentColor"
+                      strokeWidth="2.4"
+                      strokeLinecap="round"
                     />
-                    <rect x="9" y="9" width="4.5" height="4.5" fill="#ffffff" />
-                    <rect
-                      x="13.5"
-                      y="9"
-                      width="4.5"
-                      height="4.5"
-                      fill="currentColor"
-                    />
-                  </g>
-                </svg>
+                    <circle cx="5" cy="3.5" r="2" fill="currentColor" />
+                    <g transform="translate(6, 4)">
+                      <rect x="0" y="0" width="4.5" height="4.5" fill="#ffffff" />
+                      <rect
+                        x="4.5"
+                        y="0"
+                        width="4.5"
+                        height="4.5"
+                        fill="currentColor"
+                      />
+                      <rect x="9" y="0" width="4.5" height="4.5" fill="#ffffff" />
+                      <rect
+                        x="13.5"
+                        y="0"
+                        width="4.5"
+                        height="4.5"
+                        fill="currentColor"
+                      />
+
+                      <rect
+                        x="0"
+                        y="4.5"
+                        width="4.5"
+                        height="4.5"
+                        fill="currentColor"
+                      />
+                      <rect
+                        x="4.5"
+                        y="4.5"
+                        width="4.5"
+                        height="4.5"
+                        fill="#ffffff"
+                      />
+                      <rect
+                        x="9"
+                        y="4.5"
+                        width="4.5"
+                        height="4.5"
+                        fill="currentColor"
+                      />
+                      <rect
+                        x="13.5"
+                        y="4.5"
+                        width="4.5"
+                        height="4.5"
+                        fill="#ffffff"
+                      />
+
+                      <rect x="0" y="9" width="4.5" height="4.5" fill="#ffffff" />
+                      <rect
+                        x="4.5"
+                        y="9"
+                        width="4.5"
+                        height="4.5"
+                        fill="currentColor"
+                      />
+                      <rect x="9" y="9" width="4.5" height="4.5" fill="#ffffff" />
+                      <rect
+                        x="13.5"
+                        y="9"
+                        width="4.5"
+                        height="4.5"
+                        fill="currentColor"
+                      />
+                    </g>
+                  </svg>
+                </div>
+                <span className="endpoint-label finish-label">FINISH</span>
               </div>
-              <span className="endpoint-label finish-label">FINISH</span>
-            </div>
+            )}
           </div>
         </div>
       </div>

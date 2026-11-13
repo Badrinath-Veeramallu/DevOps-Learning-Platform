@@ -252,6 +252,52 @@ class ApiClient {
     }
   }
 
+  /// Fetch quiz questions for a pathway.
+  ///
+  /// Calls `GET /api/quiz/:pathwayId`.
+  Future<Map<String, dynamic>> getQuiz({required String pathwayId}) async {
+    try {
+      final response = await _dio.get(
+        '/quiz/${Uri.encodeComponent(pathwayId)}',
+      );
+      return response.data as Map<String, dynamic>;
+    } on DioException catch (e) {
+      throw ApiException.fromDioException(e);
+    }
+  }
+
+  /// Submit quiz answers for evaluation.
+  ///
+  /// Calls `POST /api/quiz/:pathwayId/submit`.
+  Future<Map<String, dynamic>> submitQuiz({
+    required String pathwayId,
+    required Map<String, int> answers,
+  }) async {
+    try {
+      final response = await _dio.post(
+        '/quiz/${Uri.encodeComponent(pathwayId)}/submit',
+        data: {'answers': answers},
+      );
+      return response.data as Map<String, dynamic>;
+    } on DioException catch (e) {
+      throw ApiException.fromDioException(e);
+    }
+  }
+
+  /// Get current quiz status and eligibility.
+  ///
+  /// Calls `GET /api/quiz/:pathwayId/status`.
+  Future<Map<String, dynamic>> getQuizStatus({required String pathwayId}) async {
+    try {
+      final response = await _dio.get(
+        '/quiz/${Uri.encodeComponent(pathwayId)}/status',
+      );
+      return response.data as Map<String, dynamic>;
+    } on DioException catch (e) {
+      throw ApiException.fromDioException(e);
+    }
+  }
+
   /// Fetch aggregated daily activity counts over the last 365 days ending today.
   ///
   /// Calls `GET /api/activity?tz=...`.

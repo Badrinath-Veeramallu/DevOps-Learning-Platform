@@ -156,6 +156,24 @@ export const progressAPI = {
     }),
 };
 
+export const quizAPI = {
+  getQuiz: (pathwayId = "git") =>
+    request(`/quiz/${encodeURIComponent(pathwayId)}`, {
+      method: "GET",
+    }),
+
+  submitQuiz: (pathwayId = "git", answers) =>
+    request(`/quiz/${encodeURIComponent(pathwayId)}/submit`, {
+      method: "POST",
+      body: JSON.stringify({ answers }),
+    }),
+
+  getQuizStatus: (pathwayId = "git") =>
+    request(`/quiz/${encodeURIComponent(pathwayId)}/status`, {
+      method: "GET",
+    }),
+};
+
 export const systemAPI = {
   warmup: () =>
     fetch(`${API_BASE_URL}/health`, { method: "GET" })

@@ -499,6 +499,7 @@ class _DockerModuleScreenState extends State<DockerModuleScreen> {
             onToggleComplete: _handleToggleComplete,
             onNavigateModule: _handleNavigateModule,
             onReturnToPathway: _handleBackToPathway,
+            onTakeQuiz: () => context.push('/pathways/docker/quiz'),
           ),
         ],
       ),

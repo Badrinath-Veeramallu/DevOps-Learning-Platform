@@ -18,6 +18,7 @@ class SubtopicNavFooter extends StatelessWidget {
   final VoidCallback onToggleComplete;
   final ValueChanged<String> onNavigateModule;
   final VoidCallback onReturnToPathway;
+  final VoidCallback? onTakeQuiz;
 
   const SubtopicNavFooter({
     super.key,
@@ -33,6 +34,7 @@ class SubtopicNavFooter extends StatelessWidget {
     required this.onToggleComplete,
     required this.onNavigateModule,
     required this.onReturnToPathway,
+    this.onTakeQuiz,
   });
 
   @override
@@ -282,6 +284,28 @@ class SubtopicNavFooter extends StatelessWidget {
                       color: isNextLocked ? AppColors.textSubtle : AppColors.primary,
                     ),
                   ],
+                ),
+              ),
+
+            if (nextModule == null && onTakeQuiz != null)
+              ElevatedButton.icon(
+                onPressed: onTakeQuiz,
+                icon: const Icon(Icons.quiz_outlined, size: 14),
+                label: const Text(
+                  'Final Quiz',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.success,
+                  foregroundColor: Colors.white,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
               ),
           ],
