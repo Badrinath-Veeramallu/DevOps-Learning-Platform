@@ -1,188 +1,17 @@
 import 'package:flutter/material.dart';
+
 import '../../../core/theme/app_colors.dart';
 import '../../../models/curriculum_model.dart';
 import 'milestone_monument.dart';
 import 'pathway_stop_node.dart';
+import 'pathway_track_painter.dart';
 
-/// Geometry coordinate configuration for the 6-stop Linux pathway roadmap.
-class LinuxRoadGeometry {
-  static const double laneWidth = 68.0;
-  static const double xStart = 34.0;
-  static const double xFinish = 42.0; // Right side aligned with Stop 6
-
-  static const List<double> nodeX = [
-    26.0, // Stop 1 (module 1) - Left
-    42.0, // Stop 2 (module 2) - Right
-    26.0, // Stop 3 (module 3) - Left
-    42.0, // Stop 4 (module 4) - Right
-    26.0, // Stop 5 (module 5) - Left
-    42.0, // Stop 6 (module 6) - Right
-  ];
-
-  static double getNodeX(int moduleIndex) {
-    if (moduleIndex < 0 || moduleIndex >= nodeX.length) return 34.0;
-    return nodeX[moduleIndex];
-  }
-
-  static double getEntryX(int moduleIndex) {
-    if (moduleIndex <= 0) {
-      return (xStart + nodeX[0]) / 2.0; // 30.0
-    }
-    return (nodeX[moduleIndex - 1] + nodeX[moduleIndex]) / 2.0;
-  }
-
-  static double getExitX(int moduleIndex) {
-    if (moduleIndex >= nodeX.length - 1) {
-      return (nodeX.last + xFinish) / 2.0; // 42.0
-    }
-    return (nodeX[moduleIndex] + nodeX[moduleIndex + 1]) / 2.0;
-  }
-}
-
-/// CustomPainter rendering smooth S-curved highway road segments for Linux.
-class LinuxContinuousRoadPainter extends CustomPainter {
-  final bool isStart;
-  final bool isFinish;
-  final int moduleIndex;
-  final Color cushionColor;
-  final Color baseColor;
-  final Color dashColor;
-
-  LinuxContinuousRoadPainter({
-    this.isStart = false,
-    this.isFinish = false,
-    this.moduleIndex = 0,
-    Color? cushionColor,
-    Color? baseColor,
-    Color? dashColor,
-  })  : cushionColor = cushionColor ??
-            const Color(0xFF2E171B).withValues(alpha: 0.55),
-        baseColor = baseColor ?? const Color(0xFF3B1F24),
-        dashColor = dashColor ?? const Color(0xFFB88A91);
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final path = Path();
-
-    if (isStart) {
-      const double x0 = LinuxRoadGeometry.xStart;
-      final double xExit = LinuxRoadGeometry.getEntryX(0);
-
-      path.moveTo(x0, 26);
-      path.cubicTo(
-        x0,
-        26 + (size.height - 26) * 0.45,
-        xExit,
-        size.height - (size.height - 26) * 0.45,
-        xExit,
-        size.height,
-      );
-    } else if (isFinish) {
-      const double xIn = LinuxRoadGeometry.xFinish;
-      const double xEnd = LinuxRoadGeometry.xFinish;
-
-      path.moveTo(xIn, 0);
-      path.cubicTo(
-        xIn,
-        26 * 0.45,
-        xEnd,
-        26 * 0.55,
-        xEnd,
-        26,
-      );
-    } else {
-      final double xIn = LinuxRoadGeometry.getEntryX(moduleIndex);
-      final double xNode = LinuxRoadGeometry.getNodeX(moduleIndex);
-      final double xOut = LinuxRoadGeometry.getExitX(moduleIndex);
-
-      path.moveTo(xIn, 0);
-      path.cubicTo(
-        xIn,
-        32 * 0.55,
-        xNode,
-        32 * 0.45,
-        xNode,
-        32,
-      );
-
-      final double dy = size.height - 32;
-      path.cubicTo(
-        xNode,
-        32 + dy * 0.42,
-        xOut,
-        size.height - dy * 0.42,
-        xOut,
-        size.height,
-      );
-    }
-
-    // 1. Cushion Outer Glow
-    final cushionPaint = Paint()
-      ..color = cushionColor
-      ..strokeWidth = 32.0
-      ..style = PaintingStyle.stroke
-      ..strokeCap = isStart || isFinish ? StrokeCap.round : StrokeCap.butt
-      ..strokeJoin = StrokeJoin.round;
-    canvas.drawPath(path, cushionPaint);
-
-    // 2. Base Surface
-    final basePaint = Paint()
-      ..color = baseColor
-      ..strokeWidth = 20.0
-      ..style = PaintingStyle.stroke
-      ..strokeCap = isStart || isFinish ? StrokeCap.round : StrokeCap.butt
-      ..strokeJoin = StrokeJoin.round;
-    canvas.drawPath(path, basePaint);
-
-    // 3. Dashed Center Markings
-    final dashPaint = Paint()
-      ..color = dashColor
-      ..strokeWidth = 3.0
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round;
-
-    _drawDashedPath(canvas, path, dashPaint, dashLength: 8.0, dashSpace: 6.0);
-  }
-
-  void _drawDashedPath(
-    Canvas canvas,
-    Path source,
-    Paint paint, {
-    required double dashLength,
-    required double dashSpace,
-  }) {
-    for (final metric in source.computeMetrics()) {
-      double distance = 0.0;
-      while (distance < metric.length) {
-        final length = (distance + dashLength < metric.length)
-            ? dashLength
-            : metric.length - distance;
-        final extract = metric.extractPath(distance, distance + length);
-        canvas.drawPath(extract, paint);
-        distance += dashLength + dashSpace;
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant LinuxContinuousRoadPainter oldDelegate) {
-    return oldDelegate.isStart != isStart ||
-        oldDelegate.isFinish != isFinish ||
-        oldDelegate.moduleIndex != moduleIndex;
-  }
-}
-
-/// Interactive 6-stop Linux Essentials learning pathway map.
+/// Interactive curved learning pathway map for Linux Essentials.
 ///
-/// Features:
-/// - Exact Web curriculum order (6 stops)
-/// - Connected winding pathway track with layered road cushions & dashed markings
-/// - START and FINISH milestone monuments
-/// - Responsive adaptation (linear mobile highway on phones, winding alternating S-curves on tablets/wide screens)
-/// - Visual state indication: Completed, Current Focus, Upcoming
-/// - Direct navigation to `/pathways/linux/:moduleId`
-class LinuxPathwayMap extends StatelessWidget {
+/// Renders a continuous cubic-Bézier pale-blush winding road in a background
+/// [CustomPaint] layer with responsive alternating left/right cards and
+/// completion nodes in the foreground [Stack] layer for Linux's 6 stops.
+class LinuxPathwayMap extends StatefulWidget {
   final List<CurriculumModule> modules;
   final Set<String> completedModuleIds;
   final ValueChanged<String> onSelectModule;
@@ -197,333 +26,382 @@ class LinuxPathwayMap extends StatelessWidget {
   });
 
   @override
+  State<LinuxPathwayMap> createState() => _LinuxPathwayMapState();
+}
+
+class _LinuxPathwayMapState extends State<LinuxPathwayMap> {
+  final GlobalKey _stackKey = GlobalKey();
+  final GlobalKey _startMonumentKey = GlobalKey();
+  final GlobalKey _finishMonumentKey = GlobalKey();
+  List<GlobalKey> _nodeKeys = [];
+
+  List<Offset> _measuredPoints = const [];
+  double _lastMeasuredWidth = -1;
+  bool _measurementScheduled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _syncNodeKeys();
+  }
+
+  @override
+  void didUpdateWidget(covariant LinuxPathwayMap oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final modulesChanged = oldWidget.modules.length != widget.modules.length;
+    final completionChanged =
+        oldWidget.completedModuleIds.length != widget.completedModuleIds.length;
+    if (modulesChanged) {
+      _syncNodeKeys();
+      _measuredPoints = const [];
+      _lastMeasuredWidth = -1;
+    } else if (completionChanged) {
+      _lastMeasuredWidth = -1;
+    }
+  }
+
+  void _syncNodeKeys() {
+    _nodeKeys = List<GlobalKey>.generate(
+      widget.modules.length,
+      (_) => GlobalKey(),
+    );
+  }
+
+  void _scheduleMeasurement(double width) {
+    if (_measurementScheduled) return;
+    _measurementScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _measurementScheduled = false;
+      if (!mounted) return;
+      _measurePoints(width);
+    });
+  }
+
+  void _measurePoints(double width) {
+    final stackBox =
+        _stackKey.currentContext?.findRenderObject() as RenderBox?;
+    if (stackBox == null || !stackBox.hasSize) return;
+
+    final startCenter = _resolveCenter(
+      _startMonumentKey,
+      stackBox,
+      // Monument emblem is a 52x52 circle anchored at the top center of the monument.
+      localAnchor: (size) => Offset(size.width / 2, 26.0),
+    );
+    final finishCenter = _resolveCenter(
+      _finishMonumentKey,
+      stackBox,
+      localAnchor: (size) => Offset(size.width / 2, 26.0),
+    );
+
+    if (startCenter == null || finishCenter == null) return;
+
+    final nextPoints = <Offset>[startCenter];
+    for (final key in _nodeKeys) {
+      final nodeCenter = _resolveCenter(
+        key,
+        stackBox,
+        localAnchor: (size) => Offset(size.width / 2, size.height / 2),
+      );
+      if (nodeCenter == null) return;
+      nextPoints.add(nodeCenter);
+    }
+    nextPoints.add(finishCenter);
+
+    final widthChanged = (width - _lastMeasuredWidth).abs() > 0.5;
+    if (widthChanged || _pointsDiffer(_measuredPoints, nextPoints)) {
+      setState(() {
+        _measuredPoints = nextPoints;
+        _lastMeasuredWidth = width;
+      });
+    }
+  }
+
+  Offset? _resolveCenter(
+    GlobalKey key,
+    RenderBox ancestor, {
+    required Offset Function(Size size) localAnchor,
+  }) {
+    final box = key.currentContext?.findRenderObject() as RenderBox?;
+    if (box == null || !box.hasSize) return null;
+    final global = box.localToGlobal(localAnchor(box.size));
+    return ancestor.globalToLocal(global);
+  }
+
+  bool _pointsDiffer(List<Offset> a, List<Offset> b) {
+    if (a.length != b.length) return true;
+    for (int i = 0; i < a.length; i++) {
+      if ((a[i] - b[i]).distance > 0.5) return true;
+    }
+    return false;
+  }
+
+  List<Offset> _estimateFallbackPoints(_PathwayMetrics metrics) {
+    final width = metrics.maxWidth;
+    final xLeft = metrics.edgeMargin + metrics.nodeSize / 2;
+    final xRight = width - metrics.edgeMargin - metrics.nodeSize / 2;
+    final xCenter = width / 2;
+
+    const double startY = 48.0;
+    const double estimatedCardHeight = 200.0;
+    final double stepStride = estimatedCardHeight + metrics.stopSpacing;
+
+    final points = <Offset>[Offset(xCenter, startY)];
+    double currentY = startY + 26.0 + metrics.stopSpacing + (estimatedCardHeight / 2);
+    for (int i = 0; i < widget.modules.length; i++) {
+      final isLeft = i % 2 == 0;
+      points.add(Offset(isLeft ? xLeft : xRight, currentY));
+      currentY += stepStride;
+    }
+
+    final finishY =
+        currentY - (estimatedCardHeight / 2) + 26.0;
+    points.add(Offset(xCenter, finishY));
+    return points;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    if (modules.isEmpty) {
+    if (widget.modules.isEmpty) {
       return const Center(
         child: Padding(
           padding: EdgeInsets.all(32.0),
-          child: CircularProgressIndicator(color: AppColors.lightAccent),
+          child: CircularProgressIndicator(color: AppColors.primary),
         ),
       );
     }
 
-    final currentStopIndex = modules.indexWhere(
-      (m) => !completedModuleIds.contains(m.id),
+    final currentStopIndex = widget.modules.indexWhere(
+      (m) => !widget.completedModuleIds.contains(m.id),
     );
     final activeIndex =
-        currentStopIndex == -1 ? modules.length - 1 : currentStopIndex;
-    final isAllCompleted =
-        modules.isNotEmpty && completedModuleIds.length >= modules.length;
+        currentStopIndex == -1 ? widget.modules.length - 1 : currentStopIndex;
+    final isAllCompleted = widget.modules.isNotEmpty &&
+        widget.completedModuleIds.length >= widget.modules.length;
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        if (constraints.maxWidth >= 720) {
-          return _buildTabletWindingLayout(
-            context,
-            constraints.maxWidth,
-            activeIndex,
-            isAllCompleted,
-          );
-        } else {
-          return _buildMobileLayout(
-            context,
-            constraints.maxWidth,
-            activeIndex,
-            isAllCompleted,
-          );
+        final maxWidth = constraints.maxWidth;
+        final metrics = _PathwayMetrics.fromWidth(maxWidth);
+
+        if ((maxWidth - _lastMeasuredWidth).abs() > 0.5 ||
+            _measuredPoints.length != widget.modules.length + 2) {
+          _scheduleMeasurement(maxWidth);
         }
-      },
-    );
-  }
 
-  Widget _buildMobileLayout(
-    BuildContext context,
-    double width,
-    int activeIndex,
-    bool isAllCompleted,
-  ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // START Monument Row
-        IntrinsicHeight(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              SizedBox(
-                width: LinuxRoadGeometry.laneWidth,
-                child: Stack(
-                  children: [
-                    Positioned.fill(
-                      child: CustomPaint(
-                        painter: LinuxContinuousRoadPainter(isStart: true),
+        final effectivePoints =
+            _measuredPoints.length == widget.modules.length + 2 &&
+                    (maxWidth - _lastMeasuredWidth).abs() <= 0.5
+                ? _measuredPoints
+                : _estimateFallbackPoints(metrics);
+
+        return NotificationListener<SizeChangedLayoutNotification>(
+          onNotification: (_) {
+            _scheduleMeasurement(maxWidth);
+            return false;
+          },
+          child: SizeChangedLayoutNotifier(
+            child: Stack(
+              key: _stackKey,
+              clipBehavior: Clip.none,
+              children: [
+                // Background Layer: Continuous Pale-Blush + Muted-Burgundy Road
+                Positioned.fill(
+                  child: IgnorePointer(
+                    child: CustomPaint(
+                      key: const Key('pathway_road_painter'),
+                      painter: PathwayTrackPainter(
+                        points: effectivePoints,
+                        cushionWidth: metrics.roadCushionWidth,
+                        roadWidth: metrics.roadBaseWidth,
+                        dashWidth: metrics.roadDashWidth,
+                        dashLength: metrics.roadDashLength,
+                        dashSpace: metrics.roadDashSpace,
                       ),
-                    ),
-                    Positioned(
-                      left: LinuxRoadGeometry.xStart - 26,
-                      top: 0,
-                      child: const MilestoneMonument(
-                        type: MilestoneMonumentType.start,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 10),
-              const Expanded(
-                child: Padding(
-                  padding: EdgeInsets.only(top: 14, bottom: 20),
-                  child: Text(
-                    'Journey Kickoff',
-                    style: TextStyle(
-                      color: AppColors.textSubtle,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.5,
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
-        ),
 
-        // 6 Stops with built-in continuous smooth winding road
-        ...List.generate(modules.length, (idx) {
-          final module = modules[idx];
-          final isCompleted = completedModuleIds.contains(module.id);
-          final isCurrent = idx == activeIndex && !isCompleted;
-          final status = isCompleted
-              ? StopStatus.completed
-              : (isCurrent ? StopStatus.current : StopStatus.upcoming);
-
-          final stopNode = PathwayStopNode(
-            module: module,
-            status: status,
-            onSelectModule: onSelectModule,
-            totalStops: modules.length,
-            showContinuousRoad: false,
-          );
-
-          return IntrinsicHeight(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                SizedBox(
-                  width: LinuxRoadGeometry.laneWidth,
-                  child: Stack(
-                    children: [
-                      Positioned.fill(
-                        child: CustomPaint(
-                          painter: LinuxContinuousRoadPainter(
-                            moduleIndex: idx,
+                // Foreground Layer: START Monument, Alternating Stop Cards/Nodes, FINISH Monument
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // START Monument Section
+                    Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text(
+                            'Journey Kickoff',
+                            style: TextStyle(
+                              color: AppColors.textSubtle,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.5,
+                            ),
                           ),
-                        ),
-                      ),
-                      Positioned(
-                        left: LinuxRoadGeometry.getNodeX(idx) - 24,
-                        top: 8,
-                        child: stopNode.buildNodeCircle(),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 20),
-                    child: stopNode.buildStopCard(context),
-                  ),
-                ),
-              ],
-            ),
-          );
-        }),
-
-        // FINISH Monument Row (aligned with Stop 6 on the right)
-        IntrinsicHeight(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              SizedBox(
-                width: LinuxRoadGeometry.laneWidth,
-                child: Stack(
-                  children: [
-                    Positioned.fill(
-                      child: CustomPaint(
-                        painter: LinuxContinuousRoadPainter(isFinish: true),
+                          const SizedBox(height: 8),
+                          MilestoneMonument(
+                            key: _startMonumentKey,
+                            type: MilestoneMonumentType.start,
+                          ),
+                        ],
                       ),
                     ),
-                    Positioned(
-                      left: LinuxRoadGeometry.xFinish - 26,
-                      top: 0,
-                      child: MilestoneMonument(
-                        type: MilestoneMonumentType.finish,
-                        isAllCompleted: isAllCompleted,
+                    SizedBox(height: metrics.stopSpacing),
+
+                    // Stop Rows (Alternating Left/Right Nodes & Cards)
+                    ...List.generate(widget.modules.length, (idx) {
+                      final module = widget.modules[idx];
+                      final isCompleted =
+                          widget.completedModuleIds.contains(module.id);
+                      final isCurrent = idx == activeIndex && !isCompleted;
+                      final status = isCompleted
+                          ? StopStatus.completed
+                          : (isCurrent
+                              ? StopStatus.current
+                              : StopStatus.upcoming);
+                      final isLeft = idx % 2 == 0;
+
+                      final nodeWidget = KeyedSubtree(
+                        key: _nodeKeys[idx],
+                        child: PathwayStopNode(
+                          module: module,
+                          status: status,
+                          onSelectModule: widget.onSelectModule,
+                          isNodeOnly: true,
+                          totalStops: widget.modules.length,
+                          nodeSize: metrics.nodeSize,
+                        ),
+                      );
+
+                      final cardWidget = Expanded(
+                        child: PathwayStopNode(
+                          module: module,
+                          status: status,
+                          onSelectModule: widget.onSelectModule,
+                          totalStops: widget.modules.length,
+                          nodeSize: metrics.nodeSize,
+                        ).buildStopCard(context),
+                      );
+
+                      return Padding(
+                        padding: EdgeInsets.only(bottom: metrics.stopSpacing),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: isLeft
+                              ? [
+                                  SizedBox(width: metrics.edgeMargin),
+                                  nodeWidget,
+                                  SizedBox(width: metrics.nodeCardGap),
+                                  cardWidget,
+                                  SizedBox(width: metrics.cardOppositeIndent),
+                                ]
+                              : [
+                                  SizedBox(width: metrics.cardOppositeIndent),
+                                  cardWidget,
+                                  SizedBox(width: metrics.nodeCardGap),
+                                  nodeWidget,
+                                  SizedBox(width: metrics.edgeMargin),
+                                ],
+                        ),
+                      );
+                    }),
+
+                    // FINISH Monument Section
+                    Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          MilestoneMonument(
+                            key: _finishMonumentKey,
+                            type: MilestoneMonumentType.finish,
+                            isAllCompleted: isAllCompleted,
+                          ),
+                          const SizedBox(height: 8),
+                          ConstrainedBox(
+                            constraints: BoxConstraints(
+                              maxWidth: (maxWidth - 24).clamp(160.0, 420.0),
+                            ),
+                            child: Text(
+                              isAllCompleted
+                                  ? widget.finishText
+                                  : 'Pathway Milestone Finish',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: isAllCompleted
+                                    ? AppColors.success
+                                    : AppColors.textSubtle,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 0.4,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 14),
-                  child: Text(
-                    isAllCompleted
-                        ? finishText
-                        : 'Linux Pathway Milestone Finish',
-                    style: TextStyle(
-                      color: isAllCompleted
-                          ? AppColors.success
-                          : AppColors.textSubtle,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTabletWindingLayout(
-    BuildContext context,
-    double width,
-    int activeIndex,
-    bool isAllCompleted,
-  ) {
-    return Column(
-      children: [
-        // START Monument
-        Align(
-          alignment: Alignment.centerLeft,
-          child: Padding(
-            padding: const EdgeInsets.only(left: 28),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const MilestoneMonument(type: MilestoneMonumentType.start),
-                const SizedBox(width: 14),
-                const Text(
-                  'Journey Kickoff',
-                  style: TextStyle(
-                    color: AppColors.textSubtle,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.5,
-                  ),
-                ),
               ],
             ),
           ),
-        ),
-
-        const SizedBox(height: 24),
-
-        // Alternating 6 Stops
-        ...List.generate(modules.length, (idx) {
-          final module = modules[idx];
-          final isCompleted = completedModuleIds.contains(module.id);
-          final isCurrent = idx == activeIndex && !isCompleted;
-          final status = isCompleted
-              ? StopStatus.completed
-              : (isCurrent ? StopStatus.current : StopStatus.upcoming);
-          final isLeft = idx % 2 == 0;
-
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 24),
-            child: Row(
-              mainAxisAlignment:
-                  isLeft ? MainAxisAlignment.start : MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: isLeft
-                  ? [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8, left: 30),
-                        child: PathwayStopNode(
-                          module: module,
-                          status: status,
-                          onSelectModule: onSelectModule,
-                          isNodeOnly: true,
-                          totalStops: modules.length,
-                        ),
-                      ),
-                      const SizedBox(width: 24),
-                      Expanded(
-                        child: PathwayStopNode(
-                          module: module,
-                          status: status,
-                          onSelectModule: onSelectModule,
-                          totalStops: modules.length,
-                        ).buildStopCard(context),
-                      ),
-                      const SizedBox(width: 60),
-                    ]
-                  : [
-                      const SizedBox(width: 60),
-                      Expanded(
-                        child: PathwayStopNode(
-                          module: module,
-                          status: status,
-                          onSelectModule: onSelectModule,
-                          totalStops: modules.length,
-                        ).buildStopCard(context),
-                      ),
-                      const SizedBox(width: 24),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8, right: 30),
-                        child: PathwayStopNode(
-                          module: module,
-                          status: status,
-                          onSelectModule: onSelectModule,
-                          isNodeOnly: true,
-                          totalStops: modules.length,
-                        ),
-                      ),
-                    ],
-            ),
-          );
-        }),
-
-        const SizedBox(height: 24),
-
-        // FINISH Monument (Right Aligned on Tablet matching Stop 6)
-        Align(
-          alignment: Alignment.centerRight,
-          child: Padding(
-            padding: const EdgeInsets.only(right: 28),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                MilestoneMonument(
-                  type: MilestoneMonumentType.finish,
-                  isAllCompleted: isAllCompleted,
-                ),
-                const SizedBox(width: 14),
-                Text(
-                  isAllCompleted
-                      ? finishText
-                      : 'Linux Pathway Milestone Finish',
-                  style: TextStyle(
-                    color: isAllCompleted
-                        ? AppColors.success
-                        : AppColors.textSubtle,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
+        );
+      },
     );
   }
 }
 
+class _PathwayMetrics {
+  final double maxWidth;
+  final double nodeSize;
+  final double edgeMargin;
+  final double nodeCardGap;
+  final double cardOppositeIndent;
+  final double stopSpacing;
+  final double roadCushionWidth;
+  final double roadBaseWidth;
+  final double roadDashWidth;
+  final double roadDashLength;
+  final double roadDashSpace;
+
+  const _PathwayMetrics({
+    required this.maxWidth,
+    required this.nodeSize,
+    required this.edgeMargin,
+    required this.nodeCardGap,
+    required this.cardOppositeIndent,
+    required this.stopSpacing,
+    required this.roadCushionWidth,
+    required this.roadBaseWidth,
+    required this.roadDashWidth,
+    required this.roadDashLength,
+    required this.roadDashSpace,
+  });
+
+  factory _PathwayMetrics.fromWidth(double maxWidth) {
+    final bool isTablet = maxWidth >= 680;
+    final bool isNarrow = maxWidth < 345; // 360px/375px screens minus 40px page padding
+
+    final double nodeSize = isTablet ? 48.0 : (isNarrow ? 42.0 : 44.0);
+    final double edgeMargin = isTablet ? 28.0 : (isNarrow ? 4.0 : 6.0);
+    final double nodeCardGap = isTablet ? 24.0 : (isNarrow ? 10.0 : 12.0);
+    final double cardOppositeIndent = isTablet
+        ? (maxWidth * 0.22).clamp(80.0, 240.0)
+        : (maxWidth >= 380 ? 18.0 : (maxWidth >= 345 ? 12.0 : 8.0));
+
+    return _PathwayMetrics(
+      maxWidth: maxWidth,
+      nodeSize: nodeSize,
+      edgeMargin: edgeMargin,
+      nodeCardGap: nodeCardGap,
+      cardOppositeIndent: cardOppositeIndent,
+      stopSpacing: isTablet ? 48.0 : 38.0,
+      roadCushionWidth: isTablet ? 46.0 : 34.0,
+      roadBaseWidth: isTablet ? 34.0 : 24.0,
+      roadDashWidth: isTablet ? 3.2 : 2.6,
+      roadDashLength: isTablet ? 12.0 : 10.0,
+      roadDashSpace: isTablet ? 12.0 : 10.0,
+    );
+  }
+}

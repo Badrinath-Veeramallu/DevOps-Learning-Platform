@@ -12,6 +12,7 @@ import '../../../providers/auth_provider.dart';
 import '../../pathway/data/activity_service.dart';
 import '../../pathway/data/linux_curriculum_repository.dart';
 import '../../pathway/data/progress_service.dart';
+import '../../animations/services/animation_loader.dart';
 import '../widgets/learning_content_renderer.dart';
 import '../widgets/module_header_card.dart';
 import '../widgets/module_objectives_card.dart';
@@ -128,6 +129,16 @@ class _LinuxModuleScreenState extends State<LinuxModuleScreen> {
   }
 
   Future<void> _loadData() async {
+    // 1. Fast-path: Preload Linux animations independently and trigger UI refresh as soon as ready
+    if (AnimationLoader.cachedModules(pathway: 'linux') == null) {
+      AnimationLoader.loadAnimations(pathway: 'linux').then((_) {
+        if (mounted) setState(() {});
+      }).catchError((e) {
+        debugPrint('[LinuxModuleScreen] Animation load error: $e');
+      });
+    }
+
+    // 2. Handle passed initialModules
     if (widget.initialModules != null) {
       setState(() {
         _modules = widget.initialModules!;
@@ -139,34 +150,47 @@ class _LinuxModuleScreenState extends State<LinuxModuleScreen> {
       return;
     }
 
-    try {
-      final modules = await LinuxCurriculumRepository.loadCurriculum();
-
-      if (mounted) {
-        setState(() {
-          _modules = modules;
-          _resolveCurrentModule();
-          _isLoading = false;
-          _error = null;
-        });
-
-        _updateCompletionStatus();
-        _logLessonViewed();
-
-        final authProvider = context.read<AuthProvider>();
-        final userId = authProvider.user?.id ?? 'guest';
-        await ProgressService().fetchUserProgress(userId, pathway: 'linux');
+    // 3. Load curriculum if not yet loaded
+    if (_modules.isEmpty) {
+      try {
+        final loadedModules = await LinuxCurriculumRepository.loadCurriculum();
         if (mounted) {
+          setState(() {
+            _modules = loadedModules;
+            _resolveCurrentModule();
+            _isLoading = false;
+            _error = null;
+          });
           _updateCompletionStatus();
+          _logLessonViewed();
+        }
+      } catch (e) {
+        if (mounted && _modules.isEmpty) {
+          setState(() {
+            _error = 'Failed to load Linux curriculum: $e';
+            _isLoading = false;
+          });
         }
       }
-    } catch (e) {
-      if (mounted && _modules.isEmpty) {
-        setState(() {
-          _error = 'Failed to load Linux curriculum: $e';
-          _isLoading = false;
-        });
+    } else {
+      if (_isLoading && mounted) {
+        setState(() => _isLoading = false);
       }
+      _updateCompletionStatus();
+      _logLessonViewed();
+    }
+
+    // 4. Background non-blocking progress sync
+    if (!mounted) return;
+    try {
+      final authProvider = context.read<AuthProvider>();
+      final userId = authProvider.user?.id ?? 'guest';
+      await ProgressService().fetchUserProgress(userId, pathway: 'linux');
+      if (mounted) {
+        _updateCompletionStatus();
+      }
+    } catch (e) {
+      debugPrint('[LinuxModuleScreen] Background progress sync error: $e');
     }
   }
 

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import '../../../models/animation_model.dart';
 
@@ -17,14 +18,30 @@ class AnimationLoader {
     String pathway = 'git',
     AssetBundle? bundle,
   }) async {
-    if (_cachedPathwayModules.containsKey(pathway)) {
-      return _cachedPathwayModules[pathway]!;
+    final normalizedPathway = pathway.toLowerCase();
+    if (_cachedPathwayModules.containsKey(normalizedPathway)) {
+      return _cachedPathwayModules[normalizedPathway]!;
     }
 
     final assetBundle = bundle ?? rootBundle;
-    final assetPath = pathway == 'docker'
-        ? 'assets/data/docker_animations.json'
-        : 'assets/data/git_animations.json';
+    final String assetPath;
+    switch (normalizedPathway) {
+      case 'git':
+        assetPath = 'assets/data/git_animations.json';
+        break;
+      case 'docker':
+        assetPath = 'assets/data/docker_animations.json';
+        break;
+      case 'linux':
+        assetPath = 'assets/data/linux_animations.json';
+        break;
+      default:
+        throw ArgumentError.value(
+          pathway,
+          'pathway',
+          'Unsupported animation pathway "$pathway". Supported pathways are git, docker, linux.',
+        );
+    }
 
     final jsonString = await assetBundle.loadString(assetPath);
     final Map<String, dynamic> decoded =
@@ -35,8 +52,11 @@ class AnimationLoader {
         .map((m) => AnimationModule.fromJson(m as Map<String, dynamic>))
         .toList();
 
-    _cachedPathwayModules[pathway] = modules;
-    _buildIndex(pathway, modules);
+    _cachedPathwayModules[normalizedPathway] = modules;
+    _buildIndex(normalizedPathway, modules);
+    debugPrint(
+      '[AnimationLoader] Successfully loaded ${modules.length} modules for pathway "$normalizedPathway"',
+    );
     return modules;
   }
 
@@ -61,14 +81,36 @@ class AnimationLoader {
 
   /// Finds an animation by subtopic id (e.g. "01.1", "04.5") or by normalized title within a pathway.
   static SubtopicAnimation? findAnimation(String key, {String pathway = 'git'}) {
-    final idMap = _idIndexByPathway[pathway];
-    if (idMap != null && idMap.containsKey(key)) {
-      return idMap[key];
+    final normPathway = pathway.toLowerCase();
+    final idMap = _idIndexByPathway[normPathway];
+    if (idMap != null) {
+      if (idMap.containsKey(key)) {
+        return idMap[key];
+      }
+      // Padded / unpadded key fallback (e.g. "1.1" <-> "01.1")
+      final parts = key.split('.');
+      if (parts.length == 2) {
+        final mod = parts[0];
+        final sec = parts[1];
+        if (mod.length == 1) {
+          final padded = '0$mod.$sec';
+          if (idMap.containsKey(padded)) return idMap[padded];
+        } else if (mod.startsWith('0') && mod.length == 2) {
+          final unpadded = '${mod.substring(1)}.$sec';
+          if (idMap.containsKey(unpadded)) return idMap[unpadded];
+        }
+      }
     }
     final norm = _normalize(key);
-    final titleMap = _titleIndexByPathway[pathway];
-    if (titleMap != null && titleMap.containsKey(norm)) {
-      return titleMap[norm];
+    final titleMap = _titleIndexByPathway[normPathway];
+    if (titleMap != null) {
+      if (titleMap.containsKey(norm)) {
+        return titleMap[norm];
+      }
+      final stripped = norm.replaceFirst(RegExp(r'^\d+\s+'), '');
+      if (stripped != norm && titleMap.containsKey(stripped)) {
+        return titleMap[stripped];
+      }
     }
     return null;
   }
@@ -76,9 +118,10 @@ class AnimationLoader {
   /// Clears in-memory cache for a pathway or all pathways (primarily useful for tests).
   static void clearCache({String? pathway}) {
     if (pathway != null) {
-      _cachedPathwayModules.remove(pathway);
-      _idIndexByPathway.remove(pathway);
-      _titleIndexByPathway.remove(pathway);
+      final normPathway = pathway.toLowerCase();
+      _cachedPathwayModules.remove(normPathway);
+      _idIndexByPathway.remove(normPathway);
+      _titleIndexByPathway.remove(normPathway);
     } else {
       _cachedPathwayModules.clear();
       _idIndexByPathway.clear();
@@ -91,11 +134,12 @@ class AnimationLoader {
     List<AnimationModule> modules, {
     String pathway = 'git',
   }) {
-    _cachedPathwayModules[pathway] = modules;
-    _buildIndex(pathway, modules);
+    final normPathway = pathway.toLowerCase();
+    _cachedPathwayModules[normPathway] = modules;
+    _buildIndex(normPathway, modules);
   }
 
   /// Synchronously returns cached modules for a pathway, or null if not yet loaded.
   static List<AnimationModule>? cachedModules({String pathway = 'git'}) =>
-      _cachedPathwayModules[pathway];
+      _cachedPathwayModules[pathway.toLowerCase()];
 }

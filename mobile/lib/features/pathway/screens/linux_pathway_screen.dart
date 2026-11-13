@@ -9,6 +9,7 @@ import '../../../core/widgets/app_bottom_nav_bar.dart';
 import '../../../core/widgets/app_header_bar.dart';
 import '../../../models/curriculum_model.dart';
 import '../../../providers/auth_provider.dart';
+import '../../animations/services/animation_loader.dart';
 import '../data/linux_curriculum_repository.dart';
 import '../data/progress_service.dart';
 import '../widgets/linux_pathway_map.dart';
@@ -45,6 +46,13 @@ class _LinuxPathwayScreenState extends State<LinuxPathwayScreen> {
   @override
   void initState() {
     super.initState();
+    // Pre-warm Linux animations in background so they are instantly ready upon entering modules
+    if (AnimationLoader.cachedModules(pathway: 'linux') == null) {
+      AnimationLoader.loadAnimations(pathway: 'linux').catchError((e) {
+        debugPrint('[LinuxPathwayScreen] Preloading animations error: $e');
+        return <Never>[];
+      });
+    }
     final cached = widget.initialModules ?? LinuxCurriculumRepository.cachedModules;
     if (cached != null && cached.isNotEmpty) {
       _modules = cached;
@@ -133,6 +141,14 @@ class _LinuxPathwayScreenState extends State<LinuxPathwayScreen> {
     context.push('/pathways/linux/$moduleId');
   }
 
+  void _handleBackToDashboard() {
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.go(RouteNames.dashboard);
+    }
+  }
+
   void _handleBottomNavTap(int index) {
     switch (index) {
       case 0:
@@ -162,14 +178,17 @@ class _LinuxPathwayScreenState extends State<LinuxPathwayScreen> {
         currentIndex: 1,
         onTabSelected: _handleBottomNavTap,
       ),
-      body: _buildBody(),
+      body: SafeArea(
+        top: false,
+        child: _buildBody(),
+      ),
     );
   }
 
   Widget _buildBody() {
     if (_isLoading) {
       return const Center(
-        child: CircularProgressIndicator(color: AppColors.lightAccent),
+        child: CircularProgressIndicator(color: AppColors.primary),
       );
     }
 
@@ -180,13 +199,18 @@ class _LinuxPathwayScreenState extends State<LinuxPathwayScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.error_outline_rounded,
-                  color: AppColors.error, size: 48),
-              const SizedBox(height: 16),
+              const Icon(
+                Icons.error_outline_rounded,
+                size: 48,
+                color: AppColors.error,
+              ),
+              const SizedBox(height: 12),
               Text(
                 _error!,
-                style: AppTypography.bodyMedium.copyWith(color: AppColors.error),
                 textAlign: TextAlign.center,
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.textMuted,
+                ),
               ),
               const SizedBox(height: 16),
               ElevatedButton(
@@ -194,6 +218,10 @@ class _LinuxPathwayScreenState extends State<LinuxPathwayScreen> {
                   setState(() => _isLoading = true);
                   _loadData();
                 },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                ),
                 child: const Text('Retry'),
               ),
             ],
@@ -202,11 +230,8 @@ class _LinuxPathwayScreenState extends State<LinuxPathwayScreen> {
       );
     }
 
-    final int completedCount = _completedIds.length;
-    final int totalCount = _modules.length;
-
     return RefreshIndicator(
-      color: AppColors.lightAccent,
+      color: AppColors.primary,
       backgroundColor: AppColors.surfaceElevated,
       onRefresh: () async {
         final authProvider = context.read<AuthProvider>();
@@ -219,74 +244,67 @@ class _LinuxPathwayScreenState extends State<LinuxPathwayScreen> {
       },
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 16,
+        ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Hero Header Card matching Web's `.pathway-header-card`
+            // Pathway Hero Header Card
             PathwayHeaderCard(
+              completedCount: _completedIds.length,
+              totalCount: _modules.length,
+              modules: _modules,
+              completedIds: _completedIds,
+              onBack: _handleBackToDashboard,
               title: 'Linux Essentials Pathway',
               description:
                   'A progressive, step-by-step interactive map guiding you through Linux file systems, permissions, process and service management, networking, package administration, and shell scripting automation.',
               badgeText: 'Foundational Pathway',
-              completedCount: completedCount,
-              totalCount: totalCount,
-              modules: _modules,
-              completedIds: _completedIds,
               allDoneText:
                   '🎉 You have completed all stops in this pathway! Excellent work.',
-              onBack: () {
-                if (context.canPop()) {
-                  context.pop();
-                } else {
-                  context.go(RouteNames.dashboard);
-                }
-              },
             ),
+            const SizedBox(height: 36),
 
-            const SizedBox(height: 28),
-
-            // Learning Journey Section Title
-            Row(
-              children: [
-                Container(
-                  width: 4,
-                  height: 20,
-                  decoration: BoxDecoration(
-                    color: AppColors.lightAccent,
-                    borderRadius: BorderRadius.circular(2),
+            // Section Header matching Git and Docker
+            Center(
+              child: Column(
+                children: [
+                  Text(
+                    'Learning Journey',
+                    style: AppTypography.displayMedium.copyWith(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textMain,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 10),
-                Text(
-                  'Learning Journey',
-                  style: AppTypography.titleMedium.copyWith(
-                    color: AppColors.textMain,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -0.2,
+                  const SizedBox(height: 6),
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 520),
+                    child: Text(
+                      'Click any stop along the path to open its complete educational module, commands, and interactive visual slots.',
+                      textAlign: TextAlign.center,
+                      style: AppTypography.bodySmall.copyWith(
+                        color: AppColors.textMuted,
+                        height: 1.45,
+                        fontSize: 13,
+                      ),
+                    ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 6),
-            Text(
-              'Tap any stop along the roadmap to start learning or review content.',
-              style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textMuted,
-                fontSize: 13,
+                ],
               ),
             ),
+            const SizedBox(height: 28),
 
-            const SizedBox(height: 20),
-
-            // Connected 6-stop roadmap
+            // Winding Pathway Roadmap
             LinuxPathwayMap(
               modules: _modules,
               completedModuleIds: _completedIds,
               onSelectModule: _handleSelectModule,
+              finishText: 'Linux System Administration Mastered!',
             ),
-
-            const SizedBox(height: 40),
+            const SizedBox(height: 48),
           ],
         ),
       ),

@@ -17,6 +17,7 @@ import 'package:devops_learning_app/features/pathway/data/linux_curriculum_repos
 import 'package:devops_learning_app/features/pathway/data/progress_service.dart';
 import 'package:devops_learning_app/features/pathway/screens/linux_pathway_screen.dart';
 import 'package:devops_learning_app/features/pathway/widgets/linux_pathway_map.dart';
+import 'package:devops_learning_app/features/pathway/widgets/pathway_track_painter.dart';
 import 'package:devops_learning_app/models/curriculum_model.dart';
 import 'package:devops_learning_app/models/user_model.dart';
 import 'package:devops_learning_app/providers/auth_provider.dart';
@@ -404,5 +405,151 @@ void main() {
       await tester.tap(find.text('View Pathway'));
       expect(didTap, isTrue);
     });
+
+    testWidgets(
+      '7. LinuxPathwayMap renders continuous cubic-Bezier road behind cards in Stack',
+      (tester) async {
+        tester.view.physicalSize = const Size(390, 844);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(() {
+          tester.view.resetPhysicalSize();
+          tester.view.devicePixelRatio = 1.0;
+        });
+
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: AppTheme.lightTheme,
+            home: Scaffold(
+              body: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: LinuxPathwayMap(
+                  modules: linuxModules,
+                  completedModuleIds: const {'linux-01'},
+                  onSelectModule: (_) {},
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Road CustomPaint exists and sits in the first background layer of Stack
+        final roadFinder = find.byKey(const Key('pathway_road_painter'));
+        expect(roadFinder, findsOneWidget);
+
+        final customPaint = tester.widget<CustomPaint>(roadFinder);
+        expect(customPaint.painter, isA<PathwayTrackPainter>());
+
+        final stackFinder = find.ancestor(
+          of: roadFinder,
+          matching: find.byType(Stack),
+        );
+        expect(stackFinder, findsWidgets);
+
+        final painter = customPaint.painter! as PathwayTrackPainter;
+        expect(painter.points.length, equals(linuxModules.length + 2)); // 6 stops + START + FINISH = 8 points
+      },
+    );
+
+    testWidgets(
+      '8. LinuxPathwayMap renders all 6 module stops with alternating layout and exact stop badges',
+      (tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: AppTheme.lightTheme,
+            home: Scaffold(
+              body: SingleChildScrollView(
+                child: LinuxPathwayMap(
+                  modules: linuxModules,
+                  completedModuleIds: const {'linux-01'},
+                  onSelectModule: (_) {},
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Verify stop badges Stop 1 of 6 through Stop 6 of 6
+        for (int i = 1; i <= 6; i++) {
+          expect(find.text('Stop $i of 6'), findsOneWidget);
+        }
+
+        // Verify all 6 short titles
+        for (final mod in linuxModules) {
+          expect(find.text(mod.shortTitle), findsOneWidget);
+        }
+
+        // Check completion states
+        expect(find.text('Completed'), findsOneWidget); // linux-01
+        expect(find.text('Review Module'), findsOneWidget); // linux-01 button
+
+        expect(find.text('Current Focus'), findsOneWidget); // linux-02
+        expect(find.text('Start Learning'), findsOneWidget); // linux-02 button
+
+        expect(find.text('Upcoming'), findsNWidgets(4)); // linux-03 through linux-06
+        expect(find.text('Explore Stop'), findsNWidgets(4));
+      },
+    );
+
+    testWidgets(
+      '9. LinuxPathwayMap renders START and FINISH monuments with completion message',
+      (tester) async {
+        final allCompletedIds = linuxModules.map((m) => m.id).toSet();
+
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: AppTheme.lightTheme,
+            home: Scaffold(
+              body: SingleChildScrollView(
+                child: LinuxPathwayMap(
+                  modules: linuxModules,
+                  completedModuleIds: allCompletedIds,
+                  onSelectModule: (_) {},
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('START'), findsOneWidget);
+        expect(find.text('FINISH'), findsOneWidget);
+        expect(find.text('Journey Kickoff'), findsOneWidget);
+        expect(find.text('Linux System Administration Mastered!'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      '10. LinuxPathwayScreen renders cleanly without RenderFlex overflow on narrow screen (320 x 640)',
+      (tester) async {
+        tester.view.physicalSize = const Size(320, 640);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(() {
+          tester.view.resetPhysicalSize();
+          tester.view.devicePixelRatio = 1.0;
+        });
+
+        await tester.pumpWidget(
+          _wrapScreen(
+            authProvider: authProvider,
+            child: LinuxPathwayScreen(
+              initialModules: linuxModules,
+              initialCompletedIds: const {'linux-01'},
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('Learning Journey'), findsOneWidget);
+        expect(
+          find.text(
+            'Click any stop along the path to open its complete educational module, commands, and interactive visual slots.',
+          ),
+          findsOneWidget,
+        );
+        expect(tester.takeException(), isNull);
+      },
+    );
   });
 }
