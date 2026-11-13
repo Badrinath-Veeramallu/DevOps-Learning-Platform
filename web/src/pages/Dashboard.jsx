@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 import { activityAPI } from "../services/api";
 import { LearningStreak } from "../components/LearningStreak";
-import { isPathwayUnlocked } from "../services/progressService";
+import { isPathwayUnlocked, getPathwayLockReason } from "../services/progressService";
 
 export const Dashboard = () => {
   const { user } = useAuth();
