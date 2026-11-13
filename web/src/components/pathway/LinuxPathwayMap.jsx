@@ -6,8 +6,8 @@ import { linuxCurriculum } from "../../data/linuxCurriculum";
  * LinuxPathwayMap — Coursiv.io-inspired winding learning journey.
  *
  * Visualizes the 6 Linux Essentials subtopics along a connected S-curved pathway
- * with alternating left/right stops, progress states (completed, current, upcoming),
- * and direct links to each learning module.
+ * with alternating left/right stops, sequential locking, progress states (completed, current, locked),
+ * and direct links to accessible learning modules.
  */
 export const LinuxPathwayMap = ({
   modules = linuxCurriculum,
@@ -15,17 +15,14 @@ export const LinuxPathwayMap = ({
   completedIds,
 }) => {
   const pathwayModules = Array.isArray(modules) && modules.length > 0 ? modules : linuxCurriculum;
-  const effectiveCompletedIds = Array.isArray(completedModuleIds)
+  const rawCompleted = Array.isArray(completedModuleIds)
     ? completedModuleIds
     : Array.isArray(completedIds)
     ? completedIds
     : [];
+  const completedSet = new Set(rawCompleted);
 
-  // Determine current active stop (the first non-completed module, or the last one if all are done)
-  const currentStopIndex = pathwayModules.findIndex(
-    (mod) => !effectiveCompletedIds.includes(mod.id)
-  );
-  const activeIndex = currentStopIndex === -1 ? pathwayModules.length - 1 : currentStopIndex;
+  const isAllCompleted = pathwayModules.length > 0 && pathwayModules.every((m) => completedSet.has(m.id));
 
   return (
     <div className="pathway-journey-container" role="region" aria-label="Linux Essentials Learning Pathway">
@@ -87,52 +84,72 @@ export const LinuxPathwayMap = ({
         {/* 6 Pathway Stops */}
         <div className="pathway-stops-list">
           {pathwayModules.map((module, idx) => {
-            const isCompleted = effectiveCompletedIds.includes(module.id);
-            const isCurrent = idx === activeIndex && !isCompleted;
-            const isUpcoming = !isCompleted && !isCurrent;
+            const isCompleted = completedSet.has(module.id);
+            const isPrecedingCompleted = idx === 0 || completedSet.has(pathwayModules[idx - 1].id);
+            const isCurrent = !isCompleted && isPrecedingCompleted;
+            const isLocked = !isCompleted && !isPrecedingCompleted;
             const isEven = idx % 2 === 0;
 
-            let statusLabel = "Upcoming";
+            let statusLabel = "Locked";
             if (isCompleted) statusLabel = "Completed";
-            if (isCurrent) statusLabel = "Current Stop";
+            else if (isCurrent) statusLabel = "Current Stop";
 
             return (
               <div
                 key={module.id}
                 className={`pathway-stop-row ${isEven ? "row-left" : "row-right"} ${
                   isCompleted ? "stop-completed" : ""
-                } ${isCurrent ? "stop-current" : ""} ${isUpcoming ? "stop-upcoming" : ""}`}
+                } ${isCurrent ? "stop-current" : ""} ${isLocked ? "stop-locked" : ""}`}
               >
                 {/* Center Node / Milestone Pin on the Pathway */}
                 <div className="pathway-node-anchor">
                   <div className="node-outer-glow">
-                    <Link
-                      to={`/pathways/linux/${module.id}`}
-                      className={`pathway-node-circle ${
-                        isCompleted
-                          ? "node-circle-completed"
-                          : isCurrent
-                          ? "node-circle-current"
-                          : "node-circle-upcoming"
-                      }`}
-                      aria-label={`${module.title} (${statusLabel})`}
-                    >
-                      {isCompleted ? (
+                    {isLocked ? (
+                      <div
+                        className="pathway-node-circle node-circle-locked"
+                        aria-label={`${module.title} (Locked)`}
+                        title="Complete the previous module to unlock this module."
+                      >
                         <svg
                           width="20"
                           height="20"
                           viewBox="0 0 24 24"
                           fill="none"
                           stroke="currentColor"
-                          strokeWidth="3"
+                          strokeWidth="2.5"
                           aria-hidden="true"
                         >
-                          <polyline points="20 6 9 17 4 12" />
+                          <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                         </svg>
-                      ) : (
-                        <span className="node-number">{module.order}</span>
-                      )}
-                    </Link>
+                      </div>
+                    ) : (
+                      <Link
+                        to={`/pathways/linux/${module.id}`}
+                        className={`pathway-node-circle ${
+                          isCompleted
+                            ? "node-circle-completed"
+                            : "node-circle-current"
+                        }`}
+                        aria-label={`${module.title} (${statusLabel})`}
+                      >
+                        {isCompleted ? (
+                          <svg
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="3"
+                            aria-hidden="true"
+                          >
+                            <polyline points="20 6 9 17 4 12" />
+                          </svg>
+                        ) : (
+                          <span className="node-number">{module.order}</span>
+                        )}
+                      </Link>
+                    )}
                   </div>
                 </div>
 
@@ -155,9 +172,13 @@ export const LinuxPathwayMap = ({
                             Current Focus
                           </span>
                         )}
-                        {isUpcoming && (
-                          <span className="stop-status-pill pill-upcoming">
-                            Upcoming
+                        {isLocked && (
+                          <span className="stop-status-pill pill-locked">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
+                              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                            </svg>
+                            Locked
                           </span>
                         )}
                       </div>
@@ -172,10 +193,24 @@ export const LinuxPathwayMap = ({
                     </div>
 
                     <h3 className="stop-title">
-                      <Link to={`/pathways/linux/${module.id}`}>
-                        {module.shortTitle}
-                      </Link>
+                      {isLocked ? (
+                        <span>{module.shortTitle}</span>
+                      ) : (
+                        <Link to={`/pathways/linux/${module.id}`}>
+                          {module.shortTitle}
+                        </Link>
+                      )}
                     </h3>
+
+                    {isLocked && (
+                      <div className="stop-locked-hint">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                          <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                        </svg>
+                        <span>Complete the previous module to unlock this module.</span>
+                      </div>
+                    )}
 
                     <p className="stop-desc">{module.summary}</p>
 
@@ -190,27 +225,38 @@ export const LinuxPathwayMap = ({
                         <span>{module.objectives.length} Objectives</span>
                       </div>
 
-                      <Link
-                        to={`/pathways/linux/${module.id}`}
-                        className={`btn-stop-action ${
-                          isCurrent
-                            ? "btn-stop-primary"
-                            : isCompleted
-                            ? "btn-stop-review"
-                            : "btn-stop-secondary"
-                        }`}
-                      >
-                        <span>
-                          {isCompleted
-                            ? "Review Module"
-                            : isCurrent
-                            ? "Start Learning"
-                            : "Explore Stop"}
-                        </span>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
-                          <polyline points="9 18 15 12 9 6" />
-                        </svg>
-                      </Link>
+                      {isLocked ? (
+                        <button
+                          type="button"
+                          disabled
+                          className="btn-stop-action btn-stop-locked"
+                          aria-label="Locked: Complete the previous module to unlock this module."
+                        >
+                          <span>Locked</span>
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                          </svg>
+                        </button>
+                      ) : (
+                        <Link
+                          to={`/pathways/linux/${module.id}`}
+                          className={`btn-stop-action ${
+                            isCurrent
+                              ? "btn-stop-primary"
+                              : "btn-stop-review"
+                          }`}
+                        >
+                          <span>
+                            {isCompleted
+                              ? "Review Module"
+                              : "Start Learning"}
+                          </span>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
+                            <polyline points="9 18 15 12 9 6" />
+                          </svg>
+                        </Link>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -224,7 +270,7 @@ export const LinuxPathwayMap = ({
           <div className="pathway-endpoint-anchor">
             <div
               className={`pathway-endpoint-monument finish-monument ${
-                effectiveCompletedIds.length === pathwayModules.length ? "is-completed-all" : ""
+                isAllCompleted ? "is-completed-all" : ""
               }`}
             >
               <div className="endpoint-icon-circle finish-circle" title="Pathway Finish">
@@ -266,4 +312,3 @@ export const LinuxPathwayMap = ({
 };
 
 export default LinuxPathwayMap;
-

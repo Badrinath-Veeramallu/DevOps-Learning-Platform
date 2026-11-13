@@ -134,6 +134,11 @@ export const activityAPI = {
 };
 
 export const progressAPI = {
+  getPathwaysStatus: () =>
+    request("/progress/pathways/status", {
+      method: "GET",
+    }),
+
   getProgress: (pathwayId = "git") =>
     request(`/progress/${encodeURIComponent(pathwayId)}`, {
       method: "GET",
@@ -152,4 +157,3 @@ export const systemAPI = {
       .then((r) => r.json())
       .catch(() => null),
 };
-

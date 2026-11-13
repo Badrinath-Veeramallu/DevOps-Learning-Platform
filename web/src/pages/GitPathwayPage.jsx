@@ -15,12 +15,13 @@ export const GitPathwayPage = () => {
   // Sync state from server on mount and if module is marked completed anywhere
   useEffect(() => {
     fetchUserProgress(userId, "git").then((ids) => {
-      if (Array.isArray(ids)) setCompletedIds(ids);
+      if (Array.isArray(ids)) setCompletedIds([...new Set(ids)]);
     });
 
     const handleProgressUpdate = (e) => {
+      if (e?.detail?.pathway && e.detail.pathway !== "git") return;
       if (e?.detail?.allCompleted && Array.isArray(e.detail.allCompleted)) {
-        setCompletedIds(e.detail.allCompleted);
+        setCompletedIds([...new Set(e.detail.allCompleted)]);
       } else {
         setCompletedIds(getCompletedModules(userId, "git"));
       }
@@ -30,9 +31,14 @@ export const GitPathwayPage = () => {
     return () => window.removeEventListener("devops_progress_updated", handleProgressUpdate);
   }, [userId]);
 
+  const pathwayModuleIds = new Set(gitCurriculum.map((m) => m.id));
+  const validCompletedIds = [...new Set(Array.isArray(completedIds) ? completedIds : [])].filter((id) =>
+    pathwayModuleIds.has(id)
+  );
   const totalModules = gitCurriculum.length;
-  const completedCount = completedIds.length;
-  const progressPercent = Math.round((completedCount / totalModules) * 100);
+  const completedCount = validCompletedIds.length;
+  const progressPercent = totalModules > 0 ? Math.round((completedCount / totalModules) * 100) : 0;
+  const nextUncompletedModule = gitCurriculum.find((m) => !validCompletedIds.includes(m.id));
 
   return (
     <div className="pathway-page-wrapper">
@@ -95,9 +101,9 @@ export const GitPathwayPage = () => {
               <span className="progress-hint">
                 {completedCount === totalModules
                   ? "🎉 You have completed all stops in this pathway! Excellent work."
-                  : completedCount === 0
-                  ? "Click on Stop 1 below to start your journey."
-                  : `Next up: Stop ${completedCount + 1}`}
+                  : nextUncompletedModule
+                  ? `Next up: Stop ${nextUncompletedModule.order} · ${nextUncompletedModule.shortTitle}`
+                  : "Click on Stop 1 below to start your journey."}
               </span>
             </div>
           </div>
@@ -107,8 +113,8 @@ export const GitPathwayPage = () => {
         <section aria-label="Learning Pathway Interactive Map">
           <GitPathwayMap
             modules={gitCurriculum}
-            completedIds={completedIds}
-            completedModuleIds={completedIds}
+            completedIds={validCompletedIds}
+            completedModuleIds={validCompletedIds}
           />
         </section>
       </div>

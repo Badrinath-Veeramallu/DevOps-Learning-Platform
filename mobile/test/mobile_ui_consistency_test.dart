@@ -224,7 +224,7 @@ void main() {
         // 5. Dynamic completion states + tap navigation still work
         expect(find.text('Completed'), findsNWidgets(2));
         expect(find.text('Current Focus'), findsOneWidget);
-        expect(find.text('Upcoming'), findsNWidgets(4));
+        expect(find.text('Locked'), findsNWidgets(8)); // 4 status pills + 4 buttons
 
         await tester.ensureVisible(find.text('Start Learning'));
         await tester.tap(find.text('Start Learning'));

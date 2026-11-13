@@ -123,6 +123,19 @@ class _GitPathwayScreenState extends State<GitPathwayScreen> {
   }
 
   void _handleSelectModule(String moduleId) {
+    if (!ProgressService.isModuleUnlocked(
+      pathway: 'git',
+      moduleId: moduleId,
+      completedModules: _completedIds,
+    )) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Complete the previous module to unlock this module.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
     context.push('/pathways/git/$moduleId');
   }
 
@@ -212,7 +225,7 @@ class _GitPathwayScreenState extends State<GitPathwayScreen> {
                       children: [
                         // Pathway Hero Header Card
                         PathwayHeaderCard(
-                          completedCount: _completedIds.length,
+                          completedCount: _modules.where((m) => _completedIds.contains(m.id)).length,
                           totalCount: _modules.length,
                           modules: _modules,
                           completedIds: _completedIds,

@@ -10,11 +10,15 @@ import 'level_badge.dart';
 /// "Continue Learning" active track card directly mirroring Web's `.continue-learning-card`.
 class ContinueLearningCard extends StatelessWidget {
   final LearningPathTrack track;
+  final bool isLocked;
+  final String? lockReason;
   final VoidCallback onContinue;
 
   const ContinueLearningCard({
     super.key,
     required this.track,
+    this.isLocked = false,
+    this.lockReason,
     required this.onContinue,
   });
 
@@ -23,6 +27,7 @@ class ContinueLearningCard extends StatelessWidget {
     final hasPathway = track.hasPathway;
 
     return AppCard(
+      borderColor: isLocked ? AppColors.borderDefault : null,
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -33,23 +38,54 @@ class ContinueLearningCard extends StatelessWidget {
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               LevelBadge(level: track.level),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 3.5,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceElevated,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  hasPathway ? 'Interactive Pathway Active' : 'Module in progress',
-                  style: AppTypography.bodySmall.copyWith(
-                    color: hasPathway ? AppColors.primary : AppColors.textMuted,
-                    fontWeight: FontWeight.w500,
+              if (isLocked)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 3.5,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF1F5F9),
+                    borderRadius: BorderRadius.circular(999),
+                    border: Border.all(color: const Color(0xFFCBD5E1)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.lock_outline,
+                        size: 12,
+                        color: Color(0xFF64748B),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Locked',
+                        style: AppTypography.badgeText.copyWith(
+                          color: const Color(0xFF64748B),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              else
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 3.5,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceElevated,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    hasPathway ? 'Interactive Pathway Active' : 'Module in progress',
+                    style: AppTypography.bodySmall.copyWith(
+                      color: hasPathway ? AppColors.primary : AppColors.textMuted,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
-              ),
             ],
           ),
           const SizedBox(height: 14),
@@ -68,13 +104,52 @@ class ContinueLearningCard extends StatelessWidget {
               height: 1.5,
             ),
           ),
+          if (isLocked && lockReason != null) ...[
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFEF3C7),
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(color: const Color(0xFFFDE68A)),
+              ),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.lock_clock_outlined,
+                    size: 14,
+                    color: Color(0xFF92400E),
+                  ),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      lockReason!,
+                      style: AppTypography.bodySmall.copyWith(
+                        color: const Color(0xFF92400E),
+                        fontSize: 12,
+                        height: 1.3,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
           const SizedBox(height: 20),
-          AppButton(
-            text: hasPathway ? 'Open Pathway' : 'Continue',
-            icon: const Icon(Icons.arrow_forward_rounded, size: 18),
-            variant: ButtonVariant.primary,
-            onPressed: onContinue,
-          ),
+          if (isLocked)
+            AppButton(
+              text: 'Locked',
+              icon: const Icon(Icons.lock_outline, size: 18),
+              variant: ButtonVariant.ghost,
+              onPressed: onContinue,
+            )
+          else
+            AppButton(
+              text: hasPathway ? 'Open Pathway' : 'Continue',
+              icon: const Icon(Icons.arrow_forward_rounded, size: 18),
+              variant: ButtonVariant.primary,
+              onPressed: onContinue,
+            ),
         ],
       ),
     );

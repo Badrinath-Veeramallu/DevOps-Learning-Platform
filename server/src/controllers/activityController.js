@@ -1,5 +1,6 @@
 const Activity = require("../models/Activity");
 const { logActivity } = require("../utils/activityLogger");
+const { getPathwayLockStatus } = require("./progressController");
 
 /**
  * Validates timezone and returns standard formatter or UTC fallback
@@ -86,6 +87,7 @@ async function getActivity(req, res) {
  * POST /api/activity/log
  * Authenticated endpoint to log lesson_viewed and animation_finished events.
  * stop_completed is exclusively logged server-side by progressController.
+ * Rejects activity logging for locked pathways with 403 Forbidden.
  */
 async function logClientActivity(req, res) {
   try {
@@ -104,6 +106,17 @@ async function logClientActivity(req, res) {
         success: false,
         message: "stopSlug is required",
       });
+    }
+
+    if (pathwayId === "docker" || pathwayId === "linux") {
+      const lockStatus = await getPathwayLockStatus(userId);
+      if (lockStatus[pathwayId] && lockStatus[pathwayId].isLocked) {
+        return res.status(403).json({
+          success: false,
+          isLocked: true,
+          message: lockStatus[pathwayId].lockReason || `Cannot log activity for locked pathway "${pathwayId}".`,
+        });
+      }
     }
 
     const activity = await logActivity(userId, type, {

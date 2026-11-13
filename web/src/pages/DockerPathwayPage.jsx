@@ -6,6 +6,8 @@ import { dockerCurriculum } from "../data/dockerCurriculum";
 import {
   getCompletedModules,
   fetchUserProgress,
+  isPathwayUnlocked,
+  getPathwayLockReason,
 } from "../services/progressService";
 
 export const DockerPathwayPage = () => {
@@ -14,15 +16,22 @@ export const DockerPathwayPage = () => {
   const [completedIds, setCompletedIds] = useState(() =>
     getCompletedModules(userId, "docker")
   );
+  const [, setProgressTick] = useState(0);
 
   // Sync state from server on mount and if module is marked completed anywhere
   useEffect(() => {
     fetchUserProgress(userId, "docker").then((ids) => {
-      if (Array.isArray(ids)) setCompletedIds(ids);
+      if (Array.isArray(ids)) setCompletedIds([...new Set(ids)]);
     });
 
-    const handleProgressUpdate = () => {
-      setCompletedIds(getCompletedModules(userId, "docker"));
+    const handleProgressUpdate = (e) => {
+      setProgressTick((t) => t + 1);
+      if (e?.detail?.pathway && e.detail.pathway !== "docker") return;
+      if (e?.detail?.allCompleted && Array.isArray(e.detail.allCompleted)) {
+        setCompletedIds([...new Set(e.detail.allCompleted)]);
+      } else {
+        setCompletedIds(getCompletedModules(userId, "docker"));
+      }
     };
 
     window.addEventListener("devops_progress_updated", handleProgressUpdate);
@@ -30,9 +39,77 @@ export const DockerPathwayPage = () => {
       window.removeEventListener("devops_progress_updated", handleProgressUpdate);
   }, [userId]);
 
+  const isUnlocked = isPathwayUnlocked(userId, "docker");
+  const lockReason = getPathwayLockReason(userId, "docker");
+
+  // Pathway-level Route Guard
+  if (!isUnlocked) {
+    return (
+      <div className="pathway-page-wrapper">
+        <div className="pathway-page-container">
+          <div className="pathway-back-nav">
+            <Link to="/dashboard" className="back-link">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                aria-hidden="true"
+              >
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
+              <span>Back to Dashboard</span>
+            </Link>
+          </div>
+
+          <div className="pathway-locked-container">
+            <div className="pathway-locked-card">
+              <div className="locked-icon-bubble">
+                <svg
+                  width="36"
+                  height="36"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                </svg>
+              </div>
+              <span className="badge-pill badge-locked">Pathway Locked</span>
+              <h1 className="locked-card-title">Docker & Containerization Pathway</h1>
+              <p className="locked-card-desc">
+                {lockReason || "Complete all 7 Git modules to unlock the Docker pathway."}
+              </p>
+              <div className="locked-card-actions">
+                <Link to="/pathways/git" className="btn-locked-action-primary">
+                  Go to Git Pathway &rarr;
+                </Link>
+                <Link to="/dashboard" className="btn-locked-action-secondary">
+                  Return to Dashboard
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const pathwayModuleIds = new Set(dockerCurriculum.map((m) => m.id));
+  const validCompletedIds = [...new Set(Array.isArray(completedIds) ? completedIds : [])].filter((id) =>
+    pathwayModuleIds.has(id)
+  );
   const totalModules = dockerCurriculum.length;
-  const completedCount = completedIds.length;
-  const progressPercent = Math.round((completedCount / totalModules) * 100);
+  const completedCount = validCompletedIds.length;
+  const progressPercent = totalModules > 0 ? Math.round((completedCount / totalModules) * 100) : 0;
+  const nextUncompletedModule = dockerCurriculum.find((m) => !validCompletedIds.includes(m.id));
 
   return (
     <div className="pathway-page-wrapper">
@@ -101,9 +178,9 @@ export const DockerPathwayPage = () => {
               <span className="progress-hint">
                 {completedCount === totalModules
                   ? "🎉 You have completed all stops in this pathway! Excellent work."
-                  : completedCount === 0
-                  ? "Click on Stop 1 below to start your journey."
-                  : `Next up: Stop ${completedCount + 1}`}
+                  : nextUncompletedModule
+                  ? `Next up: Stop ${nextUncompletedModule.order} · ${nextUncompletedModule.shortTitle}`
+                  : "Click on Stop 1 below to start your journey."}
               </span>
             </div>
           </div>
@@ -111,7 +188,11 @@ export const DockerPathwayPage = () => {
 
         {/* Interactive Road / Pathway Visualization */}
         <section aria-label="Learning Pathway Interactive Map">
-          <DockerPathwayMap completedModuleIds={completedIds} />
+          <DockerPathwayMap
+            modules={dockerCurriculum}
+            completedIds={validCompletedIds}
+            completedModuleIds={validCompletedIds}
+          />
         </section>
       </div>
     </div>
@@ -119,4 +200,3 @@ export const DockerPathwayPage = () => {
 };
 
 export default DockerPathwayPage;
-

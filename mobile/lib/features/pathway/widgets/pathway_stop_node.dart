@@ -4,7 +4,7 @@ import '../../../core/theme/app_typography.dart';
 import '../../../models/curriculum_model.dart';
 import 'pathway_track_painter.dart';
 
-enum StopStatus { completed, current, upcoming }
+enum StopStatus { completed, current, locked, upcoming }
 
 /// Represents a single stop on a learning pathway.
 ///
@@ -37,9 +37,10 @@ class PathwayStopNode extends StatelessWidget {
   }
 
   /// Builds the circular progress milestone pin matching the website's light burgundy aesthetic.
-  Widget buildNodeCircle() {
+  Widget buildNodeCircle([BuildContext? context]) {
     final isCompleted = status == StopStatus.completed;
     final isCurrent = status == StopStatus.current;
+    final isLocked = status == StopStatus.locked;
 
     final Color bgColor;
     final Color borderColor;
@@ -56,6 +57,11 @@ class PathwayStopNode extends StatelessWidget {
       borderColor = AppColors.primary;
       contentColor = AppColors.primary;
       borderWidth = 3.5;
+    } else if (isLocked) {
+      bgColor = AppColors.surfaceAlt;
+      borderColor = AppColors.borderDefault;
+      contentColor = AppColors.textSubtle;
+      borderWidth = 1.5;
     } else {
       bgColor = AppColors.surface;
       borderColor = AppColors.lightAccent;
@@ -66,7 +72,18 @@ class PathwayStopNode extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: () => onSelectModule(module.id),
+        onTap: isLocked
+            ? () {
+                if (context != null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Complete the previous module to unlock this module.'),
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                }
+              }
+            : () => onSelectModule(module.id),
         borderRadius: BorderRadius.circular(9999),
         child: Container(
           width: nodeSize,
@@ -103,15 +120,21 @@ class PathwayStopNode extends StatelessWidget {
                     color: Colors.white,
                     size: nodeSize * 0.46,
                   )
-                : Text(
-                    '${module.order}',
-                    style: TextStyle(
-                      fontFamily: 'monospace',
-                      fontSize: nodeSize * 0.34,
-                      fontWeight: FontWeight.w700,
-                      color: contentColor,
-                    ),
-                  ),
+                : (isLocked
+                    ? Icon(
+                        Icons.lock_rounded,
+                        color: AppColors.textSubtle,
+                        size: nodeSize * 0.44,
+                      )
+                    : Text(
+                        '${module.order}',
+                        style: TextStyle(
+                          fontFamily: 'monospace',
+                          fontSize: nodeSize * 0.34,
+                          fontWeight: FontWeight.w700,
+                          color: contentColor,
+                        ),
+                      )),
           ),
         ),
       ),
@@ -122,6 +145,7 @@ class PathwayStopNode extends StatelessWidget {
   Widget buildStopCard(BuildContext context) {
     final isCompleted = status == StopStatus.completed;
     final isCurrent = status == StopStatus.current;
+    final isLocked = status == StopStatus.locked;
 
     final Color leftBorderColor;
     final Color cardBg;
@@ -138,6 +162,11 @@ class PathwayStopNode extends StatelessWidget {
       cardBg = AppColors.surface;
       outerBorderColor = AppColors.lightAccent;
       outerBorderWidth = 1.25;
+    } else if (isLocked) {
+      leftBorderColor = Colors.transparent;
+      cardBg = AppColors.surface.withValues(alpha: 0.85);
+      outerBorderColor = AppColors.borderDefault;
+      outerBorderWidth = 1.0;
     } else {
       leftBorderColor = Colors.transparent;
       cardBg = AppColors.surface;
@@ -249,11 +278,20 @@ class PathwayStopNode extends StatelessWidget {
 
                     // Title
                     InkWell(
-                      onTap: () => onSelectModule(module.id),
+                      onTap: isLocked
+                          ? () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Complete the previous module to unlock this module.'),
+                                  duration: Duration(seconds: 2),
+                                ),
+                              );
+                            }
+                          : () => onSelectModule(module.id),
                       child: Text(
                         module.shortTitle,
                         style: AppTypography.titleMedium.copyWith(
-                          color: AppColors.textMain,
+                          color: isLocked ? AppColors.textMuted : AppColors.textMain,
                           fontWeight: FontWeight.w700,
                           fontSize: 15.5,
                           height: 1.3,
@@ -266,11 +304,30 @@ class PathwayStopNode extends StatelessWidget {
                     Text(
                       module.summary,
                       style: AppTypography.bodyMedium.copyWith(
-                        color: AppColors.textMuted,
+                        color: isLocked ? AppColors.textSubtle : AppColors.textMuted,
                         fontSize: 13,
                         height: 1.45,
                       ),
                     ),
+                    if (isLocked) ...[
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          const Icon(Icons.lock_outline_rounded, size: 13, color: AppColors.textSubtle),
+                          const SizedBox(width: 5),
+                          Expanded(
+                            child: Text(
+                              'Complete the previous module to unlock this module.',
+                              style: AppTypography.bodySmall.copyWith(
+                                color: AppColors.textSubtle,
+                                fontSize: 11.5,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                     const SizedBox(height: 14),
 
                     // Footer Row
@@ -302,7 +359,7 @@ class PathwayStopNode extends StatelessWidget {
                             ),
                           ],
                         ),
-                        _buildActionButton(),
+                        _buildActionButton(context),
                       ],
                     ),
                   ],
@@ -317,6 +374,30 @@ class PathwayStopNode extends StatelessWidget {
 
   Widget _buildStatusPill() {
     switch (status) {
+      case StopStatus.locked:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+          decoration: BoxDecoration(
+            color: AppColors.surfaceAlt,
+            borderRadius: BorderRadius.circular(9999),
+            border: Border.all(color: AppColors.borderDefault, width: 1),
+          ),
+          child: const Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.lock_rounded, size: 11, color: AppColors.textSubtle),
+              SizedBox(width: 4),
+              Text(
+                'Locked',
+                style: TextStyle(
+                  color: AppColors.textSubtle,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        );
       case StopStatus.completed:
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -377,7 +458,7 @@ class PathwayStopNode extends StatelessWidget {
     }
   }
 
-  Widget _buildActionButton() {
+  Widget _buildActionButton(BuildContext context) {
     final String label;
     final IconData icon;
     final Color btnBg;
@@ -399,6 +480,13 @@ class PathwayStopNode extends StatelessWidget {
         btnBorder = AppColors.primary;
         textColor = Colors.white;
         break;
+      case StopStatus.locked:
+        label = 'Locked';
+        icon = Icons.lock_outline_rounded;
+        btnBg = AppColors.surfaceAlt;
+        btnBorder = AppColors.borderDefault;
+        textColor = AppColors.textSubtle;
+        break;
       case StopStatus.upcoming:
         label = 'Explore Stop';
         icon = Icons.arrow_forward_ios_rounded;
@@ -411,7 +499,16 @@ class PathwayStopNode extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: () => onSelectModule(module.id),
+        onTap: status == StopStatus.locked
+            ? () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Complete the previous module to unlock this module.'),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              }
+            : () => onSelectModule(module.id),
         borderRadius: BorderRadius.circular(8),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
@@ -454,7 +551,7 @@ class PathwayStopNode extends StatelessWidget {
 
   Widget _buildContent(BuildContext context) {
     if (isNodeOnly) {
-      return buildNodeCircle();
+      return buildNodeCircle(context);
     }
 
     if (!showContinuousRoad) {
@@ -463,7 +560,7 @@ class PathwayStopNode extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.only(top: 8),
-            child: buildNodeCircle(),
+            child: buildNodeCircle(context),
           ),
           const SizedBox(width: 14),
           Expanded(child: buildStopCard(context)),
@@ -489,7 +586,7 @@ class PathwayStopNode extends StatelessWidget {
                 Positioned(
                   left: PathwayRoadGeometry.getNodeX(module.order - 1) - 24,
                   top: 8,
-                  child: buildNodeCircle(),
+                  child: buildNodeCircle(context),
                 ),
               ],
             ),

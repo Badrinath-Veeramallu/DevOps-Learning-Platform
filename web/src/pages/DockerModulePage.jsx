@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, Navigate } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 import { dockerCurriculum } from "../data/dockerCurriculum";
 import {
   isModuleCompleted,
   toggleModuleCompletion,
+  isPathwayUnlocked,
 } from "../services/progressService";
 import { activityAPI } from "../services/api";
 import DockerAnimation from "../components/animations/DockerAnimation";
@@ -21,6 +22,10 @@ export const DockerModulePage = () => {
   );
   const validIndex = moduleIndex >= 0 ? moduleIndex : 0;
   const currentModule = dockerCurriculum[validIndex];
+
+  // Route Guard: learners cannot access locked modules via direct URLs
+  const isPathwayLocked = !isPathwayUnlocked(userId, "docker");
+  const isLocked = isPathwayLocked || (validIndex > 0 && !isModuleCompleted(userId, "docker", dockerCurriculum[validIndex - 1].id));
 
   const [, setProgressVersion] = useState(0);
   const completed = isModuleCompleted(userId, "docker", currentModule.id);
@@ -101,7 +106,7 @@ export const DockerModulePage = () => {
   }, []);
 
   const handleToggleComplete = () => {
-    toggleModuleCompletion(userId, "docker", currentModule.id);
+    toggleModuleCompletion(userId, "docker", currentModule.id, dockerCurriculum);
     setProgressVersion((v) => v + 1);
   };
 
@@ -117,6 +122,10 @@ export const DockerModulePage = () => {
     validIndex < dockerCurriculum.length - 1
       ? dockerCurriculum[validIndex + 1]
       : null;
+
+  if (isPathwayLocked || isLocked) {
+    return <Navigate to="/pathways/docker" replace />;
+  }
 
   return (
     <div className="module-page-wrapper" key={currentModule.id}>
@@ -622,26 +631,35 @@ export const DockerModulePage = () => {
             </Link>
 
             {nextModule ? (
-              <Link
-                to={`/pathways/docker/${nextModule.id}`}
-                className="btn-nav-module btn-next-module"
-              >
-                <div className="nav-module-text">
-                  <span className="nav-sub">Next Stop</span>
-                  <span className="nav-title">{nextModule.shortTitle}</span>
-                </div>
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  aria-hidden="true"
+              completed ? (
+                <Link
+                  to={`/pathways/docker/${nextModule.id}`}
+                  className="btn-nav-module btn-next-module"
                 >
-                  <polyline points="9 18 15 12 9 6" />
-                </svg>
-              </Link>
+                  <div className="nav-module-text">
+                    <span className="nav-sub">Next Stop</span>
+                    <span className="nav-title">{nextModule.shortTitle}</span>
+                  </div>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
+                    <polyline points="9 18 15 12 9 6" />
+                  </svg>
+                </Link>
+              ) : (
+                <div
+                  className="btn-nav-module btn-next-module btn-next-locked"
+                  title="Complete this module to unlock the next stop"
+                  style={{ opacity: 0.55, cursor: "not-allowed" }}
+                >
+                  <div className="nav-module-text">
+                    <span className="nav-sub">Next Stop (Locked)</span>
+                    <span className="nav-title">{nextModule.shortTitle}</span>
+                  </div>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                  </svg>
+                </div>
+              )
             ) : (
               <div className="nav-module-spacer" />
             )}

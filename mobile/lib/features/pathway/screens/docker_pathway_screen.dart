@@ -126,6 +126,19 @@ class _DockerPathwayScreenState extends State<DockerPathwayScreen> {
   }
 
   void _handleSelectModule(String moduleId) {
+    if (!ProgressService.isModuleUnlocked(
+      pathway: 'docker',
+      moduleId: moduleId,
+      completedModules: _completedIds,
+    )) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Complete the previous module to unlock this module.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
     context.push('/pathways/docker/$moduleId');
   }
 
@@ -155,6 +168,125 @@ class _DockerPathwayScreenState extends State<DockerPathwayScreen> {
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
     final user = authProvider.user;
+    final userId = user?.id ?? 'guest';
+
+    final isUnlocked = (widget.initialModules != null) ||
+        ProgressService().isPathwayUnlocked(pathway: 'docker', userId: userId);
+
+    if (!isUnlocked) {
+      final lockReason = ProgressService().getPathwayLockReason(
+        pathway: 'docker',
+        userId: userId,
+      );
+      return Scaffold(
+        backgroundColor: AppColors.background,
+        appBar: AppHeaderBar(
+          user: user,
+          authProvider: authProvider,
+        ),
+        bottomNavigationBar: AppBottomNavBar(
+          currentIndex: 0,
+          onTabSelected: _handleBottomNavTap,
+        ),
+        body: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 72,
+                    height: 72,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFFEF3C7),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Color(0x26B45309),
+                          blurRadius: 16,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: const Icon(
+                      Icons.lock_outline_rounded,
+                      size: 36,
+                      color: Color(0xFFB45309),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF1F5F9),
+                      borderRadius: BorderRadius.circular(999),
+                      border: Border.all(color: const Color(0xFFCBD5E1)),
+                    ),
+                    child: Text(
+                      'Pathway Locked',
+                      style: AppTypography.badgeText.copyWith(
+                        color: const Color(0xFF64748B),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Docker & Containerization',
+                    textAlign: TextAlign.center,
+                    style: AppTypography.displayMedium.copyWith(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textMain,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 400),
+                    child: Text(
+                      lockReason ?? 'Complete all 7 Git modules to unlock the Docker pathway.',
+                      textAlign: TextAlign.center,
+                      style: AppTypography.bodyMedium.copyWith(
+                        color: AppColors.textMuted,
+                        height: 1.5,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Wrap(
+                    spacing: 12,
+                    runSpacing: 10,
+                    alignment: WrapAlignment.center,
+                    children: [
+                      ElevatedButton.icon(
+                        onPressed: () => context.push(RouteNames.gitPathway),
+                        icon: const Icon(Icons.arrow_forward_rounded, size: 16),
+                        label: const Text('Go to Git Pathway'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        ),
+                      ),
+                      OutlinedButton(
+                        onPressed: _handleBackToDashboard,
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.textMain,
+                          side: const BorderSide(color: AppColors.borderDefault),
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        ),
+                        child: const Text('Back to Dashboard'),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -215,7 +347,7 @@ class _DockerPathwayScreenState extends State<DockerPathwayScreen> {
                       children: [
                         // Pathway Hero Header Card
                         PathwayHeaderCard(
-                          completedCount: _completedIds.length,
+                          completedCount: _modules.where((m) => _completedIds.contains(m.id)).length,
                           totalCount: _modules.length,
                           modules: _modules,
                           completedIds: _completedIds,

@@ -171,11 +171,6 @@ class _GitPathwayMapState extends State<GitPathwayMap> {
       );
     }
 
-    final currentStopIndex = widget.modules.indexWhere(
-      (m) => !widget.completedModuleIds.contains(m.id),
-    );
-    final activeIndex =
-        currentStopIndex == -1 ? widget.modules.length - 1 : currentStopIndex;
     final isAllCompleted = widget.modules.isNotEmpty &&
         widget.completedModuleIds.length >= widget.modules.length;
 
@@ -255,12 +250,14 @@ class _GitPathwayMapState extends State<GitPathwayMap> {
                       final module = widget.modules[idx];
                       final isCompleted =
                           widget.completedModuleIds.contains(module.id);
-                      final isCurrent = idx == activeIndex && !isCompleted;
+                      final isPrecedingCompleted =
+                          idx == 0 || widget.completedModuleIds.contains(widget.modules[idx - 1].id);
+                      final isCurrent = !isCompleted && isPrecedingCompleted;
                       final status = isCompleted
                           ? StopStatus.completed
                           : (isCurrent
                               ? StopStatus.current
-                              : StopStatus.upcoming);
+                              : StopStatus.locked);
                       final isLeft = idx % 2 == 0;
 
                       final nodeWidget = KeyedSubtree(

@@ -8,6 +8,7 @@ import '../../../core/theme/app_typography.dart';
 import '../../../core/widgets/app_bottom_nav_bar.dart';
 import '../../../core/widgets/app_header_bar.dart';
 import '../../../providers/auth_provider.dart';
+import '../../pathway/data/progress_service.dart';
 import '../models/learning_path_track.dart';
 import '../widgets/learning_track_card.dart';
 
@@ -22,7 +23,49 @@ class LearningPathsScreen extends StatefulWidget {
 class _LearningPathsScreenState extends State<LearningPathsScreen> {
   String _activeTrackId = 'git';
 
+  @override
+  void initState() {
+    super.initState();
+    ProgressService().addListener(_onProgressChanged);
+  }
+
+  @override
+  void dispose() {
+    ProgressService().removeListener(_onProgressChanged);
+    super.dispose();
+  }
+
+  void _onProgressChanged() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
   void _handleSelectTrack(String trackId) {
+    final authProvider = context.read<AuthProvider>();
+    final userId = authProvider.user?.id ?? 'guest';
+    final isUnlocked = ProgressService().isPathwayUnlocked(
+      pathway: trackId,
+      userId: userId,
+    );
+
+    if (!isUnlocked) {
+      final reason = ProgressService().getPathwayLockReason(
+        pathway: trackId,
+        userId: userId,
+      );
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            reason ?? 'This pathway is locked. Complete prerequisite pathways to unlock.',
+          ),
+          backgroundColor: const Color(0xFF92400E),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+
     setState(() => _activeTrackId = trackId);
     if (trackId == 'git') {
       context.push(RouteNames.gitPathway);
@@ -59,6 +102,7 @@ class _LearningPathsScreenState extends State<LearningPathsScreen> {
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
     final user = authProvider.user;
+    final userId = user?.id ?? 'guest';
     final tracks = LearningPathTrack.defaultTracks;
 
     return Scaffold(
@@ -102,9 +146,20 @@ class _LearningPathsScreenState extends State<LearningPathsScreen> {
                 itemBuilder: (ctx, i) {
                   final track = tracks[i];
                   final isActive = track.id == _activeTrackId;
+                  final isUnlocked = ProgressService().isPathwayUnlocked(
+                    pathway: track.id,
+                    userId: userId,
+                  );
+                  final lockReason = ProgressService().getPathwayLockReason(
+                    pathway: track.id,
+                    userId: userId,
+                  );
+
                   return LearningTrackCard(
                     track: track,
                     isActive: isActive,
+                    isLocked: !isUnlocked,
+                    lockReason: lockReason,
                     onSelect: () => _handleSelectTrack(track.id),
                   );
                 },
@@ -117,4 +172,3 @@ class _LearningPathsScreenState extends State<LearningPathsScreen> {
     );
   }
 }
-

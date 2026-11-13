@@ -1,17 +1,37 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
+import {
+  isPathwayUnlocked,
+  getPathwayLockReason,
+  fetchAllPathwaysStatus,
+} from "../services/progressService";
 
 export const Dashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const userId = user?._id || user?.id || user?.email || "guest";
+
   const [activeTrackId, setActiveTrackId] = useState(() => {
     return localStorage.getItem("devops_active_track") || "git";
   });
+  const [, setProgressTick] = useState(0);
+
+  // Sync pathways progress on mount and listen to real-time progress events
+  useEffect(() => {
+    fetchAllPathwaysStatus(userId);
+
+    const onProgressUpdate = () => {
+      setProgressTick((t) => t + 1);
+    };
+
+    window.addEventListener("devops_progress_updated", onProgressUpdate);
+    return () => window.removeEventListener("devops_progress_updated", onProgressUpdate);
+  }, [userId]);
 
   const firstName = user?.name ? user.name.trim().split(" ")[0] : "Learner";
 
-  // 6 Core Learning Paths from actual application data
+  // Authoritative progression order: Git -> Docker -> Linux -> Kubernetes -> CI/CD -> IaC
   const learningPaths = [
     {
       id: "git",
@@ -23,21 +43,21 @@ export const Dashboard = () => {
       hasPathway: true,
     },
     {
-      id: "linux",
-      title: "Linux Essentials",
-      level: "Foundational",
-      modules: "6 Lessons · Interactive Pathway",
-      description:
-        "File system navigation, permissions, process management, networking, package management, and shell scripting automation.",
-      hasPathway: true,
-    },
-    {
       id: "docker",
       title: "Docker & Container Engineering",
       level: "Intermediate",
       modules: "7 Modules · Interactive Pathway",
       description:
         "Container isolation, multi-stage Dockerfile architecture, layer caching, container networking, and security best practices.",
+      hasPathway: true,
+    },
+    {
+      id: "linux",
+      title: "Linux Essentials",
+      level: "Foundational",
+      modules: "6 Lessons · Interactive Pathway",
+      description:
+        "File system navigation, permissions, process management, networking, package management, and shell scripting automation.",
       hasPathway: true,
     },
     {
@@ -70,30 +90,45 @@ export const Dashboard = () => {
   ];
 
   const handleSelectTrack = (trackId) => {
+    const isUnlocked = isPathwayUnlocked(userId, trackId);
+    if (!isUnlocked) {
+      const lockReason = getPathwayLockReason(userId, trackId);
+      alert(lockReason || "This pathway is currently locked. Complete prerequisite pathways to unlock.");
+      return;
+    }
+
     setActiveTrackId(trackId);
     localStorage.setItem("devops_active_track", trackId);
     if (trackId === "git") {
       navigate("/pathways/git");
-    } else if (trackId === "linux") {
-      navigate("/pathways/linux");
     } else if (trackId === "docker") {
       navigate("/pathways/docker");
+    } else if (trackId === "linux") {
+      navigate("/pathways/linux");
     }
   };
 
   const handleContinue = (path) => {
+    const isUnlocked = isPathwayUnlocked(userId, path.id);
+    if (!isUnlocked) {
+      const lockReason = getPathwayLockReason(userId, path.id);
+      alert(lockReason || "This pathway is currently locked. Complete prerequisite pathways to unlock.");
+      return;
+    }
+
     if (path.id === "git") {
       navigate("/pathways/git");
-    } else if (path.id === "linux") {
-      navigate("/pathways/linux");
     } else if (path.id === "docker") {
       navigate("/pathways/docker");
+    } else if (path.id === "linux") {
+      navigate("/pathways/linux");
     } else {
       alert(`Continuing ${path.title}`);
     }
   };
 
   const activePath = learningPaths.find((p) => p.id === activeTrackId);
+  const isActivePathUnlocked = activePath ? isPathwayUnlocked(userId, activePath.id) : false;
 
   return (
     <div className="dashboard-wrapper">
@@ -102,7 +137,7 @@ export const Dashboard = () => {
         <header className="dashboard-welcome-header">
           <h1>Welcome back, {firstName}</h1>
           <p className="dashboard-subtitle">
-            Continue learning or choose a learning path to get started.
+            Master the DevOps lifecycle sequentially: Git &rarr; Docker &rarr; Linux
           </p>
         </header>
 
@@ -111,30 +146,63 @@ export const Dashboard = () => {
           <h2 className="section-heading">Continue Learning</h2>
 
           {activePath ? (
-            <div className="continue-learning-card">
+            <div className={`continue-learning-card ${!isActivePathUnlocked ? "path-card-locked" : ""}`}>
               <div className="continue-card-body">
                 <div className="continue-card-meta">
                   <span className={`badge-pill badge-${activePath.level.toLowerCase()}`}>
                     {activePath.level}
                   </span>
-                  <span className="continue-module-label">
-                    {activePath.hasPathway ? "Interactive Pathway Active" : "Module in progress"}
-                  </span>
+                  {!isActivePathUnlocked ? (
+                    <span className="badge-pill badge-locked">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                      </svg>
+                      Locked
+                    </span>
+                  ) : (
+                    <span className="continue-module-label">
+                      {activePath.hasPathway ? "Interactive Pathway Active" : "Module in progress"}
+                    </span>
+                  )}
                 </div>
                 <h3 className="continue-track-title">{activePath.title}</h3>
                 <p className="continue-track-desc">{activePath.description}</p>
+                {!isActivePathUnlocked && (
+                  <div className="path-card-lock-hint">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <circle cx="12" cy="12" r="10" />
+                      <line x1="12" y1="8" x2="12" y2="12" />
+                      <line x1="12" y1="16" x2="12.01" y2="16" />
+                    </svg>
+                    <span>{getPathwayLockReason(userId, activePath.id)}</span>
+                  </div>
+                )}
               </div>
 
               <div className="continue-card-actions">
                 <button
                   type="button"
-                  className="btn-continue-primary"
+                  className={isActivePathUnlocked ? "btn-continue-primary" : "btn-continue-primary btn-path-locked"}
                   onClick={() => handleContinue(activePath)}
                 >
-                  <span>{activePath.hasPathway ? "Open Pathway" : "Continue"}</span>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
-                    <polyline points="9 18 15 12 9 6" />
-                  </svg>
+                  <span>
+                    {!isActivePathUnlocked
+                      ? "Locked"
+                      : activePath.hasPathway
+                      ? "Open Pathway"
+                      : "Continue"}
+                  </span>
+                  {isActivePathUnlocked ? (
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
+                      <polyline points="9 18 15 12 9 6" />
+                    </svg>
+                  ) : (
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                    </svg>
+                  )}
                 </button>
               </div>
             </div>
@@ -153,7 +221,7 @@ export const Dashboard = () => {
           <div className="tracks-header">
             <h2 className="section-heading">Available Learning Paths</h2>
             <p className="tracks-subtext">
-              Select a path to build practical skills across the DevOps lifecycle.
+              Complete each foundational track sequentially to unlock subsequent intermediate and advanced technologies.
             </p>
           </div>
 
@@ -161,18 +229,45 @@ export const Dashboard = () => {
             {learningPaths.map((path) => {
               const isActive = path.id === activeTrackId;
               const hasPathway = Boolean(path.hasPathway);
+              const isUnlocked = isPathwayUnlocked(userId, path.id);
+              const lockReason = getPathwayLockReason(userId, path.id);
 
               return (
-                <div key={path.id} className={`dashboard-path-card ${isActive ? "active-path-card" : ""}`}>
+                <div
+                  key={path.id}
+                  className={`dashboard-path-card ${isActive ? "active-path-card" : ""} ${!isUnlocked ? "path-card-locked" : ""}`}
+                >
                   <div className="path-card-body">
                     <div className="path-card-header">
                       <h3 className="path-card-title">{path.title}</h3>
-                      <span className={`badge-pill badge-${path.level.toLowerCase()}`}>
-                        {path.level}
-                      </span>
+                      <div style={{ display: "flex", gap: "0.4rem", alignItems: "center" }}>
+                        {!isUnlocked && (
+                          <span className="badge-pill badge-locked">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                            </svg>
+                            Locked
+                          </span>
+                        )}
+                        <span className={`badge-pill badge-${path.level.toLowerCase()}`}>
+                          {path.level}
+                        </span>
+                      </div>
                     </div>
 
                     <p className="path-card-desc">{path.description}</p>
+
+                    {!isUnlocked && lockReason && (
+                      <div className="path-card-lock-hint">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                          <circle cx="12" cy="12" r="10" />
+                          <line x1="12" y1="8" x2="12" y2="12" />
+                          <line x1="12" y1="16" x2="12.01" y2="16" />
+                        </svg>
+                        <span>{lockReason}</span>
+                      </div>
+                    )}
                   </div>
 
                   <div className="path-card-footer">
@@ -188,14 +283,26 @@ export const Dashboard = () => {
                     <button
                       type="button"
                       onClick={() => handleSelectTrack(path.id)}
-                      className={`btn-path-action ${hasPathway ? "btn-path-highlight" : ""} ${isActive ? "btn-active-track" : ""}`}
+                      className={`btn-path-action ${!isUnlocked ? "btn-path-locked" : hasPathway ? "btn-path-highlight" : ""} ${isActive && isUnlocked ? "btn-active-track" : ""}`}
                     >
-                      <span>
-                        {hasPathway ? "View Pathway" : isActive ? "Active Path" : "Start Learning"}
-                      </span>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                        <polyline points="9 18 15 12 9 6" />
-                      </svg>
+                      {!isUnlocked ? (
+                        <>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                          </svg>
+                          <span>Locked</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>
+                            {hasPathway ? "View Pathway" : isActive ? "Active Path" : "Start Learning"}
+                          </span>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                            <polyline points="9 18 15 12 9 6" />
+                          </svg>
+                        </>
+                      )}
                     </button>
                   </div>
                 </div>

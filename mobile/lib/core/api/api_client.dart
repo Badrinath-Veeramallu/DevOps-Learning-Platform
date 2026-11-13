@@ -189,6 +189,15 @@ class ApiClient {
   ///
   /// Calls `GET /api/progress/:pathwayId`.
   /// Returns `{ "success": true, "pathwayId": "git", "completedModules": [...] }`.
+  Future<Map<String, dynamic>> getPathwaysStatus() async {
+    try {
+      final response = await _dio.get('/progress/pathways/status');
+      return response.data as Map<String, dynamic>;
+    } on DioException catch (e) {
+      throw ApiException.fromDioException(e);
+    }
+  }
+
   Future<Map<String, dynamic>> getProgress({String pathwayId = 'git'}) async {
     try {
       final response = await _dio.get(

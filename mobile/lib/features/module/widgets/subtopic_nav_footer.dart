@@ -12,6 +12,7 @@ class SubtopicNavFooter extends StatelessWidget {
   final CurriculumModule? prevModule;
   final CurriculumModule? nextModule;
   final bool isCompleted;
+  final bool isNextLocked;
   final VoidCallback onPrevSubtopic;
   final VoidCallback onNextSubtopic;
   final VoidCallback onToggleComplete;
@@ -26,6 +27,7 @@ class SubtopicNavFooter extends StatelessWidget {
     this.prevModule,
     this.nextModule,
     required this.isCompleted,
+    this.isNextLocked = false,
     required this.onPrevSubtopic,
     required this.onNextSubtopic,
     required this.onToggleComplete,
@@ -226,30 +228,59 @@ class SubtopicNavFooter extends StatelessWidget {
 
             if (nextModule != null)
               ElevatedButton(
-                onPressed: () => onNavigateModule(nextModule!.id),
+                onPressed: isNextLocked
+                    ? () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Complete Stop ${currentModule.order} to unlock Stop ${nextModule!.order}.',
+                            ),
+                            duration: const Duration(seconds: 2),
+                          ),
+                        );
+                      }
+                    : () => onNavigateModule(nextModule!.id),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.surfaceElevated,
-                  foregroundColor: AppColors.primary,
-                  side: const BorderSide(color: AppColors.primaryBorder),
+                  backgroundColor: isNextLocked
+                      ? AppColors.surfaceAlt
+                      : AppColors.surfaceElevated,
+                  foregroundColor: isNextLocked
+                      ? AppColors.textSubtle
+                      : AppColors.primary,
+                  side: BorderSide(
+                    color: isNextLocked
+                        ? AppColors.borderDefault
+                        : AppColors.primaryBorder,
+                  ),
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    if (isNextLocked) ...[
+                      const Icon(Icons.lock_rounded, size: 12, color: AppColors.textSubtle),
+                      const SizedBox(width: 4),
+                    ],
                     Flexible(
                       child: Text(
-                        'Stop ${nextModule!.order}',
+                        isNextLocked
+                            ? 'Stop ${nextModule!.order} (Locked)'
+                            : 'Stop ${nextModule!.order}',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: isNextLocked ? FontWeight.normal : FontWeight.w600,
                         ),
                       ),
                     ),
                     const SizedBox(width: 6),
-                    const Icon(Icons.arrow_forward_rounded, size: 14),
+                    Icon(
+                      Icons.arrow_forward_rounded,
+                      size: 14,
+                      color: isNextLocked ? AppColors.textSubtle : AppColors.primary,
+                    ),
                   ],
                 ),
               ),

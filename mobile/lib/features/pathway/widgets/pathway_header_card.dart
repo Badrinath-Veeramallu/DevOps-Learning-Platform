@@ -37,8 +37,12 @@ class PathwayHeaderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final validCompletedCount =
+        modules.where((m) => completedIds.contains(m.id)).length;
+    final effectiveCompletedCount =
+        modules.isNotEmpty ? validCompletedCount : completedCount;
     final progressPercent = totalCount > 0
-        ? ((completedCount / totalCount) * 100).round()
+        ? ((effectiveCompletedCount / totalCount) * 100).round()
         : 0;
 
     // Find next uncompleted module
@@ -52,7 +56,7 @@ class PathwayHeaderCard extends StatelessWidget {
       }
     }
 
-    final bool isAllDone = totalCount > 0 && completedCount >= totalCount;
+    final bool isAllDone = totalCount > 0 && effectiveCompletedCount >= totalCount;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -211,7 +215,7 @@ class PathwayHeaderCard extends StatelessWidget {
                             ),
                             children: [
                               TextSpan(
-                                text: '$completedCount',
+                                text: '$effectiveCompletedCount',
                                 style: const TextStyle(
                                   color: AppColors.textMain,
                                   fontWeight: FontWeight.w700,
@@ -231,7 +235,7 @@ class PathwayHeaderCard extends StatelessWidget {
                     ClipRRect(
                       borderRadius: BorderRadius.circular(9999),
                       child: LinearProgressIndicator(
-                        value: totalCount > 0 ? completedCount / totalCount : 0.0,
+                        value: totalCount > 0 ? effectiveCompletedCount / totalCount : 0.0,
                         minHeight: 8,
                         backgroundColor: AppColors.paleBlush,
                         valueColor: const AlwaysStoppedAnimation<Color>(

@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 
 import '../../../core/api/api_client.dart';
+import '../../../core/api/api_exceptions.dart';
 import '../../../core/storage/secure_storage_service.dart';
 
 /// Explicit status representing synchronization with the backend REST API.
@@ -54,6 +55,51 @@ class ProgressService extends ChangeNotifier {
 
   ApiClient? _apiClient;
   ISecureStorageService? _storageService;
+
+  /// Authoritative module ordering for each pathway curriculum.
+  static const Map<String, List<String>> pathwayModules = {
+    'git': [
+      'git-01',
+      'git-02',
+      'git-03',
+      'git-04',
+      'git-05',
+      'git-06',
+      'git-07',
+    ],
+    'docker': [
+      'docker-01',
+      'docker-02',
+      'docker-03',
+      'docker-04',
+      'docker-05',
+      'docker-06',
+      'docker-07',
+    ],
+    'linux': [
+      'linux-01',
+      'linux-02',
+      'linux-03',
+      'linux-04',
+      'linux-05',
+      'linux-06',
+    ],
+  };
+
+  /// Validates whether a module is unlocked based on completed modules.
+  /// The first module is always unlocked; subsequent modules require module[idx - 1] to be completed.
+  static bool isModuleUnlocked({
+    required String pathway,
+    required String moduleId,
+    required Set<String> completedModules,
+  }) {
+    final list = pathwayModules[pathway.toLowerCase()];
+    if (list == null) return true;
+    final idx = list.indexOf(moduleId);
+    if (idx <= 0) return true;
+    final prevId = list[idx - 1];
+    return completedModules.contains(prevId);
+  }
 
   // In-memory cache keyed by "${userId}_${pathway}" -> Set of completed module IDs
   final Map<String, Set<String>> _cache = {};
@@ -402,6 +448,15 @@ class ProgressService extends ChangeNotifier {
     return Set<String>.from(set);
   }
 
+  /// Synchronously returns cached completed module IDs.
+  Set<String> getCompletedModulesSync(
+    String userId, {
+    String pathway = 'git',
+  }) {
+    final cacheKey = _getCacheKey(userId, pathway);
+    return Set<String>.from(_cache[cacheKey] ?? <String>{});
+  }
+
   /// Synchronously checks if a module is completed from the in-memory cache.
   bool isModuleCompleted(
     String userId,
@@ -411,6 +466,108 @@ class ProgressService extends ChangeNotifier {
     final cacheKey = _getCacheKey(userId, pathway);
     final current = _cache[cacheKey] ?? <String>{};
     return current.contains(moduleId);
+  }
+
+  /// Checks whether an entire pathway is fully completed.
+  /// Sequential rules:
+  /// - Git: all 7 Git modules completed.
+  /// - Docker: Git is completed AND all 7 Docker modules completed.
+  /// - Linux: Docker is completed AND all 6 Linux modules completed.
+  bool isPathwayCompleted({
+    required String pathway,
+    required String userId,
+  }) {
+    final cleanPathway = pathway.toLowerCase();
+    if (cleanPathway == 'git') {
+      final completed = getCompletedModulesSync(userId, pathway: 'git');
+      final gitModules = pathwayModules['git'] ?? [];
+      return gitModules.isNotEmpty && gitModules.every((id) => completed.contains(id));
+    }
+    if (cleanPathway == 'docker') {
+      if (!isPathwayCompleted(pathway: 'git', userId: userId)) return false;
+      final completed = getCompletedModulesSync(userId, pathway: 'docker');
+      final dockerModules = pathwayModules['docker'] ?? [];
+      return dockerModules.isNotEmpty && dockerModules.every((id) => completed.contains(id));
+    }
+    if (cleanPathway == 'linux') {
+      if (!isPathwayCompleted(pathway: 'docker', userId: userId)) return false;
+      final completed = getCompletedModulesSync(userId, pathway: 'linux');
+      final linuxModules = pathwayModules['linux'] ?? [];
+      return linuxModules.isNotEmpty && linuxModules.every((id) => completed.contains(id));
+    }
+    return false;
+  }
+
+  /// Checks whether a pathway is unlocked based on prerequisite pathways:
+  /// Progression: Git -> Docker -> Linux
+  /// - Git: always unlocked.
+  /// - Docker: unlocked if Git is fully completed.
+  /// - Linux: unlocked if Docker is fully completed (which requires Git to be completed).
+  bool isPathwayUnlocked({
+    required String pathway,
+    required String userId,
+  }) {
+    final cleanPathway = pathway.toLowerCase();
+    if (cleanPathway == 'git') return true;
+    if (cleanPathway == 'docker') return isPathwayCompleted(pathway: 'git', userId: userId);
+    if (cleanPathway == 'linux') return isPathwayCompleted(pathway: 'docker', userId: userId);
+    return false;
+  }
+
+  /// Returns lock explanation if locked, or null if unlocked.
+  String? getPathwayLockReason({
+    required String pathway,
+    required String userId,
+  }) {
+    final cleanPathway = pathway.toLowerCase();
+    if (cleanPathway == 'git') return null;
+    if (cleanPathway == 'docker') {
+      if (!isPathwayCompleted(pathway: 'git', userId: userId)) {
+        return 'Complete all 7 Git modules to unlock the Docker pathway.';
+      }
+      return null;
+    }
+    if (cleanPathway == 'linux') {
+      if (!isPathwayCompleted(pathway: 'git', userId: userId)) {
+        return 'Complete all 7 Git modules first.';
+      }
+      if (!isPathwayCompleted(pathway: 'docker', userId: userId)) {
+        return 'Complete all 7 Docker modules to unlock the Linux pathway.';
+      }
+      return null;
+    }
+    return 'Pathway coming soon.';
+  }
+
+  /// Sync lock and completion status for all core pathways from the server.
+  Future<Map<String, dynamic>?> fetchAllPathwaysStatus(String userId) async {
+    if (userId.trim().isEmpty || userId == 'guest') return null;
+    final hasToken = await _effectiveStorage.hasToken();
+    if (!hasToken) return null;
+
+    try {
+      final res = await _effectiveClient.getPathwaysStatus();
+      if (res['success'] == true && res['pathways'] is Map) {
+        final pathwaysMap = res['pathways'] as Map<String, dynamic>;
+        for (final entry in pathwaysMap.entries) {
+          final pId = entry.key;
+          final pData = entry.value;
+          if (pData is Map && pData['completedModules'] is List) {
+            final modules = (pData['completedModules'] as List)
+                .map((e) => e.toString())
+                .toSet();
+            final cacheKey = _getCacheKey(userId, pId);
+            _cache[cacheKey] = modules;
+            await _saveToDisk(userId, pId, modules, sessionGeneration: _currentSessionGeneration);
+          }
+        }
+        notifyListeners();
+        return pathwaysMap;
+      }
+    } catch (e) {
+      debugPrint('[ProgressService] fetchAllPathwaysStatus error: $e');
+    }
+    return null;
   }
 
   /// Checks whether local progress is confirmed to be synchronized with the backend.
@@ -538,6 +695,7 @@ class ProgressService extends ChangeNotifier {
 
     // 1. Fetch authoritative server progress (GET /api/progress/:pathwayId)
     Set<String>? authoritativeServerSet;
+    bool isServerLocked = false;
     try {
       final res = await _effectiveClient.getProgress(pathwayId: pathway);
       if (generation != _currentSessionGeneration) {
@@ -550,11 +708,27 @@ class ProgressService extends ChangeNotifier {
             .toSet();
       }
     } catch (e) {
+      if (e is ApiException && e.statusCode == 403) {
+        isServerLocked = true;
+      }
       debugPrint('[ProgressService] fetchUserProgress GET network error: $e');
     }
 
     if (generation != _currentSessionGeneration) {
       return <String>{};
+    }
+
+    if (isServerLocked) {
+      // Pathway is locked on server! Purge any pending changes and return local cached progress.
+      _pendingChanges[cacheKey]?.clear();
+      await _savePendingToDisk(userId, pathway, sessionGeneration: generation);
+      _status[cacheKey] = SyncStatus.synced;
+      notifyListeners();
+      return getCompletedModules(
+        userId,
+        pathway: pathway,
+        sessionGeneration: generation,
+      );
     }
 
     // Server unreachable or returned error: preserve local progress and mark offline
@@ -577,6 +751,17 @@ class ProgressService extends ChangeNotifier {
     // 3-8. Reconcile pending local changes sequentially using safe GET-first logic
     if (pending.isNotEmpty) {
       final pendingEntries = Map<String, bool>.from(pending).entries.toList();
+      final curriculumList = pathwayModules[pathway.toLowerCase()];
+      if (curriculumList != null) {
+        pendingEntries.sort((a, b) {
+          final idxA = curriculumList.indexOf(a.key);
+          final idxB = curriculumList.indexOf(b.key);
+          if (idxA != -1 && idxB != -1) return idxA.compareTo(idxB);
+          if (idxA != -1) return -1;
+          if (idxB != -1) return 1;
+          return a.key.compareTo(b.key);
+        });
+      }
 
       for (final entry in pendingEntries) {
         final moduleId = entry.key;
@@ -592,6 +777,21 @@ class ProgressService extends ChangeNotifier {
 
         // 4. If they already match, remove that pending entry
         if (serverAlreadyMatches) {
+          pending.remove(moduleId);
+          continue;
+        }
+
+        // Validate sequential unlocking rule:
+        // If desiredState is true and module is locked based on currentServerSet, discard the pending mutation.
+        if (desiredState &&
+            !isModuleUnlocked(
+              pathway: pathway,
+              moduleId: moduleId,
+              completedModules: currentServerSet,
+            )) {
+          debugPrint(
+            '[ProgressService] Discarding invalid out-of-order pending completion for $moduleId',
+          );
           pending.remove(moduleId);
           continue;
         }
@@ -713,6 +913,8 @@ class ProgressService extends ChangeNotifier {
     String userId,
     String moduleId, {
     String pathway = 'git',
+    bool validateSequence = false,
+    bool validatePathwayLock = true,
   }) {
     final generation = _currentSessionGeneration;
     return _enqueueMutation<bool>(
@@ -737,6 +939,8 @@ class ProgressService extends ChangeNotifier {
           moduleId: moduleId,
           desiredState: desiredState,
           generation: generation,
+          validateSequence: validateSequence,
+          validatePathwayLock: validatePathwayLock,
         );
       },
     );
@@ -878,18 +1082,50 @@ class ProgressService extends ChangeNotifier {
     required String moduleId,
     required bool desiredState,
     required int generation,
+    bool validateSequence = false,
+    bool validatePathwayLock = true,
   }) async {
     final cacheKey = _getCacheKey(userId, pathway);
+    final current = Set<String>.from(_cache[cacheKey] ?? <String>{});
+
+    if (validateSequence && desiredState) {
+      if (!isModuleUnlocked(
+        pathway: pathway,
+        moduleId: moduleId,
+        completedModules: current,
+      )) {
+        debugPrint(
+          '[ProgressService] Cannot complete locked module: $moduleId',
+        );
+        _pendingChanges[cacheKey]?.remove(moduleId);
+        return false;
+      }
+    }
+
+    // Pathway-level unlocking check
+    if (validatePathwayLock && desiredState && !isPathwayUnlocked(pathway: pathway, userId: userId)) {
+      debugPrint('[ProgressService] Cannot complete module in locked pathway: $pathway');
+      _pendingChanges[cacheKey]?.remove(moduleId);
+      return false;
+    }
 
     // 1. Explicitly record pending local change
     _pendingChanges.putIfAbsent(cacheKey, () => {})[moduleId] = desiredState;
 
     // 2. Immediate optimistic update to in-memory cache
-    final current = Set<String>.from(_cache[cacheKey] ?? <String>{});
     if (desiredState) {
       current.add(moduleId);
     } else {
       current.remove(moduleId);
+      final list = pathwayModules[pathway.toLowerCase()];
+      if (list != null) {
+        final idx = list.indexOf(moduleId);
+        if (idx != -1) {
+          final subsequent = list.sublist(idx + 1).toSet();
+          current.removeWhere((id) => subsequent.contains(id));
+          _pendingChanges[cacheKey]?.removeWhere((k, v) => subsequent.contains(k));
+        }
+      }
     }
     _cache[cacheKey] = current;
     _status[cacheKey] = SyncStatus.pending;
@@ -1000,6 +1236,28 @@ class ProgressService extends ChangeNotifier {
       debugPrint(
         '[ProgressService] Toggle error ($err). Attempting safe GET reconciliation...',
       );
+      if (err is ApiException && (err.statusCode == 400 || err.statusCode == 403)) {
+        debugPrint(
+          '[ProgressService] Server rejected toggle for $moduleId with 400 Bad Request. Reverting local state.',
+        );
+        _pendingChanges[cacheKey]?.remove(moduleId);
+        await _savePendingToDisk(userId, pathway, sessionGeneration: generation);
+        try {
+          final getRes = await _effectiveClient.getProgress(pathwayId: pathway);
+          if (generation == _currentSessionGeneration &&
+              getRes['success'] == true &&
+              getRes['completedModules'] is List) {
+            final serverSet = (getRes['completedModules'] as List)
+                .map((e) => e.toString())
+                .toSet();
+            _cache[cacheKey] = serverSet;
+            _status[cacheKey] = SyncStatus.synced;
+            await _saveToDisk(userId, pathway, serverSet, sessionGeneration: generation);
+            notifyListeners();
+          }
+        } catch (_) {}
+        return false;
+      }
     }
 
     // Session check before attempting any fallback GET request

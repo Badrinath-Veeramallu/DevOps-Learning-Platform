@@ -232,8 +232,9 @@ void main() {
         expect(find.text('Current Focus'), findsOneWidget); // git-02
         expect(find.text('Start Learning'), findsOneWidget); // git-02 button
 
-        expect(find.text('Upcoming'), findsNWidgets(5)); // git-03 through git-07
-        expect(find.text('Explore Stop'), findsNWidgets(5));
+        // Sequential Unlocking: git-03 through git-07 are locked
+        expect(find.text('Locked'), findsNWidgets(10)); // 5 status pills + 5 buttons
+        expect(find.text('Complete the previous module to unlock this module.'), findsNWidgets(5));
       },
     );
 

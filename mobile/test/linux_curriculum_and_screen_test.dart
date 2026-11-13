@@ -487,8 +487,9 @@ void main() {
         expect(find.text('Current Focus'), findsOneWidget); // linux-02
         expect(find.text('Start Learning'), findsOneWidget); // linux-02 button
 
-        expect(find.text('Upcoming'), findsNWidgets(4)); // linux-03 through linux-06
-        expect(find.text('Explore Stop'), findsNWidgets(4));
+        // Sequential Unlocking: linux-03 through linux-06 are locked
+        expect(find.text('Locked'), findsNWidgets(8)); // 4 status pills + 4 buttons
+        expect(find.text('Complete the previous module to unlock this module.'), findsNWidgets(4));
       },
     );
 

@@ -93,12 +93,55 @@ class _GitModuleScreenState extends State<GitModuleScreen> {
     }
   }
 
+  bool get _isLocked {
+    if (_currentModule == null) return false;
+    if (_currentModule!.order <= 1) return false;
+    if (widget.initialModules != null && widget.initialCompletedIds == null) {
+      return false;
+    }
+    final authProvider = context.read<AuthProvider>();
+    final userId = authProvider.user?.id ?? 'guest';
+    final completed =
+        ProgressService().getCompletedModulesSync(userId, pathway: 'git');
+    final effectiveCompleted = completed.isNotEmpty
+        ? completed
+        : (widget.initialCompletedIds ?? const {});
+    return !ProgressService.isModuleUnlocked(
+      pathway: 'git',
+      moduleId: _currentModule!.id,
+      completedModules: effectiveCompleted,
+    );
+  }
+
+  void _checkLockAndRedirect() {
+    if (_isLocked && mounted) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _isLocked) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Complete the previous module to unlock this module.'),
+              duration: Duration(seconds: 2),
+            ),
+          );
+          try {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go(RouteNames.gitPathway);
+            }
+          } catch (_) {}
+        }
+      });
+    }
+  }
+
   void _updateCompletionStatus() {
     if (_currentModule == null) return;
     final authProvider = context.read<AuthProvider>();
     final userId = authProvider.user?.id ?? 'guest';
     final isDone = ProgressService().isModuleCompleted(userId, _currentModule!.id);
     setState(() => _isCompleted = isDone);
+    _checkLockAndRedirect();
   }
 
   void _logLessonViewed() {
@@ -217,9 +260,21 @@ class _GitModuleScreenState extends State<GitModuleScreen> {
     final authProvider = context.read<AuthProvider>();
     final userId = authProvider.user?.id ?? 'guest';
 
+    if (_isLocked) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Complete the previous module to unlock this module.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+
     final isNowDone = await ProgressService().toggleModuleCompletion(
       userId,
       _currentModule!.id,
+      pathway: 'git',
+      validateSequence: true,
     );
 
     if (mounted) {
@@ -241,6 +296,23 @@ class _GitModuleScreenState extends State<GitModuleScreen> {
   }
 
   void _handleNavigateModule(String targetModuleId) {
+    final authProvider = context.read<AuthProvider>();
+    final userId = authProvider.user?.id ?? 'guest';
+    final completed =
+        ProgressService().getCompletedModulesSync(userId, pathway: 'git');
+    if (!ProgressService.isModuleUnlocked(
+      pathway: 'git',
+      moduleId: targetModuleId,
+      completedModules: completed,
+    )) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Complete the previous module to unlock this module.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
     context.push('/pathways/git/$targetModuleId');
   }
 
@@ -279,6 +351,35 @@ class _GitModuleScreenState extends State<GitModuleScreen> {
             ? const Center(
                 child: CircularProgressIndicator(color: AppColors.primary),
               )
+            : _isLocked
+                ? Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(24.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.lock_rounded, size: 48, color: AppColors.textSubtle),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Module Locked',
+                            style: AppTypography.titleLarge.copyWith(fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 8),
+                          const Text(
+                            'Complete the previous module to unlock this module.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: AppColors.textMuted),
+                          ),
+                          const SizedBox(height: 24),
+                          ElevatedButton.icon(
+                            onPressed: _handleBackToPathway,
+                            icon: const Icon(Icons.arrow_back_rounded),
+                            label: const Text('Return to Pathway'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
             : _error != null
                 ? Center(
                     child: Padding(
@@ -377,6 +478,7 @@ class _GitModuleScreenState extends State<GitModuleScreen> {
             prevModule: prevModule,
             nextModule: nextModule,
             isCompleted: _isCompleted,
+            isNextLocked: nextModule != null && !_isCompleted,
             onPrevSubtopic: _handlePrevSubtopic,
             onNextSubtopic: _handleNextSubtopic,
             onToggleComplete: _handleToggleComplete,
