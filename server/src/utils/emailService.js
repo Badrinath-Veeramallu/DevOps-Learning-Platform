@@ -18,7 +18,7 @@ function getMockEmails() {
 function getSmtpStatus() {
   const host =
     process.env.BREVO_SMTP_HOST?.trim() || "smtp-relay.brevo.com";
-  const port = process.env.BREVO_SMTP_PORT?.trim() || "587";
+  const port = process.env.BREVO_SMTP_PORT?.trim() || "2525";
   const user = process.env.BREVO_SMTP_LOGIN?.trim();
   const pass = process.env.BREVO_SMTP_KEY?.trim();
   const from = process.env.EMAIL_FROM?.trim();
@@ -92,7 +92,7 @@ function getTransporter() {
     socketTimeout: 15000,
   };
 
-  if (status.port === 587) {
+  if (status.port === 587 || status.port === 2525) {
     transportOptions.requireTLS = true;
   }
 
