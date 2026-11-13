@@ -1,6 +1,5 @@
 
 const nodemailer = require("nodemailer");
-const { Resend } = require("resend");
 
 // In-memory mock storage used exclusively by automated tests.
 let mockSentEmails = [];
@@ -14,26 +13,26 @@ function getMockEmails() {
 }
 
 /**
- * Check SMTP configuration.
- * Retained for compatibility with existing diagnostics.
- * Production OTP emails are sent through Resend.
+ * Check Brevo SMTP configuration.
  */
 function getSmtpStatus() {
-  const host = process.env.SMTP_HOST?.trim();
-  const port = process.env.SMTP_PORT?.trim() || "587";
-  const user = process.env.SMTP_USER?.trim();
-  const pass = process.env.SMTP_PASS?.trim();
+  const host =
+    process.env.BREVO_SMTP_HOST?.trim() || "smtp-relay.brevo.com";
+  const port = process.env.BREVO_SMTP_PORT?.trim() || "587";
+  const user = process.env.BREVO_SMTP_LOGIN?.trim();
+  const pass = process.env.BREVO_SMTP_KEY?.trim();
   const from = process.env.EMAIL_FROM?.trim();
 
   const missing = [];
-  if (!host) missing.push("SMTP_HOST");
-  if (!user) missing.push("SMTP_USER");
-  if (!pass) missing.push("SMTP_PASS");
+
+  if (!user) missing.push("BREVO_SMTP_LOGIN");
+  if (!pass) missing.push("BREVO_SMTP_KEY");
+  if (!from) missing.push("EMAIL_FROM");
 
   return {
     isConfigured: missing.length === 0,
     missing,
-    host: host || null,
+    host,
     port: parseInt(port, 10),
     hasUser: Boolean(user),
     hasPass: Boolean(pass),
@@ -42,8 +41,8 @@ function getSmtpStatus() {
 }
 
 /**
- * Retain the existing SMTP transporter for compatibility
- * with existing diagnostics and automated tests.
+ * Create Brevo SMTP transporter.
+ * Preserve mock behavior for automated tests.
  */
 function getTransporter() {
   if (process.env.NODE_ENV === "test") {
@@ -71,10 +70,12 @@ function getTransporter() {
 
   if (!status.isConfigured) {
     const error = new Error(
-      `SMTP email service is not configured. Missing variables: ${status.missing.join(", ")}`
+      `Brevo SMTP is not configured. Missing variables: ${status.missing.join(", ")}`
     );
+
     error.code = "SMTP_NOT_CONFIGURED";
     error.missing = status.missing;
+
     throw error;
   }
 
@@ -83,8 +84,8 @@ function getTransporter() {
     port: status.port,
     secure: status.port === 465,
     auth: {
-      user: process.env.SMTP_USER.trim(),
-      pass: process.env.SMTP_PASS.trim(),
+      user: process.env.BREVO_SMTP_LOGIN.trim(),
+      pass: process.env.BREVO_SMTP_KEY.trim(),
     },
     connectionTimeout: 10000,
     greetingTimeout: 10000,
@@ -99,8 +100,7 @@ function getTransporter() {
 }
 
 /**
- * Verify the SMTP connection.
- * This is a diagnostic helper; OTP sending uses Resend.
+ * Verify the Brevo SMTP connection.
  */
 async function verifySmtpConnection() {
   const status = getSmtpStatus();
@@ -109,7 +109,7 @@ async function verifySmtpConnection() {
     return {
       success: false,
       code: "SMTP_NOT_CONFIGURED",
-      message: `SMTP configuration incomplete. Missing: ${status.missing.join(", ")}`,
+      message: `Brevo SMTP configuration incomplete. Missing: ${status.missing.join(", ")}`,
       missing: status.missing,
     };
   }
@@ -120,20 +120,20 @@ async function verifySmtpConnection() {
 
     return {
       success: true,
-      message: `Successfully connected to SMTP server (${status.host}:${status.port}).`,
+      message: `Successfully connected to Brevo SMTP (${status.host}:${status.port}).`,
     };
   } catch (err) {
-    let message = err.message || "Failed to connect to SMTP server";
+    let message = err.message || "Failed to connect to Brevo SMTP server";
 
     if (err.code === "EAUTH") {
       message =
-        "SMTP authentication failed. Check your SMTP credentials.";
+        "Brevo SMTP authentication failed. Check your SMTP login and SMTP key.";
     } else if (
       err.code === "ESOCKET" ||
       err.code === "ETIMEDOUT" ||
       err.code === "ECONNECTION"
     ) {
-      message = `Connection timed out connecting to ${status.host}:${status.port}.`;
+      message = `Connection failed connecting to Brevo SMTP at ${status.host}:${status.port}.`;
     }
 
     return {
@@ -143,6 +143,7 @@ async function verifySmtpConnection() {
     };
   }
 }
+
 
 /**
  * Generate the existing verification email template.
@@ -215,62 +216,30 @@ If you did not attempt to register on the DevOps Learning Platform, please disre
 }
 
 /**
- * Send OTP email through Resend in production.
+ * Send OTP email through Brevo SMTP.
  */
 async function sendOtpEmail(recipientEmail, otp) {
   const { html, text } = buildOtpEmailTemplate(otp);
 
-  // Preserve the existing mock behavior in automated tests.
-  if (process.env.NODE_ENV === "test") {
-    const transporter = getTransporter();
-
-    return transporter.sendMail({
-      from: process.env.EMAIL_FROM || "DevOps Learning Platform",
-      to: recipientEmail,
-      subject: "Your Verification Code - DevOps Learning Platform",
-      text,
-      html,
-    });
-  }
-
-  const apiKey = process.env.RESEND_API_KEY?.trim();
-
-  if (!apiKey) {
-    const error = new Error("RESEND_API_KEY is not configured");
-    error.code = "RESEND_NOT_CONFIGURED";
-    throw error;
-  }
-
-  const from =
-    process.env.RESEND_FROM_EMAIL?.trim() ||
-    process.env.EMAIL_FROM?.trim() ||
-    "DevOps Learning Platform <onboarding@resend.dev>";
-
-  const resend = new Resend(apiKey);
-
-  const { data, error } = await resend.emails.send({
-    from,
-    to: [recipientEmail],
+  const mailOptions = {
+    from:
+      process.env.EMAIL_FROM ||
+      "DevOps Learning Platform",
+    to: recipientEmail,
     subject: "Your Verification Code - DevOps Learning Platform",
     text,
     html,
-  });
-
-  if (error) {
-    const sendError = new Error(`Resend email failed: ${error.message}`);
-    sendError.code = error.name || "RESEND_SEND_FAILED";
-    throw sendError;
-  }
-
-  if (!data?.id) {
-    throw new Error("Resend did not return an email ID");
-  }
-
-  return {
-    messageId: data.id,
-    accepted: [recipientEmail],
-    rejected: [],
   };
+
+  // Preserve existing mock behavior in automated tests.
+  if (process.env.NODE_ENV === "test") {
+    const transporter = getTransporter();
+    return transporter.sendMail(mailOptions);
+  }
+
+  const transporter = getTransporter();
+
+  return transporter.sendMail(mailOptions);
 }
 
 module.exports = {
@@ -281,3 +250,4 @@ module.exports = {
   resetMockEmails,
   getMockEmails,
 };
+
