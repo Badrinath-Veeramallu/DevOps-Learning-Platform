@@ -87,6 +87,9 @@ class _SubtopicAnimationCardState extends State<SubtopicAnimationCard> {
       debugPrint(
         '[SubtopicAnimationCard] Animation not found for key: "${widget.animationKey}", title: "${widget.fallbackTitle}", pathway: "${widget.pathway}"',
       );
+      if (widget.pathway == 'cicd') {
+        return const SizedBox(height: 220);
+      }
       return const SizedBox.shrink();
     }
 

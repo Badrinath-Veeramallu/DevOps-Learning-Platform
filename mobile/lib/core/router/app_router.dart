@@ -8,11 +8,13 @@ import '../../features/dashboard/screens/dashboard_screen.dart';
 import '../../features/dashboard/screens/learning_paths_screen.dart';
 import '../../features/module/screens/docker_module_screen.dart';
 import '../../features/module/screens/git_module_screen.dart';
+import '../../features/module/screens/cicd_module_screen.dart';
 import '../../features/module/screens/linux_module_screen.dart';
 import '../../features/onboarding/screens/splash_screen.dart';
 import '../../features/onboarding/screens/welcome_screen.dart';
 import '../../features/pathway/screens/docker_pathway_screen.dart';
 import '../../features/pathway/screens/git_pathway_screen.dart';
+import '../../features/pathway/screens/cicd_pathway_screen.dart';
 import '../../features/pathway/screens/linux_pathway_screen.dart';
 import '../../features/profile/screens/profile_screen.dart';
 import '../../features/quiz/screens/pathway_quiz_screen.dart';
@@ -75,6 +77,9 @@ class AppRouter {
             location.startsWith('/pathways/docker') ||
             location == RouteNames.linuxPathway ||
             location.startsWith('/pathways/linux') ||
+            location == RouteNames.cicdPathway ||
+            location.startsWith('/pathways/cicd') ||
+            location.startsWith('/pathways/') ||
             location == RouteNames.profile;
 
         if (!isAuthenticated && isProtectedRoute) {
@@ -137,6 +142,70 @@ class AppRouter {
             return const LearningPathsScreen();
           },
         ),
+
+        // =====================================================================
+        // QUIZ ROUTES MUST BE REGISTERED BEFORE :moduleId TO PREVENT SHADOWING!
+        // =====================================================================
+        GoRoute(
+          path: RouteNames.gitQuiz,
+          name: 'gitQuiz',
+          builder: (BuildContext context, GoRouterState state) {
+            final isFastTrack = state.uri.queryParameters['fastTrack'] == 'true';
+            return PathwayQuizScreen(
+              pathwayId: 'git',
+              isFastTrack: isFastTrack,
+            );
+          },
+        ),
+        GoRoute(
+          path: RouteNames.linuxQuiz,
+          name: 'linuxQuiz',
+          builder: (BuildContext context, GoRouterState state) {
+            final isFastTrack = state.uri.queryParameters['fastTrack'] == 'true';
+            return PathwayQuizScreen(
+              pathwayId: 'linux',
+              isFastTrack: isFastTrack,
+            );
+          },
+        ),
+        GoRoute(
+          path: RouteNames.dockerQuiz,
+          name: 'dockerQuiz',
+          builder: (BuildContext context, GoRouterState state) {
+            final isFastTrack = state.uri.queryParameters['fastTrack'] == 'true';
+            return PathwayQuizScreen(
+              pathwayId: 'docker',
+              isFastTrack: isFastTrack,
+            );
+          },
+        ),
+        GoRoute(
+          path: RouteNames.cicdQuiz,
+          name: 'cicdQuiz',
+          builder: (BuildContext context, GoRouterState state) {
+            final isFastTrack = state.uri.queryParameters['fastTrack'] == 'true';
+            return PathwayQuizScreen(
+              pathwayId: 'cicd',
+              isFastTrack: isFastTrack,
+            );
+          },
+        ),
+        GoRoute(
+          path: RouteNames.pathwayQuiz,
+          name: 'pathwayQuiz',
+          builder: (BuildContext context, GoRouterState state) {
+            final pathwayId = state.pathParameters['pathwayId'] ?? 'git';
+            final isFastTrack = state.uri.queryParameters['fastTrack'] == 'true';
+            return PathwayQuizScreen(
+              pathwayId: pathwayId,
+              isFastTrack: isFastTrack,
+            );
+          },
+        ),
+
+        // =====================================================================
+        // PATHWAY & MODULE ROUTES
+        // =====================================================================
         GoRoute(
           path: RouteNames.gitPathway,
           name: 'gitPathway',
@@ -183,13 +252,21 @@ class AppRouter {
           },
         ),
         GoRoute(
-          path: RouteNames.pathwayQuiz,
-          name: 'pathwayQuiz',
+          path: RouteNames.cicdPathway,
+          name: 'cicdPathway',
           builder: (BuildContext context, GoRouterState state) {
-            final pathwayId = state.pathParameters['pathwayId'] ?? 'git';
-            return PathwayQuizScreen(pathwayId: pathwayId);
+            return const CicdPathwayScreen();
           },
         ),
+        GoRoute(
+          path: RouteNames.cicdModule,
+          name: 'cicdModule',
+          builder: (BuildContext context, GoRouterState state) {
+            final moduleId = state.pathParameters['moduleId'] ?? '';
+            return CicdModuleScreen(moduleId: moduleId);
+          },
+        ),
+
         GoRoute(
           path: RouteNames.profile,
           name: 'profile',

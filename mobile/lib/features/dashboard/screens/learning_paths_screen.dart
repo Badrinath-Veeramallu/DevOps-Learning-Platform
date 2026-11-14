@@ -12,7 +12,7 @@ import '../../pathway/data/progress_service.dart';
 import '../models/learning_path_track.dart';
 import '../widgets/learning_track_card.dart';
 
-/// Screen listing all available DevOps learning tracks (Git, Docker, CI/CD, etc.).
+/// Screen listing all available DevOps learning tracks (Git, Linux, Docker, CI/CD, etc.).
 class LearningPathsScreen extends StatefulWidget {
   const LearningPathsScreen({super.key});
 
@@ -27,6 +27,15 @@ class _LearningPathsScreenState extends State<LearningPathsScreen> {
   void initState() {
     super.initState();
     ProgressService().addListener(_onProgressChanged);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final authProvider = context.read<AuthProvider>();
+      final userId = authProvider.user?.id ?? 'guest';
+      ProgressService().fetchUserProgress(userId, pathway: 'git');
+      ProgressService().fetchUserProgress(userId, pathway: 'linux');
+      ProgressService().fetchUserProgress(userId, pathway: 'docker');
+      ProgressService().fetchUserProgress(userId, pathway: 'cicd');
+      ProgressService().fetchAllPathwaysStatus(userId);
+    });
   }
 
   @override
@@ -69,10 +78,12 @@ class _LearningPathsScreenState extends State<LearningPathsScreen> {
     setState(() => _activeTrackId = trackId);
     if (trackId == 'git') {
       context.push(RouteNames.gitPathway);
-    } else if (trackId == 'docker') {
-      context.push(RouteNames.dockerPathway);
     } else if (trackId == 'linux') {
       context.push(RouteNames.linuxPathway);
+    } else if (trackId == 'docker') {
+      context.push(RouteNames.dockerPathway);
+    } else if (trackId == 'cicd') {
+      context.push(RouteNames.cicdPathway);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

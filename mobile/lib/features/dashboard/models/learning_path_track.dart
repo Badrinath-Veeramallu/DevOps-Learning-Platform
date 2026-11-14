@@ -1,7 +1,7 @@
 /// Model representing a DevOps learning path track.
 ///
 /// Matches the 6 core paths defined in Web's `Dashboard.jsx`.
-/// Authoritative progression: Git -> Docker -> Linux
+/// Authoritative progression: Git -> Linux -> Docker -> CI/CD -> Kubernetes -> IaC
 class LearningPathTrack {
   final String id;
   final String title;
@@ -19,7 +19,7 @@ class LearningPathTrack {
     this.hasPathway = false,
   });
 
-  /// The 6 core learning tracks in authoritative order (Git -> Docker -> Linux).
+  /// The 6 core learning tracks in authoritative order (Git -> Linux -> Docker -> CI/CD -> Kubernetes -> IaC).
   static const List<LearningPathTrack> defaultTracks = [
     LearningPathTrack(
       id: 'git',
@@ -28,15 +28,6 @@ class LearningPathTrack {
       modules: '7 Modules · Interactive Pathway',
       description:
           'Version control strategies, GitOps branch patterns, interactive rebasing, merge conflict resolution, and commit workflows.',
-      hasPathway: true,
-    ),
-    LearningPathTrack(
-      id: 'docker',
-      title: 'Docker & Container Engineering',
-      level: 'Intermediate',
-      modules: '7 Modules · Interactive Pathway',
-      description:
-          'Container isolation, multi-stage Dockerfile architecture, layer caching, container networking, and security best practices.',
       hasPathway: true,
     ),
     LearningPathTrack(
@@ -49,21 +40,30 @@ class LearningPathTrack {
       hasPathway: true,
     ),
     LearningPathTrack(
+      id: 'docker',
+      title: 'Docker & Container Engineering',
+      level: 'Intermediate',
+      modules: '7 Modules · Interactive Pathway',
+      description:
+          'Container isolation, multi-stage Dockerfile architecture, layer caching, container networking, and security best practices.',
+      hasPathway: true,
+    ),
+    LearningPathTrack(
+      id: 'cicd',
+      title: 'CI/CD & GitOps Delivery',
+      level: 'Intermediate',
+      modules: '7 Modules · Interactive Pathway',
+      description:
+          'Automated deployment pipelines using GitHub Actions, container registries, test automation, and GitOps synchronization with Argo CD.',
+      hasPathway: true,
+    ),
+    LearningPathTrack(
       id: 'kubernetes',
       title: 'Kubernetes Cluster Architecture',
       level: 'Advanced',
       modules: '12 Modules',
       description:
           'Workload orchestration: Deployments, StatefulSets, Services, Ingress controllers, ConfigMaps, and Helm charts.',
-      hasPathway: false,
-    ),
-    LearningPathTrack(
-      id: 'cicd',
-      title: 'CI/CD & GitOps Delivery',
-      level: 'Intermediate',
-      modules: '10 Modules',
-      description:
-          'Automated deployment pipelines using GitHub Actions, container registries, test automation, and GitOps synchronization.',
       hasPathway: false,
     ),
     LearningPathTrack(

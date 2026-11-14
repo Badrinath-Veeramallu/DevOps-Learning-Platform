@@ -11,10 +11,16 @@ class RouteNames {
   static const String learningPaths = '/learning-paths';
   static const String gitPathway = '/pathways/git';
   static const String gitModule = '/pathways/git/:moduleId';
-  static const String dockerPathway = '/pathways/docker';
-  static const String dockerModule = '/pathways/docker/:moduleId';
   static const String linuxPathway = '/pathways/linux';
   static const String linuxModule = '/pathways/linux/:moduleId';
+  static const String dockerPathway = '/pathways/docker';
+  static const String dockerModule = '/pathways/docker/:moduleId';
+  static const String cicdPathway = '/pathways/cicd';
+  static const String cicdModule = '/pathways/cicd/:moduleId';
+  static const String gitQuiz = '/pathways/git/quiz';
+  static const String linuxQuiz = '/pathways/linux/quiz';
+  static const String dockerQuiz = '/pathways/docker/quiz';
+  static const String cicdQuiz = '/pathways/cicd/quiz';
   static const String pathwayQuiz = '/pathways/:pathwayId/quiz';
   static const String profile = '/profile';
 }

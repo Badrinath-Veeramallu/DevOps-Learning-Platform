@@ -190,7 +190,6 @@ class _LinuxPathwayScreenState extends State<LinuxPathwayScreen> {
         pathway: 'linux',
         userId: userId,
       );
-      final isGitDone = ProgressService().isPathwayCompleted(pathway: 'git', userId: userId);
 
       return Scaffold(
         backgroundColor: AppColors.background,
@@ -274,15 +273,9 @@ class _LinuxPathwayScreenState extends State<LinuxPathwayScreen> {
                     alignment: WrapAlignment.center,
                     children: [
                       ElevatedButton.icon(
-                        onPressed: () {
-                          if (!isGitDone) {
-                            context.push(RouteNames.gitPathway);
-                          } else {
-                            context.push(RouteNames.dockerPathway);
-                          }
-                        },
+                        onPressed: () => context.push(RouteNames.gitPathway),
                         icon: const Icon(Icons.arrow_forward_rounded, size: 16),
-                        label: Text(!isGitDone ? 'Go to Git Pathway' : 'Go to Docker Pathway'),
+                        label: const Text('Go to Git Pathway'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primary,
                           foregroundColor: Colors.white,

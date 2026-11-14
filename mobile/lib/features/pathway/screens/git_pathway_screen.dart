@@ -13,6 +13,7 @@ import '../data/git_curriculum_repository.dart';
 import '../data/progress_service.dart';
 import '../widgets/git_pathway_map.dart';
 import '../widgets/pathway_header_card.dart';
+import '../widgets/pathway_fasttrack_banner.dart';
 
 /// Full Git Learning Pathway Journey Screen matching Web's `GitPathwayPage.jsx`.
 ///
@@ -231,6 +232,11 @@ class _GitPathwayScreenState extends State<GitPathwayScreen> {
                           completedIds: _completedIds,
                           onBack: _handleBackToDashboard,
                         ),
+                        if (_modules.where((m) => _completedIds.contains(m.id)).length < _modules.length)
+                          PathwayFastTrackBanner(
+                            pathwayTitle: 'Git & GitHub',
+                            onAttemptQuiz: () => context.push('/pathways/git/quiz?fastTrack=true'),
+                          ),
                         const SizedBox(height: 36),
 
                         // Section Header
