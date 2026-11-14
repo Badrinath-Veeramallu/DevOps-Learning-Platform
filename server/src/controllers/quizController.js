@@ -245,9 +245,211 @@ async function getQuizStatus(req, res) {
   }
 }
 
+/**
+ * GET /api/quiz/:pathwayId/fast-track
+ * Returns quiz questions WITHOUT requiring prerequisite module completion.
+ * Respects pathway-level progression locking.
+ */
+async function getFastTrackQuiz(req, res) {
+  try {
+    const pathwayId = (req.params.pathwayId || "git").toLowerCase();
+    const userId = req.user._id;
+
+    const questions = getSanitizedQuestions(pathwayId);
+    if (!questions) {
+      return res.status(404).json({
+        success: false,
+        message: `Pathway "${pathwayId}" not found or has no quiz configured.`,
+      });
+    }
+
+    // Verify pathway-level locking before allowing fast-track access
+    if (pathwayId === "linux" || pathwayId === "docker" || pathwayId === "kubernetes") {
+      const { getPathwayLockStatus } = require("./progressController");
+      const lockStatus = await getPathwayLockStatus(userId);
+      if (lockStatus[pathwayId] && lockStatus[pathwayId].isLocked) {
+        return res.status(403).json({
+          success: false,
+          isLocked: true,
+          message:
+            lockStatus[pathwayId].lockReason ||
+            `Pathway "${pathwayId}" is currently locked. Complete preceding pathways first.`,
+        });
+      }
+    }
+
+    let quizProgress = await QuizProgress.findOne({ userId, pathwayId });
+    if (!quizProgress) {
+      quizProgress = { hasPassed: false, bestScore: 0, attemptsCount: 0, lastAttemptAt: null };
+    }
+
+    return res.status(200).json({
+      success: true,
+      pathwayId,
+      isFastTrack: true,
+      totalQuestions: TOTAL_QUESTIONS_PER_QUIZ,
+      passingScore: PASSING_SCORE,
+      questions,
+      status: {
+        hasPassed: quizProgress.hasPassed,
+        bestScore: quizProgress.bestScore,
+        attemptsCount: quizProgress.attemptsCount,
+        lastAttemptAt: quizProgress.lastAttemptAt,
+      },
+    });
+  } catch (err) {
+    console.error("Error fetching fast-track quiz:", err);
+    return res.status(500).json({ success: false, message: "Failed to fetch quiz." });
+  }
+}
+
+/**
+ * POST /api/quiz/:pathwayId/fast-track
+ * Evaluates answers WITHOUT prerequisite module check.
+ * On pass: marks all pathway modules complete in Progress collection and unlocks next pathway.
+ */
+async function submitFastTrackQuiz(req, res) {
+  try {
+    const pathwayId = (req.params.pathwayId || "git").toLowerCase();
+    const userId = req.user._id;
+    const { answers } = req.body;
+
+    if (!answers || typeof answers !== "object") {
+      return res.status(400).json({
+        success: false,
+        message: "Answers payload must be an object of { [questionId]: selectedOptionIndex }.",
+      });
+    }
+
+    const questions = getSanitizedQuestions(pathwayId);
+    if (!questions) {
+      return res.status(404).json({
+        success: false,
+        message: `Pathway "${pathwayId}" not found or has no quiz.`,
+      });
+    }
+
+    // Verify pathway-level locking before allowing fast-track submission
+    if (pathwayId === "linux" || pathwayId === "docker" || pathwayId === "kubernetes") {
+      const { getPathwayLockStatus } = require("./progressController");
+      const lockStatus = await getPathwayLockStatus(userId);
+      if (lockStatus[pathwayId] && lockStatus[pathwayId].isLocked) {
+        return res.status(403).json({
+          success: false,
+          isLocked: true,
+          message:
+            lockStatus[pathwayId].lockReason ||
+            `Pathway "${pathwayId}" is currently locked. Complete preceding pathways first.`,
+        });
+      }
+    }
+
+    // Server-side evaluation (scoring is never bypassed)
+    const evaluation = evaluateQuiz(pathwayId, answers);
+
+    // Save individual attempt history
+    const attempt = await QuizAttempt.create({
+      userId,
+      pathwayId,
+      score: evaluation.score,
+      totalQuestions: evaluation.totalQuestions,
+      percentage: evaluation.percentage,
+      passed: evaluation.passed,
+      answers,
+    });
+
+    // Fetch or initialize aggregate QuizProgress
+    let quizProgress = await QuizProgress.findOne({ userId, pathwayId });
+    const wasAlreadyPassed = quizProgress ? quizProgress.hasPassed : false;
+    const isNowPassed = wasAlreadyPassed || evaluation.passed;
+
+    if (!quizProgress) {
+      quizProgress = new QuizProgress({
+        userId,
+        pathwayId,
+        hasPassed: isNowPassed,
+        bestScore: evaluation.score,
+        totalQuestions: evaluation.totalQuestions,
+        attemptsCount: 1,
+        firstPassedAt: evaluation.passed ? new Date() : null,
+        lastAttemptAt: new Date(),
+        latestAttemptId: attempt._id,
+      });
+    } else {
+      quizProgress.attemptsCount += 1;
+      quizProgress.lastAttemptAt = new Date();
+      quizProgress.latestAttemptId = attempt._id;
+      quizProgress.bestScore = Math.max(quizProgress.bestScore || 0, evaluation.score);
+      quizProgress.hasPassed = isNowPassed;
+      if (!wasAlreadyPassed && evaluation.passed) {
+        quizProgress.firstPassedAt = new Date();
+      }
+    }
+    await quizProgress.save();
+
+    // On pass: mark all pathway modules complete in Progress collection
+    const requiredModules = PATHWAY_PREREQUISITES[pathwayId] || [];
+    let completedModulesList = [];
+
+    if (evaluation.passed) {
+      completedModulesList = requiredModules;
+
+      let progress = await Progress.findOne({ userId, pathwayId });
+      if (!progress) {
+        progress = new Progress({ userId, pathwayId, completedModules: [] });
+      }
+      const existingSet = new Set(progress.completedModules || []);
+      const newModules = requiredModules.filter((m) => !existingSet.has(m));
+
+      if (newModules.length > 0) {
+        progress.completedModules = [...new Set([...existingSet, ...requiredModules])];
+        progress.lastUpdated = new Date();
+        await progress.save();
+
+        // Log stop_completed activity for each newly completed module
+        for (const moduleId of newModules) {
+          await logActivity(userId, "stop_completed", { pathwayId, stopSlug: moduleId });
+        }
+      }
+
+      // Log quiz_passed activity if passed for the first time
+      if (!wasAlreadyPassed) {
+        await logActivity(userId, "quiz_passed", {
+          pathwayId,
+          score: evaluation.score,
+          totalQuestions: evaluation.totalQuestions,
+          percentage: evaluation.percentage,
+          isFastTrack: true,
+        });
+      }
+    }
+
+    return res.status(200).json({
+      success: true,
+      pathwayId,
+      isFastTrack: true,
+      attemptId: attempt._id,
+      score: evaluation.score,
+      totalQuestions: evaluation.totalQuestions,
+      percentage: evaluation.percentage,
+      passed: evaluation.passed,
+      hasPassedEver: quizProgress.hasPassed,
+      bestScore: quizProgress.bestScore,
+      attemptsCount: quizProgress.attemptsCount,
+      review: evaluation.review,
+      completedModules: completedModulesList,
+    });
+  } catch (err) {
+    console.error("Error evaluating fast-track quiz:", err);
+    return res.status(500).json({ success: false, message: "Failed to evaluate quiz submission." });
+  }
+}
+
 module.exports = {
   checkPathwayCompletion,
   getQuiz,
   submitQuiz,
   getQuizStatus,
+  getFastTrackQuiz,
+  submitFastTrackQuiz,
 };

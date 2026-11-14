@@ -172,6 +172,17 @@ export const quizAPI = {
     request(`/quiz/${encodeURIComponent(pathwayId)}/status`, {
       method: "GET",
     }),
+
+  getFastTrackQuiz: (pathwayId = "git") =>
+    request(`/quiz/${encodeURIComponent(pathwayId)}/fast-track`, {
+      method: "GET",
+    }),
+
+  submitFastTrackQuiz: (pathwayId = "git", answers) =>
+    request(`/quiz/${encodeURIComponent(pathwayId)}/fast-track`, {
+      method: "POST",
+      body: JSON.stringify({ answers }),
+    }),
 };
 
 export const systemAPI = {

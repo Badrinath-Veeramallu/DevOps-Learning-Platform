@@ -51,7 +51,7 @@ export const Dashboard = () => {
 
   const firstName = user?.name ? user.name.trim().split(" ")[0] : "Learner";
 
-  // Authoritative progression order: Git -> Docker -> Linux -> Kubernetes -> CI/CD -> IaC
+  // Authoritative progression order: Git -> Linux -> Docker -> Kubernetes -> CI/CD -> IaC
   const learningPaths = [
     {
       id: "git",
@@ -63,21 +63,21 @@ export const Dashboard = () => {
       hasPathway: true,
     },
     {
-      id: "docker",
-      title: "Docker & Container Engineering",
-      level: "Intermediate",
-      modules: "7 Modules · Interactive Pathway",
-      description:
-        "Container isolation, multi-stage Dockerfile architecture, layer caching, container networking, and security best practices.",
-      hasPathway: true,
-    },
-    {
       id: "linux",
       title: "Linux Essentials",
       level: "Foundational",
       modules: "6 Lessons · Interactive Pathway",
       description:
         "File system navigation, permissions, process management, networking, package management, and shell scripting automation.",
+      hasPathway: true,
+    },
+    {
+      id: "docker",
+      title: "Docker & Container Engineering",
+      level: "Intermediate",
+      modules: "7 Modules · Interactive Pathway",
+      description:
+        "Container isolation, multi-stage Dockerfile architecture, layer caching, container networking, and security best practices.",
       hasPathway: true,
     },
     {

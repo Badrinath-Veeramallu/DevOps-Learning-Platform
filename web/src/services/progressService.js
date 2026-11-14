@@ -101,15 +101,17 @@ export const isPathwayCompleted = (userId = "guest", pathway = "git") => {
 
 /**
  * Checks whether a pathway is unlocked based on prerequisite pathways:
- * Progression: Git -> Docker -> Linux
+ * Progression: Git -> Linux -> Docker -> Kubernetes -> CI/CD -> IaC
  * - Git: Always unlocked by default.
- * - Docker: Unlocked only after ALL Git modules are completed.
- * - Linux: Unlocked only after ALL Docker modules are completed (and Git remains complete).
+ * - Linux: Unlocked only after ALL Git modules are completed.
+ * - Docker: Unlocked only after ALL Linux lessons are completed (and Git remains complete).
+ * - Kubernetes: Unlocked only after ALL Docker modules are completed.
  */
 export const isPathwayUnlocked = (userId = "guest", pathway = "git") => {
   if (pathway === "git") return true;
-  if (pathway === "docker") return isPathwayCompleted(userId, "git");
-  if (pathway === "linux") return isPathwayCompleted(userId, "docker");
+  if (pathway === "linux") return isPathwayCompleted(userId, "git");
+  if (pathway === "docker") return isPathwayCompleted(userId, "linux");
+  if (pathway === "kubernetes") return isPathwayCompleted(userId, "docker");
   return false;
 };
 
@@ -118,18 +120,30 @@ export const isPathwayUnlocked = (userId = "guest", pathway = "git") => {
  */
 export const getPathwayLockReason = (userId = "guest", pathway = "git") => {
   if (pathway === "git") return null;
-  if (pathway === "docker") {
+  if (pathway === "linux") {
     if (!isPathwayCompleted(userId, "git")) {
-      return "Complete all 7 Git modules to unlock the Docker pathway.";
+      return "Complete all 7 Git modules to unlock the Linux pathway.";
     }
     return null;
   }
-  if (pathway === "linux") {
+  if (pathway === "docker") {
     if (!isPathwayCompleted(userId, "git")) {
       return "Complete all 7 Git modules first.";
     }
+    if (!isPathwayCompleted(userId, "linux")) {
+      return "Complete the Linux module to unlock the Docker module.";
+    }
+    return null;
+  }
+  if (pathway === "kubernetes") {
+    if (!isPathwayCompleted(userId, "git")) {
+      return "Complete all Git modules first.";
+    }
+    if (!isPathwayCompleted(userId, "linux")) {
+      return "Complete all Linux lessons first.";
+    }
     if (!isPathwayCompleted(userId, "docker")) {
-      return "Complete all 7 Docker modules to unlock the Linux pathway.";
+      return "Complete all 7 Docker modules to unlock the Kubernetes pathway.";
     }
     return null;
   }

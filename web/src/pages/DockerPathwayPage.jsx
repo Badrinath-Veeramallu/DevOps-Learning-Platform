@@ -7,6 +7,7 @@ import {
   getCompletedModules,
   fetchUserProgress,
   isPathwayUnlocked,
+  isPathwayCompleted,
   getPathwayLockReason,
 } from "../services/progressService";
 
@@ -44,6 +45,7 @@ export const DockerPathwayPage = () => {
 
   // Pathway-level Route Guard
   if (!isUnlocked) {
+    const isGitDone = isPathwayCompleted(userId, "git");
     return (
       <div className="pathway-page-wrapper">
         <div className="pathway-page-container">
@@ -85,11 +87,14 @@ export const DockerPathwayPage = () => {
               <span className="badge-pill badge-locked">Pathway Locked</span>
               <h1 className="locked-card-title">Docker & Containerization Pathway</h1>
               <p className="locked-card-desc">
-                {lockReason || "Complete all 7 Git modules to unlock the Docker pathway."}
+                {lockReason || "Complete all prerequisite pathways to unlock Docker."}
               </p>
               <div className="locked-card-actions">
-                <Link to="/pathways/git" className="btn-locked-action-primary">
-                  Go to Git Pathway &rarr;
+                <Link
+                  to={!isGitDone ? "/pathways/git" : "/pathways/linux"}
+                  className="btn-locked-action-primary"
+                >
+                  {!isGitDone ? "Go to Git Pathway \u2192" : "Go to Linux Pathway \u2192"}
                 </Link>
                 <Link to="/dashboard" className="btn-locked-action-secondary">
                   Return to Dashboard
@@ -184,6 +189,27 @@ export const DockerPathwayPage = () => {
               </span>
             </div>
           </div>
+
+          {/* Fast-Track Quiz Banner — hidden once pathway is 100% complete */}
+          {completedCount < totalModules && (
+            <div className="pathway-fasttrack-banner">
+              <div className="fasttrack-banner-content">
+                <div className="fasttrack-banner-text">
+                  <strong>Already familiar with Docker &amp; Containerization?</strong>
+                  <span>Test your knowledge and skip to the next pathway by passing the assessment.</span>
+                </div>
+                <Link
+                  to="/pathways/docker/quiz?fastTrack=true"
+                  className="btn-fasttrack-quiz"
+                >
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M13 2L4.09 12.97 11 13l-2 9 8.91-10.97L11 11l2-9z"/>
+                  </svg>
+                  Attempt Pathway Quiz
+                </Link>
+              </div>
+            </div>
+          )}
         </header>
 
         {/* Interactive Road / Pathway Visualization */}

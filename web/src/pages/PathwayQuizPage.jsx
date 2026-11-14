@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
+import { useParams, Link, useLocation } from "react-router-dom";
 import { quizAPI } from "../services/api";
+import { useAuth } from "../context/useAuth";
+import { fetchAllPathwaysStatus } from "../services/progressService";
 
 const PATHWAY_NAMES = {
   git: "Git & GitHub",
@@ -8,12 +10,20 @@ const PATHWAY_NAMES = {
   linux: "Linux Essentials",
 };
 
+const NEXT_PATHWAY = { git: "linux", linux: "docker", docker: "kubernetes", kubernetes: null };
+const NEXT_PATHWAY_LABEL = { git: "Linux Essentials", linux: "Docker & Containerization", docker: "Kubernetes Cluster Architecture", kubernetes: null };
+
 export const PathwayQuizPage = ({ pathwayId: propPathwayId }) => {
   const { pathwayId: paramPathwayId } = useParams();
   const location = useLocation();
   const pathDerivedId = location.pathname.split("/")[2];
   const pathwayId = (propPathwayId || paramPathwayId || pathDerivedId || "git").toLowerCase();
-  const navigate = useNavigate();
+
+  // Detect fast-track mode from query param
+  const isFastTrack = new URLSearchParams(location.search).get("fastTrack") === "true";
+
+  const { user } = useAuth();
+  const userId = user?._id || user?.id || user?.email || "guest";
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -43,10 +53,12 @@ export const PathwayQuizPage = ({ pathwayId: propPathwayId }) => {
     setCurrentIndex(0);
 
     try {
-      const data = await quizAPI.getQuiz(pathwayId);
+      const data = isFastTrack
+        ? await quizAPI.getFastTrackQuiz(pathwayId)
+        : await quizAPI.getQuiz(pathwayId);
       setQuizData(data);
     } catch (err) {
-      if (err.data && err.data.prerequisiteNotMet) {
+      if (!isFastTrack && err.data && err.data.prerequisiteNotMet) {
         setPrereqError(err.data);
       } else {
         setError(err.message || "Failed to load quiz.");
@@ -84,8 +96,34 @@ export const PathwayQuizPage = ({ pathwayId: propPathwayId }) => {
     setShowConfirmModal(false);
     setIsSubmitting(true);
     try {
-      const res = await quizAPI.submitQuiz(pathwayId, answers);
+      const res = isFastTrack
+        ? await quizAPI.submitFastTrackQuiz(pathwayId, answers)
+        : await quizAPI.submitQuiz(pathwayId, answers);
       setResult(res);
+
+      // If fast-track pass: sync localStorage + notify all pathway pages
+      if (isFastTrack && res.passed && Array.isArray(res.completedModules) && res.completedModules.length > 0) {
+        localStorage.setItem(
+          `devops_progress_${userId}_${pathwayId}`,
+          JSON.stringify(res.completedModules)
+        );
+        window.dispatchEvent(
+          new CustomEvent("devops_progress_updated", {
+            detail: {
+              userId,
+              pathway: pathwayId,
+              allCompleted: res.completedModules,
+            },
+          })
+        );
+        // Refresh all pathway statuses to unlock next pathway in dashboard
+        try {
+          await fetchAllPathwaysStatus(userId);
+        } catch {
+          // non-critical — dashboard will refresh on next visit
+        }
+      }
+
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) {
       alert(err.message || "Failed to submit quiz. Please try again.");
@@ -230,7 +268,9 @@ export const PathwayQuizPage = ({ pathwayId: propPathwayId }) => {
 
             <p className="quiz-result-desc">
               {isPass
-                ? `You have demonstrated mastery of ${pathwayTitle}. Your final quiz completion is officially recorded!`
+                ? isFastTrack
+                  ? `Outstanding! You have demonstrated prior mastery of ${pathwayTitle}. All stops have been marked complete${NEXT_PATHWAY_LABEL[pathwayId] ? ` and ${NEXT_PATHWAY_LABEL[pathwayId]} is now unlocked!` : "."}`
+                  : `You have demonstrated mastery of ${pathwayTitle}. Your final quiz completion is officially recorded!`
                 : `You scored ${result.score} out of ${result.totalQuestions}. A score of at least 10 (50%) is required to pass. You can retake the quiz anytime!`}
             </p>
 
@@ -249,6 +289,16 @@ export const PathwayQuizPage = ({ pathwayId: propPathwayId }) => {
               <Link to={`/pathways/${pathwayId}`} className="quiz-btn quiz-btn-primary">
                 Back to Roadmap
               </Link>
+
+              {isPass && NEXT_PATHWAY[pathwayId] && (
+                <Link
+                  to={`/pathways/${NEXT_PATHWAY[pathwayId]}`}
+                  className="quiz-btn quiz-btn-primary"
+                  style={{ background: "#15803d" }}
+                >
+                  Continue to {NEXT_PATHWAY_LABEL[pathwayId]} &rarr;
+                </Link>
+              )}
             </div>
           </div>
 
@@ -258,19 +308,32 @@ export const PathwayQuizPage = ({ pathwayId: propPathwayId }) => {
               <h2 className="quiz-review-title">Detailed Answer Review</h2>
               {result.review.map((item, idx) => {
                 const optLetters = ["A", "B", "C", "D"];
+                const isAttempted =
+                  typeof item.isAttempted === "boolean"
+                    ? item.isAttempted
+                    : typeof item.selectedOption === "number" &&
+                      item.selectedOption >= 0 &&
+                      item.selectedOption < item.options.length;
+                const statusClass = item.isCorrect
+                  ? "is-correct"
+                  : isAttempted
+                  ? "is-wrong"
+                  : "is-unattempted";
+                const statusLabel = item.isCorrect
+                  ? "✓ Correct"
+                  : isAttempted
+                  ? "✕ Incorrect"
+                  : "NOT ATTEMPTED";
+
                 return (
                   <div
                     key={item.id}
-                    className={`quiz-review-card ${item.isCorrect ? "is-correct" : "is-wrong"}`}
+                    className={`quiz-review-card ${statusClass}`}
                   >
                     <div className="quiz-review-q-header">
                       <span className="quiz-question-number">Question {idx + 1}</span>
-                      <span
-                        className={`quiz-review-status-tag ${
-                          item.isCorrect ? "is-correct" : "is-wrong"
-                        }`}
-                      >
-                        {item.isCorrect ? "✓ Correct" : "✕ Incorrect"}
+                      <span className={`quiz-review-status-tag ${statusClass}`}>
+                        {statusLabel}
                       </span>
                     </div>
 
@@ -281,7 +344,7 @@ export const PathwayQuizPage = ({ pathwayId: propPathwayId }) => {
                     <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
                       {item.options.map((opt, oIdx) => {
                         const isCorrectChoice = oIdx === item.correctOption;
-                        const isUserChoice = oIdx === item.selectedOption;
+                        const isUserChoice = isAttempted && oIdx === item.selectedOption;
                         let itemBorder = "var(--color-border)";
                         let itemBg = "#ffffff";
 
@@ -316,8 +379,12 @@ export const PathwayQuizPage = ({ pathwayId: propPathwayId }) => {
                                 alignItems: "center",
                                 justifyContent: "center",
                                 borderRadius: 4,
-                                background: isCorrectChoice ? "#15803d" : "#e8dde0",
-                                color: isCorrectChoice ? "#ffffff" : "#171521",
+                                background: isCorrectChoice
+                                  ? "#15803d"
+                                  : isUserChoice
+                                  ? "#dc2626"
+                                  : "#e8dde0",
+                                color: isCorrectChoice || isUserChoice ? "#ffffff" : "#171521",
                               }}
                             >
                               {optLetters[oIdx]}
@@ -384,9 +451,11 @@ export const PathwayQuizPage = ({ pathwayId: propPathwayId }) => {
             )}
           </div>
 
-          <h1 className="quiz-title">Final Comprehensive Quiz</h1>
+          <h1 className="quiz-title">{isFastTrack ? "Pathway Assessment" : "Final Comprehensive Quiz"}</h1>
           <p className="quiz-subtitle">
-            Test your complete knowledge across all modules. Score 10/20 (50%) or higher to pass!
+            {isFastTrack
+              ? `Demonstrate your existing knowledge of ${pathwayTitle}. Score 10/20 (50%) or higher to pass and skip to the next pathway!`
+              : "Test your complete knowledge across all modules. Score 10/20 (50%) or higher to pass!"}
           </p>
 
           {/* Progress Bar */}

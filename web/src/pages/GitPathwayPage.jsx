@@ -4,7 +4,6 @@ import { useAuth } from "../context/useAuth";
 import { GitPathwayMap } from "../components/pathway/GitPathwayMap";
 import { gitCurriculum } from "../data/gitCurriculum";
 import { getCompletedModules, fetchUserProgress } from "../services/progressService";
-
 export const GitPathwayPage = () => {
   const { user } = useAuth();
   const userId = user?._id || user?.id || user?.email || "guest";
@@ -107,6 +106,27 @@ export const GitPathwayPage = () => {
               </span>
             </div>
           </div>
+
+          {/* Fast-Track Quiz Banner — hidden once pathway is 100% complete */}
+          {completedCount < totalModules && (
+            <div className="pathway-fasttrack-banner">
+              <div className="fasttrack-banner-content">
+                <div className="fasttrack-banner-text">
+                  <strong>Already familiar with Git &amp; GitHub?</strong>
+                  <span>Test your knowledge and skip to the next pathway by passing the assessment.</span>
+                </div>
+                <Link
+                  to="/pathways/git/quiz?fastTrack=true"
+                  className="btn-fasttrack-quiz"
+                >
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M13 2L4.09 12.97 11 13l-2 9 8.91-10.97L11 11l2-9z"/>
+                  </svg>
+                  Attempt Pathway Quiz
+                </Link>
+              </div>
+            </div>
+          )}
         </header>
 
         {/* Interactive Road / Pathway Visualization */}

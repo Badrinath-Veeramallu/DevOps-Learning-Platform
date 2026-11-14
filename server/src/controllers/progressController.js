@@ -38,43 +38,44 @@ const PATHWAY_CURRICULA = {
  * Helper to determine pathway unlocking and completion status for a given user.
  * Sequential rules:
  * - Git: Always unlocked by default.
- * - Docker: Locked until ALL Git modules (7) are completed.
- * - Linux: Locked until ALL Docker modules (7) are completed AND Git remains complete.
+ * - Linux: Locked until ALL Git modules (7) are completed.
+ * - Docker: Locked until ALL Linux lessons (6) are completed AND Git remains complete.
+ * - Kubernetes: Locked until ALL Docker modules (7) are completed.
  */
 async function getPathwayLockStatus(userId) {
   const gitModules = PATHWAY_CURRICULA.git;
-  const dockerModules = PATHWAY_CURRICULA.docker;
   const linuxModules = PATHWAY_CURRICULA.linux;
+  const dockerModules = PATHWAY_CURRICULA.docker;
 
-  const [gitDoc, dockerDoc, linuxDoc] = await Promise.all([
+  const [gitDoc, linuxDoc, dockerDoc] = await Promise.all([
     Progress.findOne({ userId, pathwayId: "git" }),
-    Progress.findOne({ userId, pathwayId: "docker" }),
     Progress.findOne({ userId, pathwayId: "linux" }),
+    Progress.findOne({ userId, pathwayId: "docker" }),
   ]);
 
   const cleanGitCompleted = [...new Set(gitDoc?.completedModules || [])].filter((id) =>
     gitModules.includes(id)
   );
-  const cleanDockerCompleted = [...new Set(dockerDoc?.completedModules || [])].filter((id) =>
-    dockerModules.includes(id)
-  );
   const cleanLinuxCompleted = [...new Set(linuxDoc?.completedModules || [])].filter((id) =>
     linuxModules.includes(id)
+  );
+  const cleanDockerCompleted = [...new Set(dockerDoc?.completedModules || [])].filter((id) =>
+    dockerModules.includes(id)
   );
 
   const isGitComplete =
     gitModules.length > 0 &&
     gitModules.every((id) => cleanGitCompleted.includes(id));
 
-  const isDockerComplete =
-    isGitComplete &&
-    dockerModules.length > 0 &&
-    dockerModules.every((id) => cleanDockerCompleted.includes(id));
-
   const isLinuxComplete =
-    isDockerComplete &&
+    isGitComplete &&
     linuxModules.length > 0 &&
     linuxModules.every((id) => cleanLinuxCompleted.includes(id));
+
+  const isDockerComplete =
+    isLinuxComplete &&
+    dockerModules.length > 0 &&
+    dockerModules.every((id) => cleanDockerCompleted.includes(id));
 
   return {
     git: {
@@ -85,27 +86,41 @@ async function getPathwayLockStatus(userId) {
       completedModules: cleanGitCompleted,
       lockReason: null,
     },
-    docker: {
-      isLocked: !isGitComplete,
-      isCompleted: isDockerComplete,
-      totalModules: dockerModules.length,
-      completedCount: cleanDockerCompleted.length,
-      completedModules: cleanDockerCompleted,
-      lockReason: !isGitComplete
-        ? "Docker pathway is locked. Complete all Git modules to unlock."
-        : null,
-    },
     linux: {
-      isLocked: !isDockerComplete,
+      isLocked: !isGitComplete,
       isCompleted: isLinuxComplete,
       totalModules: linuxModules.length,
       completedCount: cleanLinuxCompleted.length,
       completedModules: cleanLinuxCompleted,
       lockReason: !isGitComplete
-        ? "Linux pathway is locked. Complete all Git modules first."
-        : !isDockerComplete
-          ? "Linux pathway is locked. Complete all Docker modules to unlock."
+        ? "Linux pathway is locked. Complete all Git modules to unlock."
+        : null,
+    },
+    docker: {
+      isLocked: !isLinuxComplete,
+      isCompleted: isDockerComplete,
+      totalModules: dockerModules.length,
+      completedCount: cleanDockerCompleted.length,
+      completedModules: cleanDockerCompleted,
+      lockReason: !isGitComplete
+        ? "Docker pathway is locked. Complete all Git modules first."
+        : !isLinuxComplete
+          ? "Complete the Linux module to unlock the Docker module."
           : null,
+    },
+    kubernetes: {
+      isLocked: !isDockerComplete,
+      isCompleted: false,
+      totalModules: 12,
+      completedCount: 0,
+      completedModules: [],
+      lockReason: !isGitComplete
+        ? "Kubernetes pathway is locked. Complete all Git modules first."
+        : !isLinuxComplete
+          ? "Kubernetes pathway is locked. Complete all Linux lessons first."
+          : !isDockerComplete
+            ? "Kubernetes pathway is locked. Complete all Docker modules to unlock."
+            : null,
     },
   };
 }
@@ -213,7 +228,7 @@ async function toggleProgress(req, res) {
     }
 
     // Validate pathway-level locking before allowing any module mutations
-    if (pathwayId === "docker" || pathwayId === "linux") {
+    if (pathwayId === "linux" || pathwayId === "docker" || pathwayId === "kubernetes") {
       const lockStatus = await getPathwayLockStatus(userId);
       if (lockStatus[pathwayId] && lockStatus[pathwayId].isLocked) {
         return res.status(403).json({

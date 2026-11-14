@@ -871,6 +871,7 @@ function evaluateQuiz(pathwayId, userAnswers = {}) {
       selectedOption: hasSelected ? selected : null,
       correctOption: q.correctOption,
       isCorrect,
+      isAttempted: hasSelected,
       explanation: q.explanation,
     };
   });
