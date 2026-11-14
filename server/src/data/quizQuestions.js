@@ -8,6 +8,7 @@ const PATHWAY_PREREQUISITES = {
   git: ["git-01", "git-02", "git-03", "git-04", "git-05", "git-06", "git-07"],
   docker: ["docker-01", "docker-02", "docker-03", "docker-04", "docker-05", "docker-06", "docker-07"],
   linux: ["linux-01", "linux-02", "linux-03", "linux-04", "linux-05", "linux-06"],
+  cicd: ["cicd-01", "cicd-02", "cicd-03", "cicd-04", "cicd-05", "cicd-06", "cicd-07"],
 };
 
 const PASSING_SCORE = 10;
@@ -809,6 +810,272 @@ const QUIZ_BANKS = {
       ],
       correctOption: 3,
       explanation: "cp -r recursively copies a directory and its contents to the specified destination."
+    }
+  ],
+
+  // ============================================================
+  // CI/CD & GITOPS DELIVERY — 20 QUESTIONS
+  // ============================================================
+  cicd: [
+    {
+      id: "cicd-q01",
+      moduleId: "cicd-01",
+      question: "What is the primary goal of Continuous Integration (CI)?",
+      options: [
+        "Automating server hardware provisioning",
+        "Frequently integrating and automatically verifying code changes into a shared repository",
+        "Directly modifying production database schemas manually",
+        "Eliminating the need for automated testing"
+      ],
+      correctOption: 1,
+      explanation: "Continuous Integration focuses on frequently merging code changes into a central repository and automatically validating them with builds and tests."
+    },
+    {
+      id: "cicd-q02",
+      moduleId: "cicd-01",
+      question: "What is the key difference between Continuous Delivery and Continuous Deployment?",
+      options: [
+        "Continuous Delivery requires manual approval before release to production, while Continuous Deployment releases automatically",
+        "Continuous Delivery compiles code, while Continuous Deployment does not",
+        "Continuous Delivery only supports Jenkins, while Continuous Deployment only supports GitHub Actions",
+        "Continuous Deployment does not run automated tests"
+      ],
+      correctOption: 0,
+      explanation: "Continuous Delivery keeps every release candidate production-ready but requires manual promotion to deploy to production. Continuous Deployment automatically deploys passing builds directly."
+    },
+    {
+      id: "cicd-q03",
+      moduleId: "cicd-01",
+      question: "In a standard CI/CD pipeline, which stage typically precedes artifact packaging?",
+      options: [
+        "Production deployment",
+        "Automated testing and quality verification",
+        "Production traffic monitoring",
+        "Domain DNS configuration"
+      ],
+      correctOption: 1,
+      explanation: "Automated testing and code quality checks run before packaging to ensure only validated code is bundled into deployable artifacts or container images."
+    },
+    {
+      id: "cicd-q04",
+      moduleId: "cicd-02",
+      question: "In Jenkins architecture, what is the primary role of an Agent node?",
+      options: [
+        "Managing user accounts and hosting the Web UI",
+        "Executing the actual build, test, and deployment workloads dispatched by the controller",
+        "Storing primary Git repository commit histories",
+        "Monitoring cloud hosting invoices"
+      ],
+      correctOption: 1,
+      explanation: "The Jenkins Controller manages jobs, UI, and scheduling, while Agent nodes execute the assigned pipeline stages and build steps."
+    },
+    {
+      id: "cicd-q05",
+      moduleId: "cicd-02",
+      question: "Which top-level section is required in a Declarative Jenkinsfile to specify where jobs execute?",
+      options: [
+        "environment",
+        "agent",
+        "parameters",
+        "triggers"
+      ],
+      correctOption: 1,
+      explanation: "The 'agent' directive in Declarative Pipelines specifies where the pipeline or specific stage will execute (e.g. agent any, agent { docker ... })."
+    },
+    {
+      id: "cicd-q06",
+      moduleId: "cicd-02",
+      question: "In a Declarative Jenkinsfile, what block contains the sequential stages of the pipeline?",
+      options: [
+        "stages",
+        "steps",
+        "post",
+        "matrix"
+      ],
+      correctOption: 0,
+      explanation: "The 'stages' block encloses individual 'stage' definitions, which in turn contain the executable 'steps'."
+    },
+    {
+      id: "cicd-q07",
+      moduleId: "cicd-03",
+      question: "In GitHub Actions, in which directory must workflow YAML files be stored within a repository?",
+      options: [
+        "scripts/actions",
+        ".github/workflows",
+        ".ci/github",
+        "config/pipelines"
+      ],
+      correctOption: 1,
+      explanation: "GitHub Actions detects and executes workflow definitions located in the '.github/workflows' directory of the repository."
+    },
+    {
+      id: "cicd-q08",
+      moduleId: "cicd-03",
+      question: "In a GitHub Actions workflow, which keyword specifies the triggers that run the workflow (such as push or pull_request)?",
+      options: [
+        "when",
+        "on",
+        "triggers",
+        "listen"
+      ],
+      correctOption: 1,
+      explanation: "The 'on' keyword specifies which repository events (e.g., push, pull_request, workflow_dispatch) trigger workflow execution."
+    },
+    {
+      id: "cicd-q09",
+      moduleId: "cicd-03",
+      question: "How should sensitive credentials (such as API keys and Docker tokens) be accessed inside GitHub Actions?",
+      options: [
+        "Hardcoded directly in the YAML file",
+        "Committed into Git in a plain text secrets.env file",
+        "Referenced using the ${{ secrets.SECRET_NAME }} context from GitHub Repository Secrets",
+        "Passed as public repository query parameters"
+      ],
+      correctOption: 2,
+      explanation: "GitHub Actions provides encrypted repository secrets accessible securely via the ${{ secrets.SECRET_NAME }} expression."
+    },
+    {
+      id: "cicd-q10",
+      moduleId: "cicd-04",
+      question: "According to the Test Pyramid, which type of tests should form the largest and fastest base of your test suite?",
+      options: [
+        "End-to-End (E2E) browser UI tests",
+        "Unit tests",
+        "Manual exploratory regression tests",
+        "Stress load tests"
+      ],
+      correctOption: 1,
+      explanation: "Unit tests are isolated, fast, and lightweight, providing the broadest foundation and quickest feedback in the testing pyramid."
+    },
+    {
+      id: "cicd-q11",
+      moduleId: "cicd-04",
+      question: "What is the purpose of a Quality Gate in tools like SonarQube during a CI pipeline?",
+      options: [
+        "To format HTML and CSS stylesheets",
+        "To block the pipeline and fail the build if code fails required thresholds for coverage, security vulnerabilities, or code smells",
+        "To reboot the CI runner whenever a commit arrives",
+        "To assign Jira tickets to developers"
+      ],
+      correctOption: 1,
+      explanation: "Quality Gates enforce measurable thresholds (such as minimum code coverage and zero critical vulnerabilities); failing stops pipeline progression."
+    },
+    {
+      id: "cicd-q12",
+      moduleId: "cicd-04",
+      question: "What is Static Application Security Testing (SAST) in a CI/CD pipeline?",
+      options: [
+        "Analyzing source code or compiled binaries for known security vulnerabilities without executing the program",
+        "Simulating a live penetration attack against an active production server",
+        "Verifying network firewall port configurations",
+        "Tracking application memory usage under continuous user traffic"
+      ],
+      correctOption: 0,
+      explanation: "SAST scans non-running source code early in the pipeline to detect vulnerabilities, security anti-patterns, and insecure dependencies."
+    },
+    {
+      id: "cicd-q13",
+      moduleId: "cicd-05",
+      question: "Why is using specific Git commit SHA or semantic version tags preferred over using the ':latest' tag for container images in production pipelines?",
+      options: [
+        "':latest' takes longer to download from the container registry",
+        "Immutable, unique tags guarantee reproducibility, traceability, and safe rollbacks",
+        "Docker engines refuse to pull images tagged with ':latest'",
+        "Git repositories do not support tags"
+      ],
+      correctOption: 1,
+      explanation: "Commit SHAs and SemVer tags provide immutable versions, ensuring deployments can be traced back to exact source revisions and reliably rolled back."
+    },
+    {
+      id: "cicd-q14",
+      moduleId: "cicd-05",
+      question: "Which deployment strategy maintains two identical production environments and shifts all live traffic instantly using a router or load balancer?",
+      options: [
+        "Recreate deployment",
+        "Blue/Green deployment",
+        "Shadow mirroring deployment",
+        "In-place deployment"
+      ],
+      correctOption: 1,
+      explanation: "Blue/Green deployment maintains current (Blue) and new (Green) versions in parallel, switching traffic instantly with near-zero downtime."
+    },
+    {
+      id: "cicd-q15",
+      moduleId: "cicd-05",
+      question: "How does a Canary deployment reduce release risk?",
+      options: [
+        "By testing the code only on a local developer laptop",
+        "By releasing the update to a small subset of real users first and observing metrics before expanding to the rest of the fleet",
+        "By shutting down the entire infrastructure before deploying",
+        "By skipping unit and integration tests"
+      ],
+      correctOption: 1,
+      explanation: "Canary releases route a small fraction of live traffic to the new version to verify stability and metrics before full rollout."
+    },
+    {
+      id: "cicd-q16",
+      moduleId: "cicd-06",
+      question: "What is the core philosophy of GitOps?",
+      options: [
+        "Deploying applications manually using SSH connections",
+        "Using Git repositories as the single source of truth for declarative infrastructure and application state",
+        "Replacing Git with container registries",
+        "Running builds without source control"
+      ],
+      correctOption: 1,
+      explanation: "GitOps uses Git repositories as the authoritative single source of truth for declarative system specifications and deployment configs."
+    },
+    {
+      id: "cicd-q17",
+      moduleId: "cicd-06",
+      question: "What is the role of an automated reconciliation loop in GitOps controllers like Argo CD?",
+      options: [
+        "Periodically comparing the desired state in Git with the live cluster state and automatically synchronizing or alerting on drift",
+        "Sending daily email newsletters to customers",
+        "Compiling Java bytecode into native machine code",
+        "Purging all Docker containers every hour"
+      ],
+      correctOption: 0,
+      explanation: "Argo CD continuously monitors live Kubernetes clusters against target Git manifests, correcting configuration drift to maintain the desired state."
+    },
+    {
+      id: "cicd-q18",
+      moduleId: "cicd-06",
+      question: "Why does GitOps enhance security compared to traditional CI-driven push deployments?",
+      options: [
+        "It removes the need to encrypt database passwords",
+        "The deployment agent runs inside the cluster pulling from Git, avoiding the need to expose cluster API credentials to external CI runners",
+        "It disables HTTPS encryption",
+        "It executes code without user permissions"
+      ],
+      correctOption: 1,
+      explanation: "A pull-based GitOps operator lives inside the cluster and pulls manifests from Git, so external CI runners do not require administrative cluster access."
+    },
+    {
+      id: "cicd-q19",
+      moduleId: "cicd-07",
+      question: "In an end-to-end production GitOps pipeline, what action completes the CI phase and triggers deployment?",
+      options: [
+        "Manually running kubectl apply on a production bastion host",
+        "Building and pushing the versioned container image, then updating the image tag in the GitOps deployment repository",
+        "Deleting old Docker images from the local machine",
+        "Rebooting the cluster master node"
+      ],
+      correctOption: 1,
+      explanation: "CI builds and tests the app, publishes a tagged container image, and commits the updated tag to the GitOps config repository, triggering Argo CD's sync."
+    },
+    {
+      id: "cicd-q20",
+      moduleId: "cicd-07",
+      question: "In a production CI/CD setup, how is an instant rollback achieved when an issue is detected after a GitOps deployment?",
+      options: [
+        "Reverting the commit in the GitOps repository or selecting the previous healthy release in Argo CD",
+        "Stopping all server power supplies",
+        "Re-writing the source code from scratch",
+        "Reinstalling the Kubernetes operating system"
+      ],
+      correctOption: 0,
+      explanation: "Because Git holds the complete history of declarative manifests, rolling back is as fast and safe as reverting the Git commit or rolling back to the prior revision in Argo CD."
     }
   ]
 };

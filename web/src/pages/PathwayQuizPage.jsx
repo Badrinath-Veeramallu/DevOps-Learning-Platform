@@ -6,12 +6,13 @@ import { fetchAllPathwaysStatus } from "../services/progressService";
 
 const PATHWAY_NAMES = {
   git: "Git & GitHub",
-  docker: "Docker & Containers",
   linux: "Linux Essentials",
+  docker: "Docker & Containers",
+  cicd: "CI/CD & GitOps Delivery",
 };
 
-const NEXT_PATHWAY = { git: "linux", linux: "docker", docker: "kubernetes", kubernetes: null };
-const NEXT_PATHWAY_LABEL = { git: "Linux Essentials", linux: "Docker & Containerization", docker: "Kubernetes Cluster Architecture", kubernetes: null };
+const NEXT_PATHWAY = { git: "linux", linux: "docker", docker: "cicd", cicd: "kubernetes", kubernetes: null };
+const NEXT_PATHWAY_LABEL = { git: "Linux Essentials", linux: "Docker & Containers", docker: "CI/CD & GitOps Delivery", cicd: "Kubernetes Cluster Architecture", kubernetes: null };
 
 export const PathwayQuizPage = ({ pathwayId: propPathwayId }) => {
   const { pathwayId: paramPathwayId } = useParams();

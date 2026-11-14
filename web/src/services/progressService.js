@@ -23,6 +23,14 @@ export const PATHWAY_CURRICULA = {
     "git-06",
     "git-07",
   ],
+  linux: [
+    "linux-01",
+    "linux-02",
+    "linux-03",
+    "linux-04",
+    "linux-05",
+    "linux-06",
+  ],
   docker: [
     "docker-01",
     "docker-02",
@@ -32,13 +40,14 @@ export const PATHWAY_CURRICULA = {
     "docker-06",
     "docker-07",
   ],
-  linux: [
-    "linux-01",
-    "linux-02",
-    "linux-03",
-    "linux-04",
-    "linux-05",
-    "linux-06",
+  cicd: [
+    "cicd-01",
+    "cicd-02",
+    "cicd-03",
+    "cicd-04",
+    "cicd-05",
+    "cicd-06",
+    "cicd-07",
   ],
 };
 
@@ -86,32 +95,39 @@ export const isPathwayCompleted = (userId = "guest", pathway = "git") => {
     const completed = getCompletedModules(userId, "git");
     return PATHWAY_CURRICULA.git.every((id) => completed.includes(id));
   }
-  if (pathway === "docker") {
+  if (pathway === "linux") {
     if (!isPathwayCompleted(userId, "git")) return false;
+    const completed = getCompletedModules(userId, "linux");
+    return PATHWAY_CURRICULA.linux.every((id) => completed.includes(id));
+  }
+  if (pathway === "docker") {
+    if (!isPathwayCompleted(userId, "linux")) return false;
     const completed = getCompletedModules(userId, "docker");
     return PATHWAY_CURRICULA.docker.every((id) => completed.includes(id));
   }
-  if (pathway === "linux") {
+  if (pathway === "cicd") {
     if (!isPathwayCompleted(userId, "docker")) return false;
-    const completed = getCompletedModules(userId, "linux");
-    return PATHWAY_CURRICULA.linux.every((id) => completed.includes(id));
+    const completed = getCompletedModules(userId, "cicd");
+    return PATHWAY_CURRICULA.cicd.every((id) => completed.includes(id));
   }
   return false;
 };
 
 /**
  * Checks whether a pathway is unlocked based on prerequisite pathways:
- * Progression: Git -> Linux -> Docker -> Kubernetes -> CI/CD -> IaC
+ * Progression: Git -> Linux -> Docker -> CI/CD -> Kubernetes
  * - Git: Always unlocked by default.
  * - Linux: Unlocked only after ALL Git modules are completed.
  * - Docker: Unlocked only after ALL Linux lessons are completed (and Git remains complete).
- * - Kubernetes: Unlocked only after ALL Docker modules are completed.
+ * - CI/CD: Unlocked only after ALL Docker modules are completed.
+ * - Kubernetes: Unlocked only after ALL CI/CD modules are completed.
  */
 export const isPathwayUnlocked = (userId = "guest", pathway = "git") => {
   if (pathway === "git") return true;
   if (pathway === "linux") return isPathwayCompleted(userId, "git");
   if (pathway === "docker") return isPathwayCompleted(userId, "linux");
-  if (pathway === "kubernetes") return isPathwayCompleted(userId, "docker");
+  if (pathway === "cicd") return isPathwayCompleted(userId, "docker");
+  if (pathway === "kubernetes") return isPathwayCompleted(userId, "cicd");
   return false;
 };
 
@@ -135,6 +151,18 @@ export const getPathwayLockReason = (userId = "guest", pathway = "git") => {
     }
     return null;
   }
+  if (pathway === "cicd") {
+    if (!isPathwayCompleted(userId, "git")) {
+      return "Complete all Git modules first.";
+    }
+    if (!isPathwayCompleted(userId, "linux")) {
+      return "Complete all Linux lessons first.";
+    }
+    if (!isPathwayCompleted(userId, "docker")) {
+      return "Complete all 7 Docker modules to unlock the CI/CD pathway.";
+    }
+    return null;
+  }
   if (pathway === "kubernetes") {
     if (!isPathwayCompleted(userId, "git")) {
       return "Complete all Git modules first.";
@@ -143,7 +171,10 @@ export const getPathwayLockReason = (userId = "guest", pathway = "git") => {
       return "Complete all Linux lessons first.";
     }
     if (!isPathwayCompleted(userId, "docker")) {
-      return "Complete all 7 Docker modules to unlock the Kubernetes pathway.";
+      return "Complete all Docker modules first.";
+    }
+    if (!isPathwayCompleted(userId, "cicd")) {
+      return "Complete all 7 CI/CD modules to unlock the Kubernetes pathway.";
     }
     return null;
   }

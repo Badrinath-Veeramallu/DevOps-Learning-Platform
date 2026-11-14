@@ -5750,3 +5750,22 @@
     justify-content: center;
   }
 }
+
+/* ============================================================
+   CI/CD Reserved Animation Placeholder
+   ============================================================ */
+.cicd-animation-placeholder {
+  min-height: 220px;
+  width: 100%;
+  border-radius: 12px;
+  background: transparent;
+  margin: 1.75rem 0 2.25rem;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .cicd-animation-placeholder {
+    min-height: 180px;
+    margin: 1.25rem 0 1.5rem;
+  }
+}

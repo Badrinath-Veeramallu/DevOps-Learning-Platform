@@ -14,6 +14,8 @@ import { LinuxPathwayPage } from "./pages/LinuxPathwayPage";
 import { LinuxModulePage } from "./pages/LinuxModulePage";
 import { DockerPathwayPage } from "./pages/DockerPathwayPage";
 import { DockerModulePage } from "./pages/DockerModulePage";
+import { CicdPathwayPage } from "./pages/CicdPathwayPage";
+import { CicdModulePage } from "./pages/CicdModulePage";
 import { PathwayQuizPage } from "./pages/PathwayQuizPage";
 import "./App.css";
 
@@ -24,6 +26,14 @@ import "./App.css";
 function LegacyQuizRedirect() {
   const { pathwayId } = useParams();
   return <Navigate to={`/pathways/${pathwayId}/quiz`} replace />;
+}
+
+/**
+ * Redirects legacy /pathway/:pathway/:moduleId to /pathways/:pathway/:moduleId
+ */
+function LegacyModuleRedirect({ pathway }) {
+  const { moduleId } = useParams();
+  return <Navigate to={`/pathways/${pathway}/${moduleId}`} replace />;
 }
 
 /**
@@ -144,12 +154,47 @@ function AppLayout() {
             element={<Navigate to="/pathways/docker" replace />}
           />
 
+          {/* CI/CD & GitOps Delivery Learning Pathway Routes */}
+          <Route
+            path="/pathways/cicd"
+            element={
+              <ProtectedRoute>
+                <CicdPathwayPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/pathways/cicd/:moduleId"
+            element={
+              <ProtectedRoute>
+                <CicdModulePage />
+              </ProtectedRoute>
+            }
+          />
+          {/* Aliases for convenience */}
+          <Route
+            path="/pathway/cicd"
+            element={<Navigate to="/pathways/cicd" replace />}
+          />
+          <Route
+            path="/pathway/cicd/:moduleId"
+            element={<LegacyModuleRedirect pathway="cicd" />}
+          />
+
           {/* Final Pathway Quiz Routes */}
           <Route
             path="/pathways/git/quiz"
             element={
               <ProtectedRoute>
                 <PathwayQuizPage pathwayId="git" />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/pathways/linux/quiz"
+            element={
+              <ProtectedRoute>
+                <PathwayQuizPage pathwayId="linux" />
               </ProtectedRoute>
             }
           />
@@ -162,10 +207,10 @@ function AppLayout() {
             }
           />
           <Route
-            path="/pathways/linux/quiz"
+            path="/pathways/cicd/quiz"
             element={
               <ProtectedRoute>
-                <PathwayQuizPage pathwayId="linux" />
+                <PathwayQuizPage pathwayId="cicd" />
               </ProtectedRoute>
             }
           />

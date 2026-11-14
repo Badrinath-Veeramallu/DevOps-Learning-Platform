@@ -51,7 +51,7 @@ export const Dashboard = () => {
 
   const firstName = user?.name ? user.name.trim().split(" ")[0] : "Learner";
 
-  // Authoritative progression order: Git -> Linux -> Docker -> Kubernetes -> CI/CD -> IaC
+  // Authoritative progression order: Git -> Linux -> Docker -> CI/CD -> Kubernetes -> IaC
   const learningPaths = [
     {
       id: "git",
@@ -81,21 +81,21 @@ export const Dashboard = () => {
       hasPathway: true,
     },
     {
+      id: "cicd",
+      title: "CI/CD & GitOps Delivery",
+      level: "Intermediate",
+      modules: "7 Modules · Interactive Pathway",
+      description:
+        "Automated deployment pipelines using GitHub Actions, container registries, test automation, and GitOps synchronization with Argo CD.",
+      hasPathway: true,
+    },
+    {
       id: "kubernetes",
       title: "Kubernetes Cluster Architecture",
       level: "Advanced",
       modules: "12 Modules",
       description:
         "Workload orchestration: Deployments, StatefulSets, Services, Ingress controllers, ConfigMaps, and Helm charts.",
-      hasPathway: false,
-    },
-    {
-      id: "cicd",
-      title: "CI/CD & GitOps Delivery",
-      level: "Intermediate",
-      modules: "10 Modules",
-      description:
-        "Automated deployment pipelines using GitHub Actions, container registries, test automation, and GitOps synchronization.",
       hasPathway: false,
     },
     {
@@ -121,10 +121,12 @@ export const Dashboard = () => {
     localStorage.setItem("devops_active_track", trackId);
     if (trackId === "git") {
       navigate("/pathways/git");
-    } else if (trackId === "docker") {
-      navigate("/pathways/docker");
     } else if (trackId === "linux") {
       navigate("/pathways/linux");
+    } else if (trackId === "docker") {
+      navigate("/pathways/docker");
+    } else if (trackId === "cicd") {
+      navigate("/pathways/cicd");
     }
   };
 
@@ -138,10 +140,12 @@ export const Dashboard = () => {
 
     if (path.id === "git") {
       navigate("/pathways/git");
-    } else if (path.id === "docker") {
-      navigate("/pathways/docker");
     } else if (path.id === "linux") {
       navigate("/pathways/linux");
+    } else if (path.id === "docker") {
+      navigate("/pathways/docker");
+    } else if (path.id === "cicd") {
+      navigate("/pathways/cicd");
     } else {
       alert(`Continuing ${path.title}`);
     }

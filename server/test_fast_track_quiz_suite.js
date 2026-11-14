@@ -30,7 +30,7 @@ function runFastTrackTests() {
   console.log("✓ Controller exports verified");
 
   // 2. Server-side evaluation & scoring integrity
-  for (const pathway of ["git", "docker", "linux"]) {
+  for (const pathway of ["git", "linux", "docker", "cicd"]) {
     const rawBank = QUIZ_BANKS[pathway];
     const sanitized = getSanitizedQuestions(pathway);
 
@@ -97,6 +97,10 @@ function runFastTrackTests() {
     PATHWAY_PREREQUISITES.linux,
     ["linux-01", "linux-02", "linux-03", "linux-04", "linux-05", "linux-06"]
   );
+  assert.deepStrictEqual(
+    PATHWAY_PREREQUISITES.cicd,
+    ["cicd-01", "cicd-02", "cicd-03", "cicd-04", "cicd-05", "cicd-06", "cicd-07"]
+  );
   console.log("✓ Curriculum stops for all pathways match requirements");
 
   // 4. Progress collection simulation: idempotency and partial preservation
@@ -127,7 +131,7 @@ function runFastTrackTests() {
   console.log("✓ Module progression upsert and idempotency verified");
 
   // 5. Answer Review Three-State Discrimination (Correct, Incorrect, Not Attempted)
-  for (const pathway of ["git", "docker", "linux"]) {
+  for (const pathway of ["git", "linux", "docker", "cicd"]) {
     const rawBank = QUIZ_BANKS[pathway];
     const mixedAnswers = {};
 

@@ -27,6 +27,15 @@ const PATHWAY_CURRICULA = {
     "docker-06",
     "docker-07",
   ],
+  cicd: [
+    "cicd-01",
+    "cicd-02",
+    "cicd-03",
+    "cicd-04",
+    "cicd-05",
+    "cicd-06",
+    "cicd-07",
+  ],
 };
 
 // Mock In-memory store
@@ -76,17 +85,20 @@ const mockProgressModel = {
  * - Git: Always unlocked by default.
  * - Linux: Locked until ALL Git modules (7) are completed.
  * - Docker: Locked until ALL Linux lessons (6) are completed AND Git remains complete.
- * - Kubernetes: Locked until ALL Docker modules (7) are completed.
+ * - CI/CD: Locked until ALL Docker modules (7) are completed.
+ * - Kubernetes: Locked until ALL CI/CD modules (7) are completed.
  */
 async function getPathwayLockStatus(userId) {
   const gitModules = PATHWAY_CURRICULA.git;
   const linuxModules = PATHWAY_CURRICULA.linux;
   const dockerModules = PATHWAY_CURRICULA.docker;
+  const cicdModules = PATHWAY_CURRICULA.cicd;
 
-  const [gitDoc, linuxDoc, dockerDoc] = await Promise.all([
+  const [gitDoc, linuxDoc, dockerDoc, cicdDoc] = await Promise.all([
     mockProgressModel.findOne({ userId, pathwayId: "git" }),
     mockProgressModel.findOne({ userId, pathwayId: "linux" }),
     mockProgressModel.findOne({ userId, pathwayId: "docker" }),
+    mockProgressModel.findOne({ userId, pathwayId: "cicd" }),
   ]);
 
   const cleanGitCompleted = [...new Set(gitDoc?.completedModules || [])].filter((id) =>
@@ -97,6 +109,9 @@ async function getPathwayLockStatus(userId) {
   );
   const cleanDockerCompleted = [...new Set(dockerDoc?.completedModules || [])].filter((id) =>
     dockerModules.includes(id)
+  );
+  const cleanCicdCompleted = [...new Set(cicdDoc?.completedModules || [])].filter((id) =>
+    cicdModules.includes(id)
   );
 
   const isGitComplete =
@@ -112,6 +127,11 @@ async function getPathwayLockStatus(userId) {
     isLinuxComplete &&
     dockerModules.length > 0 &&
     dockerModules.every((id) => cleanDockerCompleted.includes(id));
+
+  const isCicdComplete =
+    isDockerComplete &&
+    cicdModules.length > 0 &&
+    cicdModules.every((id) => cleanCicdCompleted.includes(id));
 
   return {
     git: {
@@ -144,8 +164,22 @@ async function getPathwayLockStatus(userId) {
           ? "Complete the Linux module to unlock the Docker module."
           : null,
     },
-    kubernetes: {
+    cicd: {
       isLocked: !isDockerComplete,
+      isCompleted: isCicdComplete,
+      totalModules: cicdModules.length,
+      completedCount: cleanCicdCompleted.length,
+      completedModules: cleanCicdCompleted,
+      lockReason: !isGitComplete
+        ? "CI/CD pathway is locked. Complete all Git modules first."
+        : !isLinuxComplete
+          ? "CI/CD pathway is locked. Complete all Linux lessons first."
+          : !isDockerComplete
+            ? "Complete all Docker modules to unlock the CI/CD module."
+            : null,
+    },
+    kubernetes: {
+      isLocked: !isCicdComplete,
       isCompleted: false,
       totalModules: 12,
       completedCount: 0,
@@ -155,8 +189,10 @@ async function getPathwayLockStatus(userId) {
         : !isLinuxComplete
           ? "Kubernetes pathway is locked. Complete all Linux lessons first."
           : !isDockerComplete
-            ? "Kubernetes pathway is locked. Complete all Docker modules to unlock."
-            : null,
+            ? "Kubernetes pathway is locked. Complete all Docker modules first."
+            : !isCicdComplete
+              ? "Kubernetes pathway is locked. Complete all CI/CD modules to unlock."
+              : null,
     },
   };
 }
@@ -166,7 +202,7 @@ async function getProgress(req, res) {
     const pathwayId = req.params.pathwayId || "git";
     const userId = req.user._id;
 
-    if (pathwayId === "linux" || pathwayId === "docker" || pathwayId === "kubernetes") {
+    if (pathwayId === "linux" || pathwayId === "docker" || pathwayId === "cicd" || pathwayId === "kubernetes") {
       const lockStatus = await getPathwayLockStatus(userId);
       if (lockStatus[pathwayId] && lockStatus[pathwayId].isLocked) {
         return res.status(403).json({
@@ -218,7 +254,7 @@ async function toggleProgress(req, res) {
       return res.status(400).json({ success: false, message: `Unknown pathway: "${pathwayId}"` });
     }
 
-    if (pathwayId === "linux" || pathwayId === "docker" || pathwayId === "kubernetes") {
+    if (pathwayId === "linux" || pathwayId === "docker" || pathwayId === "cicd" || pathwayId === "kubernetes") {
       const lockStatus = await getPathwayLockStatus(userId);
       if (lockStatus[pathwayId] && lockStatus[pathwayId].isLocked) {
         return res.status(403).json({
@@ -298,7 +334,7 @@ async function logClientActivity(req, res) {
       return res.status(400).json({ success: false, message: "stopSlug is required" });
     }
 
-    if (pathwayId === "linux" || pathwayId === "docker" || pathwayId === "kubernetes") {
+    if (pathwayId === "linux" || pathwayId === "docker" || pathwayId === "cicd" || pathwayId === "kubernetes") {
       const lockStatus = await getPathwayLockStatus(userId);
       if (lockStatus[pathwayId] && lockStatus[pathwayId].isLocked) {
         return res.status(403).json({
@@ -336,13 +372,14 @@ async function runTests() {
   const userId = "test_user_pathway_locking";
   db = {};
 
-  // 1. Initial State: Git unlocked, Linux locked, Docker locked, Kubernetes locked
+  // 1. Initial State: Git unlocked, Linux locked, Docker locked, CI/CD locked, Kubernetes locked
   let status = await getPathwayLockStatus(userId);
   assert.strictEqual(status.git.isLocked, false, "Git must be unlocked initially");
   assert.strictEqual(status.linux.isLocked, true, "Linux must be locked initially");
   assert.strictEqual(status.docker.isLocked, true, "Docker must be locked initially");
+  assert.strictEqual(status.cicd.isLocked, true, "CI/CD must be locked initially");
   assert.strictEqual(status.kubernetes.isLocked, true, "Kubernetes must be locked initially");
-  console.log("  [PASS] Initial state: Git unlocked, Linux locked, Docker locked, Kubernetes locked");
+  console.log("  [PASS] Initial state: Git unlocked, Linux locked, Docker locked, CI/CD locked, Kubernetes locked");
 
   // 2. Reject GET /api/progress/linux when locked
   let res = createRes();
@@ -369,7 +406,7 @@ async function runTests() {
   assert.strictEqual(res.statusCode, 403, "Activity log for locked Linux must return 403");
   console.log("  [PASS] Activity log rejected with 403 for locked pathway");
 
-  // 5. Complete Git modules 1 to 6 - Linux, Docker, and Kubernetes remain locked
+  // 5. Complete Git modules 1 to 6 - Linux, Docker, CI/CD, and Kubernetes remain locked
   for (let i = 1; i <= 6; i++) {
     const moduleId = `git-0${i}`;
     res = createRes();
@@ -381,9 +418,10 @@ async function runTests() {
   assert.strictEqual(status.git.isCompleted, false);
   assert.strictEqual(status.linux.isLocked, true, "Linux must remain locked with only 6 Git modules complete");
   assert.strictEqual(status.docker.isLocked, true, "Docker must remain locked");
-  console.log("  [PASS] 6 of 7 Git completed: Linux, Docker, Kubernetes remain locked");
+  assert.strictEqual(status.cicd.isLocked, true, "CI/CD must remain locked");
+  console.log("  [PASS] 6 of 7 Git completed: Linux, Docker, CI/CD, Kubernetes remain locked");
 
-  // 6. Complete Module 7 in Git - Linux unlocks! Docker and Kubernetes remain locked
+  // 6. Complete Module 7 in Git - Linux unlocks! Docker, CI/CD, and Kubernetes remain locked
   res = createRes();
   await toggleProgress({ user: { _id: userId }, params: { pathwayId: "git" }, body: { moduleId: "git-07" } }, res);
   assert.strictEqual(res.statusCode, 200);
@@ -392,8 +430,9 @@ async function runTests() {
   assert.strictEqual(status.git.isCompleted, true);
   assert.strictEqual(status.linux.isLocked, false, "Linux MUST be unlocked when all Git modules are complete");
   assert.strictEqual(status.docker.isLocked, true, "Docker MUST remain locked until Linux is completed");
+  assert.strictEqual(status.cicd.isLocked, true, "CI/CD MUST remain locked until Docker is completed");
   assert.strictEqual(status.kubernetes.isLocked, true, "Kubernetes MUST remain locked");
-  console.log("  [PASS] All 7 Git modules completed: Linux unlocked, Docker & Kubernetes locked");
+  console.log("  [PASS] All 7 Git modules completed: Linux unlocked, Docker, CI/CD & Kubernetes locked");
 
   // 7. Access Linux now succeeds
   res = createRes();
@@ -414,7 +453,7 @@ async function runTests() {
   assert.strictEqual(status.docker.isLocked, true, "Docker must remain locked with only 5 Linux lessons complete");
   console.log("  [PASS] 5 of 6 Linux lessons completed: Docker remains locked");
 
-  // 9. Complete Linux lesson 6 - Docker unlocks! Kubernetes remains locked
+  // 9. Complete Linux lesson 6 - Docker unlocks! CI/CD and Kubernetes remain locked
   res = createRes();
   await toggleProgress({ user: { _id: userId }, params: { pathwayId: "linux" }, body: { moduleId: "linux-06" } }, res);
   assert.strictEqual(res.statusCode, 200);
@@ -422,10 +461,11 @@ async function runTests() {
   assert.strictEqual(status.linux.completedCount, 6);
   assert.strictEqual(status.linux.isCompleted, true);
   assert.strictEqual(status.docker.isLocked, false, "Docker MUST be unlocked when all Linux lessons are complete");
-  assert.strictEqual(status.kubernetes.isLocked, true, "Kubernetes MUST remain locked until Docker is completed");
-  console.log("  [PASS] All 6 Linux lessons completed: Docker unlocked, Kubernetes locked");
+  assert.strictEqual(status.cicd.isLocked, true, "CI/CD MUST remain locked until Docker is completed");
+  assert.strictEqual(status.kubernetes.isLocked, true, "Kubernetes MUST remain locked until CI/CD is completed");
+  console.log("  [PASS] All 6 Linux lessons completed: Docker unlocked, CI/CD & Kubernetes locked");
 
-  // 10. Complete Docker modules 1 through 7 - Kubernetes unlocks!
+  // 10. Complete Docker modules 1 through 7 - CI/CD unlocks! Kubernetes remains locked
   for (let i = 1; i <= 7; i++) {
     const moduleId = `docker-0${i}`;
     res = createRes();
@@ -435,10 +475,24 @@ async function runTests() {
   status = await getPathwayLockStatus(userId);
   assert.strictEqual(status.docker.completedCount, 7);
   assert.strictEqual(status.docker.isCompleted, true);
-  assert.strictEqual(status.kubernetes.isLocked, false, "Kubernetes MUST unlock when all Docker modules are complete");
-  console.log("  [PASS] All 7 Docker modules completed: Kubernetes unlocked");
+  assert.strictEqual(status.cicd.isLocked, false, "CI/CD MUST unlock when all Docker modules are complete");
+  assert.strictEqual(status.kubernetes.isLocked, true, "Kubernetes MUST remain locked until CI/CD is complete");
+  console.log("  [PASS] All 7 Docker modules completed: CI/CD unlocked, Kubernetes locked");
 
-  // 11. Cascading Relocking: Uncompleting git-07 relocks Linux, Docker, and Kubernetes
+  // 11. Complete CI/CD modules 1 through 7 - Kubernetes unlocks!
+  for (let i = 1; i <= 7; i++) {
+    const moduleId = `cicd-0${i}`;
+    res = createRes();
+    await toggleProgress({ user: { _id: userId }, params: { pathwayId: "cicd" }, body: { moduleId } }, res);
+    assert.strictEqual(res.statusCode, 200);
+  }
+  status = await getPathwayLockStatus(userId);
+  assert.strictEqual(status.cicd.completedCount, 7);
+  assert.strictEqual(status.cicd.isCompleted, true);
+  assert.strictEqual(status.kubernetes.isLocked, false, "Kubernetes MUST unlock when all CI/CD modules are complete");
+  console.log("  [PASS] All 7 CI/CD modules completed: Kubernetes unlocked");
+
+  // 12. Cascading Relocking: Uncompleting git-07 relocks Linux, Docker, CI/CD, and Kubernetes
   console.log("  Testing Cascading Relocking when user uncompletes git-07...");
   res = createRes();
   await toggleProgress({ user: { _id: userId }, params: { pathwayId: "git" }, body: { moduleId: "git-07" } }, res);
@@ -448,23 +502,28 @@ async function runTests() {
   assert.strictEqual(status.git.isCompleted, false);
   assert.strictEqual(status.linux.isLocked, true, "Linux must dynamically re-lock when Git is incomplete");
   assert.strictEqual(status.docker.isLocked, true, "Docker must dynamically re-lock when Git is incomplete");
+  assert.strictEqual(status.cicd.isLocked, true, "CI/CD must dynamically re-lock when Git is incomplete");
   assert.strictEqual(status.kubernetes.isLocked, true, "Kubernetes must dynamically re-lock when Git is incomplete");
 
   // Verify historical completions are intact
   assert.strictEqual(status.linux.completedCount, 6, "Historical Linux completions must be preserved");
   assert.strictEqual(status.docker.completedCount, 7, "Historical Docker completions must be preserved");
+  assert.strictEqual(status.cicd.completedCount, 7, "Historical CI/CD completions must be preserved");
   console.log("  [PASS] Cascading relock succeeded and historical progress preserved!");
 
-  // Requests to Linux, Docker, and Kubernetes now rejected with 403
+  // Requests to Linux, Docker, CI/CD, and Kubernetes now rejected with 403
   res = createRes();
   await getProgress({ user: { _id: userId }, params: { pathwayId: "linux" } }, res);
   assert.strictEqual(res.statusCode, 403);
   res = createRes();
   await getProgress({ user: { _id: userId }, params: { pathwayId: "docker" } }, res);
   assert.strictEqual(res.statusCode, 403);
-  console.log("  [PASS] Linux, Docker, and Kubernetes requests return 403 while Git is incomplete");
+  res = createRes();
+  await getProgress({ user: { _id: userId }, params: { pathwayId: "cicd" } }, res);
+  assert.strictEqual(res.statusCode, 403);
+  console.log("  [PASS] Linux, Docker, CI/CD, and Kubernetes requests return 403 while Git is incomplete");
 
-  // 12. Restoring access when user re-completes git-07
+  // 13. Restoring access when user re-completes git-07
   console.log("  Testing Restoring access when user re-completes git-07...");
   res = createRes();
   await toggleProgress({ user: { _id: userId }, params: { pathwayId: "git" }, body: { moduleId: "git-07" } }, res);
@@ -474,8 +533,9 @@ async function runTests() {
   assert.strictEqual(status.git.isCompleted, true);
   assert.strictEqual(status.linux.isLocked, false);
   assert.strictEqual(status.docker.isLocked, false);
+  assert.strictEqual(status.cicd.isLocked, false);
   assert.strictEqual(status.kubernetes.isLocked, false);
-  console.log("  [PASS] Re-completing Git restores Linux, Docker, and Kubernetes access with historical completions!");
+  console.log("  [PASS] Re-completing Git restores Linux, Docker, CI/CD, and Kubernetes access with historical completions!");
 
   console.log("=== ALL PATHWAY LOCKING BACKEND TESTS PASSED SUCCESSFULLY! ===");
 }

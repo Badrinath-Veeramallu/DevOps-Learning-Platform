@@ -264,7 +264,7 @@ async function getFastTrackQuiz(req, res) {
     }
 
     // Verify pathway-level locking before allowing fast-track access
-    if (pathwayId === "linux" || pathwayId === "docker" || pathwayId === "kubernetes") {
+    if (pathwayId === "linux" || pathwayId === "docker" || pathwayId === "cicd" || pathwayId === "kubernetes") {
       const { getPathwayLockStatus } = require("./progressController");
       const lockStatus = await getPathwayLockStatus(userId);
       if (lockStatus[pathwayId] && lockStatus[pathwayId].isLocked) {
@@ -330,7 +330,7 @@ async function submitFastTrackQuiz(req, res) {
     }
 
     // Verify pathway-level locking before allowing fast-track submission
-    if (pathwayId === "linux" || pathwayId === "docker" || pathwayId === "kubernetes") {
+    if (pathwayId === "linux" || pathwayId === "docker" || pathwayId === "cicd" || pathwayId === "kubernetes") {
       const { getPathwayLockStatus } = require("./progressController");
       const lockStatus = await getPathwayLockStatus(userId);
       if (lockStatus[pathwayId] && lockStatus[pathwayId].isLocked) {

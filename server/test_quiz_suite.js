@@ -18,7 +18,7 @@ function runTests() {
   let totalQuestionsCount = 0;
 
   // 1. Verify all pathways have 20 questions and meet all schema integrity rules
-  for (const pathway of ["git", "docker", "linux"]) {
+  for (const pathway of ["git", "docker", "linux", "cicd"]) {
     const rawBank = QUIZ_BANKS[pathway];
     assert.ok(Array.isArray(rawBank), `${pathway} bank must be an array`);
     assert.strictEqual(
@@ -84,21 +84,22 @@ function runTests() {
   }
 
   // 2. Verify global uniqueness count
-  assert.strictEqual(totalQuestionsCount, 60, "Expected exactly 60 total questions across all 3 pathways");
-  assert.strictEqual(seenIds.size, 60, "All 60 question IDs must be globally unique");
-  console.log("✓ All 60 question IDs are verified globally unique");
+  assert.strictEqual(totalQuestionsCount, 80, "Expected exactly 80 total questions across all 4 pathways");
+  assert.strictEqual(seenIds.size, 80, "All 80 question IDs must be globally unique");
+  console.log("✓ All 80 question IDs are verified globally unique");
 
   // 3. Verify pathway prerequisites
   assert.strictEqual(PATHWAY_PREREQUISITES.git.length, 7, "Git must require 7 modules");
   assert.strictEqual(PATHWAY_PREREQUISITES.docker.length, 7, "Docker must require 7 modules");
   assert.strictEqual(PATHWAY_PREREQUISITES.linux.length, 6, "Linux must require 6 modules");
+  assert.strictEqual(PATHWAY_PREREQUISITES.cicd.length, 7, "CI/CD must require 7 modules");
   console.log("✓ Pathway prerequisite requirements verified");
 
   // 4. Verify evaluateQuiz passing criteria (passing score: 10/20 = 50%)
   assert.strictEqual(PASSING_SCORE, 10);
   assert.strictEqual(TOTAL_QUESTIONS_PER_QUIZ, 20);
 
-  for (const pathway of ["git", "docker", "linux"]) {
+  for (const pathway of ["git", "docker", "linux", "cicd"]) {
     const bank = QUIZ_BANKS[pathway];
 
     // Perfect 20/20

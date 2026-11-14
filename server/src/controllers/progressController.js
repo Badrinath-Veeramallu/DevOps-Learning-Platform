@@ -15,6 +15,14 @@ const PATHWAY_CURRICULA = {
     "git-06",
     "git-07",
   ],
+  linux: [
+    "linux-01",
+    "linux-02",
+    "linux-03",
+    "linux-04",
+    "linux-05",
+    "linux-06",
+  ],
   docker: [
     "docker-01",
     "docker-02",
@@ -24,13 +32,14 @@ const PATHWAY_CURRICULA = {
     "docker-06",
     "docker-07",
   ],
-  linux: [
-    "linux-01",
-    "linux-02",
-    "linux-03",
-    "linux-04",
-    "linux-05",
-    "linux-06",
+  cicd: [
+    "cicd-01",
+    "cicd-02",
+    "cicd-03",
+    "cicd-04",
+    "cicd-05",
+    "cicd-06",
+    "cicd-07",
   ],
 };
 
@@ -40,17 +49,20 @@ const PATHWAY_CURRICULA = {
  * - Git: Always unlocked by default.
  * - Linux: Locked until ALL Git modules (7) are completed.
  * - Docker: Locked until ALL Linux lessons (6) are completed AND Git remains complete.
- * - Kubernetes: Locked until ALL Docker modules (7) are completed.
+ * - CI/CD: Locked until ALL Docker modules (7) are completed.
+ * - Kubernetes: Locked until ALL CI/CD modules (7) are completed.
  */
 async function getPathwayLockStatus(userId) {
   const gitModules = PATHWAY_CURRICULA.git;
   const linuxModules = PATHWAY_CURRICULA.linux;
   const dockerModules = PATHWAY_CURRICULA.docker;
+  const cicdModules = PATHWAY_CURRICULA.cicd;
 
-  const [gitDoc, linuxDoc, dockerDoc] = await Promise.all([
+  const [gitDoc, linuxDoc, dockerDoc, cicdDoc] = await Promise.all([
     Progress.findOne({ userId, pathwayId: "git" }),
     Progress.findOne({ userId, pathwayId: "linux" }),
     Progress.findOne({ userId, pathwayId: "docker" }),
+    Progress.findOne({ userId, pathwayId: "cicd" }),
   ]);
 
   const cleanGitCompleted = [...new Set(gitDoc?.completedModules || [])].filter((id) =>
@@ -61,6 +73,9 @@ async function getPathwayLockStatus(userId) {
   );
   const cleanDockerCompleted = [...new Set(dockerDoc?.completedModules || [])].filter((id) =>
     dockerModules.includes(id)
+  );
+  const cleanCicdCompleted = [...new Set(cicdDoc?.completedModules || [])].filter((id) =>
+    cicdModules.includes(id)
   );
 
   const isGitComplete =
@@ -76,6 +91,11 @@ async function getPathwayLockStatus(userId) {
     isLinuxComplete &&
     dockerModules.length > 0 &&
     dockerModules.every((id) => cleanDockerCompleted.includes(id));
+
+  const isCicdComplete =
+    isDockerComplete &&
+    cicdModules.length > 0 &&
+    cicdModules.every((id) => cleanCicdCompleted.includes(id));
 
   return {
     git: {
@@ -108,8 +128,22 @@ async function getPathwayLockStatus(userId) {
           ? "Complete the Linux module to unlock the Docker module."
           : null,
     },
-    kubernetes: {
+    cicd: {
       isLocked: !isDockerComplete,
+      isCompleted: isCicdComplete,
+      totalModules: cicdModules.length,
+      completedCount: cleanCicdCompleted.length,
+      completedModules: cleanCicdCompleted,
+      lockReason: !isGitComplete
+        ? "CI/CD pathway is locked. Complete all Git modules first."
+        : !isLinuxComplete
+          ? "CI/CD pathway is locked. Complete all Linux lessons first."
+          : !isDockerComplete
+            ? "Complete all Docker modules to unlock the CI/CD module."
+            : null,
+    },
+    kubernetes: {
+      isLocked: !isCicdComplete,
       isCompleted: false,
       totalModules: 12,
       completedCount: 0,
@@ -119,8 +153,10 @@ async function getPathwayLockStatus(userId) {
         : !isLinuxComplete
           ? "Kubernetes pathway is locked. Complete all Linux lessons first."
           : !isDockerComplete
-            ? "Kubernetes pathway is locked. Complete all Docker modules to unlock."
-            : null,
+            ? "Kubernetes pathway is locked. Complete all Docker modules first."
+            : !isCicdComplete
+              ? "Kubernetes pathway is locked. Complete all CI/CD modules to unlock."
+              : null,
     },
   };
 }
@@ -158,7 +194,7 @@ async function getProgress(req, res) {
     const userId = req.user._id;
 
     // Validate pathway-level locking
-    if (pathwayId === "docker" || pathwayId === "linux") {
+    if (pathwayId === "docker" || pathwayId === "linux" || pathwayId === "cicd" || pathwayId === "kubernetes") {
       const lockStatus = await getPathwayLockStatus(userId);
       if (lockStatus[pathwayId] && lockStatus[pathwayId].isLocked) {
         return res.status(403).json({
@@ -228,7 +264,7 @@ async function toggleProgress(req, res) {
     }
 
     // Validate pathway-level locking before allowing any module mutations
-    if (pathwayId === "linux" || pathwayId === "docker" || pathwayId === "kubernetes") {
+    if (pathwayId === "linux" || pathwayId === "docker" || pathwayId === "cicd" || pathwayId === "kubernetes") {
       const lockStatus = await getPathwayLockStatus(userId);
       if (lockStatus[pathwayId] && lockStatus[pathwayId].isLocked) {
         return res.status(403).json({
