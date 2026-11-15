@@ -31,10 +31,10 @@ class LearningStreakPill extends StatelessWidget {
     final hasActivityYesterday = streak?.hasActivityYesterday ?? false;
     final isActive = currentStreak > 0;
 
-    final bgColor = isActive ? const Color(0xFFFFF4ED) : const Color(0xFFFCF8F9);
-    final borderColor = isActive ? const Color(0xFFFED7AA) : const Color(0xFFE8DDE0);
-    final textColor = isActive ? const Color(0xFF9A3412) : const Color(0xFF60343D);
-    final iconColor = isActive ? const Color(0xFFEA580C) : const Color(0xFFA8A29E);
+    final bgColor = isActive ? const Color(0xFFF7EEF0) : const Color(0xFFFCF8F9);
+    final borderColor = isActive ? const Color(0xFFE6CFD4) : const Color(0xFFE8DDE0);
+    final textColor = isActive ? const Color(0xFF6B3340) : const Color(0xFF60343D);
+    final iconColor = isActive ? const Color(0xFF3B1C22) : const Color(0xFFA8A29E);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -45,7 +45,7 @@ class LearningStreakPill extends StatelessWidget {
         boxShadow: isActive
             ? [
                 BoxShadow(
-                  color: const Color(0xFF9A3412).withValues(alpha: 0.08),
+                  color: const Color(0xFF3B1C22).withValues(alpha: 0.08),
                   blurRadius: 3,
                   offset: const Offset(0, 1),
                 ),
@@ -84,7 +84,7 @@ class LearningStreakPill extends StatelessWidget {
               width: 6,
               height: 6,
               decoration: const BoxDecoration(
-                color: Color(0xFFF59E0B),
+                color: Color(0xFF6B3340),
                 shape: BoxShape.circle,
               ),
             ),

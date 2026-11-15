@@ -9,7 +9,7 @@ import {
   fetchUserProgress,
 } from "../services/progressService";
 import { activityAPI } from "../services/api";
-import CicdAnimationPlaceholder from "../components/animations/CicdAnimationPlaceholder";
+import CicdAnimation from "../components/animations/CicdAnimation";
 
 export const CicdModulePage = () => {
   const { moduleId } = useParams();
@@ -571,9 +571,17 @@ export const CicdModulePage = () => {
                     </p>
                   ))}
 
-                {/* Dedicated Animation Placeholder for this Subtopic */}
+                {/* Step-by-Step Interactive Animation */}
                 <div className="section-animation-container">
-                  <CicdAnimationPlaceholder id={section.animationId} />
+                  <CicdAnimation
+                    key={`${currentModule.id}-anim-${section.number}`}
+                    id={`${currentModule.number}.${section.number}`}
+                    fallbackTitle={
+                      section.title
+                        ? section.title.replace(/^\d+\.\s*(Understand\s*)?/, "").trim()
+                        : undefined
+                    }
+                  />
                 </div>
               </section>
             );

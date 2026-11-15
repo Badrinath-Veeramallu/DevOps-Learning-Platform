@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import 'package:devops_learning_app/core/api/api_exceptions.dart';
@@ -118,6 +119,12 @@ class MockQuizApiClient extends FakeApiClient {
   @override
   Future<Map<String, dynamic>> getFastTrackQuiz({required String pathwayId}) async {
     calledGetFastTrack = true;
+    if (shouldLockPrereq) {
+      throw const ApiException(
+        statusCode: 403,
+        message: 'You must complete prerequisite pathways before taking this assessment.',
+      );
+    }
     final questions = List.generate(20, (i) {
       final num = i + 1;
       final qId = '$pathwayId-ft-q${num < 10 ? "0$num" : "$num"}';
@@ -154,6 +161,12 @@ class MockQuizApiClient extends FakeApiClient {
     required Map<String, int> answers,
   }) async {
     calledSubmitFastTrack = true;
+    if (shouldLockPrereq) {
+      throw const ApiException(
+        statusCode: 403,
+        message: 'Assessment submission rejected: prerequisite pathways must be completed before submitting.',
+      );
+    }
     return {
       'success': true,
       'pathwayId': pathwayId,
@@ -165,7 +178,9 @@ class MockQuizApiClient extends FakeApiClient {
       'hasPassedEver': mockHasPassedEver,
       'bestScore': mockScore,
       'attemptsCount': 1,
-      'completedModules': ['$pathwayId-01', '$pathwayId-02'],
+      'completedModules': mockPassed
+          ? (ProgressService.pathwayModules[pathwayId] ?? [])
+          : <String>[],
       'review': [],
     };
   }
@@ -560,6 +575,351 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byType(PathwayQuizScreen), findsOneWidget);
       expect(find.text('CI/CD & GITOPS DELIVERY'), findsOneWidget);
+    });
+
+    testWidgets('12. Fast-Track first-attempt success marks modules complete and shows Continue',
+        (tester) async {
+      tester.view.physicalSize = const Size(800, 1200);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      mockApi.shouldLockPrereq = false;
+      mockApi.mockScore = 15;
+      mockApi.mockPassed = true;
+      mockApi.mockHasPassedEver = true;
+
+      final userId = authProvider.user!.id;
+      ProgressService().setCompletedModulesCache(userId, {}, pathway: 'git', synced: true);
+
+      await tester.pumpWidget(
+        _wrapWidget(
+          authProvider: authProvider,
+          child: const PathwayQuizScreen(pathwayId: 'git', isFastTrack: true, autoStart: true),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.ensureVisible(find.text('Submit'));
+      await tester.tap(find.text('Submit'));
+      await tester.pumpAndSettle();
+
+      final submitBtn = find.widgetWithText(ElevatedButton, 'Submit Quiz');
+      await tester.tap(submitBtn);
+      await tester.pumpAndSettle();
+
+      expect(mockApi.calledSubmitFastTrack, isTrue);
+      expect(find.text('Congratulations! You Passed!'), findsOneWidget);
+      expect(find.text('15 / 20'), findsOneWidget);
+      expect(find.text('Continue to Linux Essentials →'), findsOneWidget);
+
+      final gitCompleted = ProgressService().getCompletedModulesSync(userId, pathway: 'git');
+      expect(gitCompleted.length, 7);
+      expect(ProgressService().isPathwayCompleted(pathway: 'git', userId: userId), isTrue);
+    });
+
+    testWidgets('13. Fast-Track first-attempt failure keeps modules uncompleted and hides Continue',
+        (tester) async {
+      tester.view.physicalSize = const Size(800, 1200);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      mockApi.shouldLockPrereq = false;
+      mockApi.mockScore = 6;
+      mockApi.mockPassed = false;
+      mockApi.mockHasPassedEver = false;
+
+      final userId = authProvider.user!.id;
+      ProgressService().setCompletedModulesCache(userId, {}, pathway: 'git', synced: true);
+
+      await tester.pumpWidget(
+        _wrapWidget(
+          authProvider: authProvider,
+          child: const PathwayQuizScreen(pathwayId: 'git', isFastTrack: true, autoStart: true),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.ensureVisible(find.text('Submit'));
+      await tester.tap(find.text('Submit'));
+      await tester.pumpAndSettle();
+
+      final submitBtn = find.widgetWithText(ElevatedButton, 'Submit Quiz');
+      await tester.tap(submitBtn);
+      await tester.pumpAndSettle();
+
+      expect(mockApi.calledSubmitFastTrack, isTrue);
+      expect(find.text('Keep Practicing!'), findsOneWidget);
+      expect(find.text('6 / 20'), findsOneWidget);
+      expect(find.text('Retake Quiz'), findsOneWidget);
+      expect(find.text('Continue to Linux Essentials →'), findsNothing);
+
+      final gitCompleted = ProgressService().getCompletedModulesSync(userId, pathway: 'git');
+      expect(gitCompleted, isEmpty);
+      expect(ProgressService().isPathwayCompleted(pathway: 'git', userId: userId), isFalse);
+    });
+
+    testWidgets('14. Failed retake after previous pass retains completed modules and Continue access',
+        (tester) async {
+      tester.view.physicalSize = const Size(800, 1200);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final userId = authProvider.user!.id;
+      const fullGit = {'git-01', 'git-02', 'git-03', 'git-04', 'git-05', 'git-06', 'git-07'};
+      ProgressService().setCompletedModulesCache(userId, fullGit, pathway: 'git', synced: true);
+      expect(ProgressService().isPathwayCompleted(pathway: 'git', userId: userId), isTrue);
+
+      // Independent flags: attempt failed, but user previously passed
+      mockApi.shouldLockPrereq = false;
+      mockApi.mockScore = 8;
+      mockApi.mockPassed = false;
+      mockApi.mockHasPassedEver = true;
+
+      await tester.pumpWidget(
+        _wrapWidget(
+          authProvider: authProvider,
+          child: const PathwayQuizScreen(pathwayId: 'git', isFastTrack: true, autoStart: true),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.ensureVisible(find.text('Submit'));
+      await tester.tap(find.text('Submit'));
+      await tester.pumpAndSettle();
+
+      final submitBtn = find.widgetWithText(ElevatedButton, 'Submit Quiz');
+      await tester.tap(submitBtn);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Keep Practicing!'), findsOneWidget);
+      expect(find.text('8 / 20'), findsOneWidget);
+      expect(
+        find.textContaining('prior passing completion and unlocked pathways remain fully preserved'),
+        findsOneWidget,
+      );
+      expect(find.text('Continue to Linux Essentials →'), findsOneWidget);
+
+      // Verify existing completion remains intact
+      final gitCompleted = ProgressService().getCompletedModulesSync(userId, pathway: 'git');
+      expect(gitCompleted.length, 7);
+      expect(gitCompleted, containsAll(fullGit));
+      expect(ProgressService().isPathwayCompleted(pathway: 'git', userId: userId), isTrue);
+    });
+
+    testWidgets('15. HTTP 403 when fetching locked Fast-Track quiz displays locked screen',
+        (tester) async {
+      mockApi.shouldLockPrereq = true;
+
+      await tester.pumpWidget(
+        _wrapWidget(
+          authProvider: authProvider,
+          child: const PathwayQuizScreen(pathwayId: 'docker', isFastTrack: true),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Final Quiz Locked'), findsOneWidget);
+      expect(find.text('Return to Pathway'), findsOneWidget);
+      expect(find.text('Start Quiz'), findsNothing);
+    });
+
+    testWidgets('16. HTTP 403 when submitting Fast-Track quiz handles error gracefully',
+        (tester) async {
+      tester.view.physicalSize = const Size(800, 1200);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      mockApi.shouldLockPrereq = false;
+      await tester.pumpWidget(
+        _wrapWidget(
+          authProvider: authProvider,
+          child: const PathwayQuizScreen(pathwayId: 'docker', isFastTrack: true, autoStart: true),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Trigger 403 on submission
+      mockApi.shouldLockPrereq = true;
+
+      await tester.ensureVisible(find.text('Submit'));
+      await tester.tap(find.text('Submit'));
+      await tester.pumpAndSettle();
+
+      final submitBtn = find.widgetWithText(ElevatedButton, 'Submit Quiz');
+      await tester.tap(submitBtn);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(SnackBar), findsOneWidget);
+      expect(find.textContaining('prerequisite pathways must be completed'), findsOneWidget);
+    });
+
+    testWidgets('17. Passing Fast-Track updates ProgressService completion cache',
+        (tester) async {
+      tester.view.physicalSize = const Size(800, 1200);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      mockApi.shouldLockPrereq = false;
+      mockApi.mockScore = 18;
+      mockApi.mockPassed = true;
+      mockApi.mockHasPassedEver = true;
+
+      final userId = authProvider.user!.id;
+      ProgressService().setCompletedModulesCache(userId, {}, pathway: 'linux', synced: true);
+
+      await tester.pumpWidget(
+        _wrapWidget(
+          authProvider: authProvider,
+          child: const PathwayQuizScreen(pathwayId: 'linux', isFastTrack: true, autoStart: true),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.ensureVisible(find.text('Submit'));
+      await tester.tap(find.text('Submit'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.widgetWithText(ElevatedButton, 'Submit Quiz'));
+      await tester.pumpAndSettle();
+
+      final linuxModules = ProgressService().getCompletedModulesSync(userId, pathway: 'linux');
+      expect(linuxModules.length, 6);
+      expect(linuxModules, containsAll(['linux-01', 'linux-02', 'linux-03', 'linux-04', 'linux-05', 'linux-06']));
+    });
+
+    testWidgets('18. Failing Fast-Track first attempt saves no modules in cache',
+        (tester) async {
+      tester.view.physicalSize = const Size(800, 1200);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      mockApi.shouldLockPrereq = false;
+      mockApi.mockScore = 4;
+      mockApi.mockPassed = false;
+      mockApi.mockHasPassedEver = false;
+
+      final userId = authProvider.user!.id;
+      ProgressService().setCompletedModulesCache(userId, {}, pathway: 'docker', synced: true);
+
+      await tester.pumpWidget(
+        _wrapWidget(
+          authProvider: authProvider,
+          child: const PathwayQuizScreen(pathwayId: 'docker', isFastTrack: true, autoStart: true),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.ensureVisible(find.text('Submit'));
+      await tester.tap(find.text('Submit'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.widgetWithText(ElevatedButton, 'Submit Quiz'));
+      await tester.pumpAndSettle();
+
+      final dockerModules = ProgressService().getCompletedModulesSync(userId, pathway: 'docker');
+      expect(dockerModules, isEmpty);
+    });
+
+    testWidgets('19. Passing Fast-Track unlocks next pathway in Git -> Linux -> Docker sequence',
+        (tester) async {
+      tester.view.physicalSize = const Size(800, 1200);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final userId = authProvider.user!.id;
+      ProgressService().setCompletedModulesCache(userId, {}, pathway: 'git', synced: true);
+      expect(ProgressService().isPathwayUnlocked(pathway: 'linux', userId: userId), isFalse);
+
+      mockApi.shouldLockPrereq = false;
+      mockApi.mockScore = 14;
+      mockApi.mockPassed = true;
+      mockApi.mockHasPassedEver = true;
+
+      await tester.pumpWidget(
+        _wrapWidget(
+          authProvider: authProvider,
+          child: const PathwayQuizScreen(pathwayId: 'git', isFastTrack: true, autoStart: true),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.ensureVisible(find.text('Submit'));
+      await tester.tap(find.text('Submit'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.widgetWithText(ElevatedButton, 'Submit Quiz'));
+      await tester.pumpAndSettle();
+
+      // Following Git -> Linux -> Docker -> CI/CD -> Kubernetes, Linux is now unlocked!
+      expect(ProgressService().isPathwayUnlocked(pathway: 'linux', userId: userId), isTrue);
+    });
+
+    testWidgets('20. Continue button navigates to next pathway using GoRouter',
+        (tester) async {
+      tester.view.physicalSize = const Size(800, 1200);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      mockApi.shouldLockPrereq = false;
+      mockApi.mockScore = 15;
+      mockApi.mockPassed = true;
+      mockApi.mockHasPassedEver = true;
+
+      final testRouter = GoRouter(
+        initialLocation: '/pathways/git/quiz?fastTrack=true',
+        routes: [
+          GoRoute(
+            path: '/pathways/git/quiz',
+            builder: (ctx, state) => const PathwayQuizScreen(
+              pathwayId: 'git',
+              isFastTrack: true,
+              autoStart: true,
+            ),
+          ),
+          GoRoute(
+            path: '/pathways/linux',
+            builder: (ctx, state) => const Scaffold(
+              body: Text('Linux Pathway Screen Destination'),
+            ),
+          ),
+        ],
+      );
+
+      await tester.pumpWidget(
+        ChangeNotifierProvider<AuthProvider>.value(
+          value: authProvider,
+          child: MaterialApp.router(
+            theme: AppTheme.darkTheme,
+            routerConfig: testRouter,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.ensureVisible(find.text('Submit'));
+      await tester.tap(find.text('Submit'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.widgetWithText(ElevatedButton, 'Submit Quiz'));
+      await tester.pumpAndSettle();
+
+      // Tap Continue to Linux Essentials →
+      final continueBtn = find.widgetWithText(ElevatedButton, 'Continue to Linux Essentials →');
+      expect(continueBtn, findsOneWidget);
+      await tester.ensureVisible(continueBtn);
+      await tester.tap(continueBtn);
+      await tester.pumpAndSettle();
+
+      // Verify route destination is reached
+      expect(find.text('Linux Pathway Screen Destination'), findsOneWidget);
     });
   });
 }

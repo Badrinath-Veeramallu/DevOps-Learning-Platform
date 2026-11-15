@@ -2830,10 +2830,10 @@
 }
 
 .streak-pill.streak-active {
-  background: #fff4ed;
-  color: #9a3412;
-  border: 1px solid #fed7aa;
-  box-shadow: 0 1px 3px rgba(154, 52, 18, 0.08);
+  background: #F7EEF0;
+  color: #6B3340;
+  border: 1px solid #E6CFD4;
+  box-shadow: 0 1px 3px rgba(59, 28, 34, 0.08);
 }
 
 .streak-pill.streak-inactive {
@@ -2849,7 +2849,7 @@
 }
 
 .streak-pill.streak-active .streak-pill-icon {
-  color: #ea580c;
+  color: #3B1C22;
 }
 
 .streak-pill.streak-inactive .streak-pill-icon {
@@ -2870,7 +2870,7 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #f59e0b;
+  background: #6B3340;
   margin-left: 0.15rem;
 }
 

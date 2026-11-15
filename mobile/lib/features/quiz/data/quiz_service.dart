@@ -96,6 +96,15 @@ class QuizService extends ChangeNotifier {
       notifyListeners();
 
       return (questions: questions, status: status);
+    } on ApiException catch (e) {
+      if (e.statusCode == 403) {
+        throw QuizPrerequisiteException(
+          e.message.isNotEmpty
+              ? e.message
+              : 'You must complete prerequisite pathways before taking this assessment.',
+        );
+      }
+      rethrow;
     } catch (e) {
       debugPrint('[QuizService] fetchFastTrackQuiz error: $e');
       rethrow;
@@ -162,6 +171,15 @@ class QuizService extends ChangeNotifier {
 
       notifyListeners();
       return result;
+    } on ApiException catch (e) {
+      if (e.statusCode == 403) {
+        throw QuizPrerequisiteException(
+          e.message.isNotEmpty
+              ? e.message
+              : 'Assessment submission rejected: prerequisite pathways must be completed before submitting.',
+        );
+      }
+      rethrow;
     } catch (e) {
       debugPrint('[QuizService] submitFastTrackQuiz error: $e');
       rethrow;

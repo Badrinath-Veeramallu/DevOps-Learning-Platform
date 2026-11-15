@@ -1060,6 +1060,8 @@ class _PathwayQuizScreenState extends State<PathwayQuizScreen> {
   Widget _buildResultView() {
     final res = _result!;
     final isPass = res.passed;
+    final hasPassedEver = res.hasPassedEver;
+    final canContinue = isPass || (widget.isFastTrack && hasPassedEver);
 
     return SingleChildScrollView(
       controller: _scrollController,
@@ -1165,10 +1167,30 @@ class _PathwayQuizScreenState extends State<PathwayQuizScreen> {
                       ? 'Outstanding! You have demonstrated prior mastery of $_pathwayTitle. All stops have been marked complete${nextLabel != null ? " and $nextLabel is now unlocked!" : "."}'
                       : 'You have demonstrated mastery of $_pathwayTitle. Your final quiz completion is officially recorded!';
 
+                  if (isPass) {
+                    return Text(
+                      passText,
+                      textAlign: TextAlign.center,
+                      style: AppTypography.bodyMedium.copyWith(
+                        color: AppColors.textMuted,
+                        height: 1.45,
+                      ),
+                    );
+                  }
+
+                  if (widget.isFastTrack && hasPassedEver) {
+                    return Text(
+                      'You scored ${res.score} out of ${res.totalQuestions} on this attempt. Your prior passing completion and unlocked pathways remain fully preserved. You may continue to ${nextLabel ?? "the next pathway"} or retake anytime.',
+                      textAlign: TextAlign.center,
+                      style: AppTypography.bodyMedium.copyWith(
+                        color: AppColors.textMuted,
+                        height: 1.45,
+                      ),
+                    );
+                  }
+
                   return Text(
-                    isPass
-                        ? passText
-                        : 'You scored ${res.score} out of ${res.totalQuestions}. A score of at least 10 (50%) is required to pass. You can retake the quiz anytime!',
+                    'You scored ${res.score} out of ${res.totalQuestions}. A score of at least 10 (50%) is required to pass. You can retake the quiz anytime!',
                     textAlign: TextAlign.center,
                     style: AppTypography.bodyMedium.copyWith(
                       color: AppColors.textMuted,
@@ -1212,7 +1234,7 @@ class _PathwayQuizScreenState extends State<PathwayQuizScreen> {
                       ),
                       child: const Text('Back to Pathway'),
                     ),
-                    if (isPass)
+                    if (canContinue)
                       Builder(builder: (context) {
                         const nextPathways = {
                           'git': 'linux',
