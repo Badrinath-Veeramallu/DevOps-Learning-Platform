@@ -223,13 +223,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Welcome Header with Learning Streak Pill (LeetCode style parity)
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Column(
+              // Welcome Header with Learning Streak Pill
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final isVeryCompact = constraints.maxWidth < 340;
+                  if (isVeryCompact) {
+                    return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
@@ -239,7 +238,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             fontWeight: FontWeight.w700,
                           ),
                         ),
-                        const SizedBox(height: 6),
+                        const SizedBox(height: 8),
+                        LearningStreakPill(
+                          streak: _streak,
+                          isLoading: _isLoadingStreak,
+                        ),
+                        const SizedBox(height: 8),
                         Text(
                           'Continue learning or choose a learning path to get started.',
                           style: AppTypography.bodyMedium.copyWith(
@@ -248,14 +252,43 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           ),
                         ),
                       ],
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  LearningStreakPill(
-                    streak: _streak,
-                    isLoading: _isLoadingStreak,
-                  ),
-                ],
+                    );
+                  }
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'Welcome back, $displayName',
+                              style: AppTypography.displayMedium.copyWith(
+                                color: AppColors.textMain,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          LearningStreakPill(
+                            streak: _streak,
+                            isLoading: _isLoadingStreak,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        'Continue learning or choose a learning path to get started.',
+                        style: AppTypography.bodyMedium.copyWith(
+                          color: AppColors.textMuted,
+                          height: 1.4,
+                        ),
+                      ),
+                    ],
+                  );
+                },
               ),
               const SizedBox(height: 28),
 

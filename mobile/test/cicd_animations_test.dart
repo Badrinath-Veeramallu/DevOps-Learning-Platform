@@ -227,39 +227,35 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('5'), findsOneWidget);
-      expect(find.text('days streak'), findsOneWidget);
+      expect(find.text('streak'), findsOneWidget);
 
       final containerFinder = find.byType(Container).first;
       final container = tester.widget<Container>(containerFinder);
       final decoration = container.decoration as BoxDecoration;
 
-      // Background: #F7EEF0 (0xFFF7EEF0)
-      expect(decoration.color, const Color(0xFFF7EEF0));
-      // Border: #E6CFD4 (0xFFE6CFD4)
+      // Background: #FCF7F8 (0xFFFCF7F8)
+      expect(decoration.color, const Color(0xFFFCF7F8));
+      // Border: #EAD9DC (0xFFEAD9DC)
       final border = decoration.border as Border;
-      expect(border.top.color, const Color(0xFFE6CFD4));
+      expect(border.top.color, const Color(0xFFEAD9DC));
 
-      // Icon: #3B1C22 (0xFF3B1C22)
-      final iconFinder = find.byIcon(Icons.local_fire_department_rounded);
-      final icon = tester.widget<Icon>(iconFinder);
-      expect(icon.color, const Color(0xFF3B1C22));
+      // Lucide Flame Icon: #542B32 (0xFF542B32)
+      final iconFinder = find.byType(LucideFlameIcon);
+      expect(iconFinder, findsOneWidget);
+      final flameIcon = tester.widget<LucideFlameIcon>(iconFinder);
+      expect(flameIcon.color, const Color(0xFF542B32));
 
-      // Text: #6B3340 (0xFF6B3340)
+      // Text: #3B1F24 (0xFF3B1F24)
       final textWidget = tester.widget<Text>(find.text('5'));
-      expect(textWidget.style?.color, const Color(0xFF6B3340));
+      expect(textWidget.style?.color, const Color(0xFF3B1F24));
+      expect(textWidget.style?.fontWeight, FontWeight.w700);
 
-      // Pending streak dot: #6B3340 (0xFF6B3340)
-      final dotContainers = tester.widgetList<Container>(find.byType(Container));
-      final dot = dotContainers.firstWhere(
-        (c) =>
-            c.decoration is BoxDecoration &&
-            (c.decoration as BoxDecoration).shape == BoxShape.circle,
-      );
-      final dotDec = dot.decoration as BoxDecoration;
-      expect(dotDec.color, const Color(0xFF6B3340));
+      final labelWidget = tester.widget<Text>(find.text('streak'));
+      expect(labelWidget.style?.color, const Color(0xFF3B1F24));
+      expect(labelWidget.style?.fontWeight, FontWeight.w500);
     });
 
-    testWidgets('10. Inactive streak renders with muted colors', (tester) async {
+    testWidgets('10. Inactive streak renders with approved Burgundy palette', (tester) async {
       const inactiveStreak = StreakModel(
         currentStreak: 0,
         longestStreak: 0,
@@ -276,19 +272,23 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('0'), findsOneWidget);
-      expect(find.text('days streak'), findsOneWidget);
+      expect(find.text('streak'), findsOneWidget);
 
       final containerFinder = find.byType(Container).first;
       final container = tester.widget<Container>(containerFinder);
       final decoration = container.decoration as BoxDecoration;
 
-      expect(decoration.color, const Color(0xFFFCF8F9));
+      expect(decoration.color, const Color(0xFFFCF7F8));
       final border = decoration.border as Border;
-      expect(border.top.color, const Color(0xFFE8DDE0));
+      expect(border.top.color, const Color(0xFFEAD9DC));
 
-      final iconFinder = find.byIcon(Icons.local_fire_department_rounded);
-      final icon = tester.widget<Icon>(iconFinder);
-      expect(icon.color, const Color(0xFFA8A29E));
+      final iconFinder = find.byType(LucideFlameIcon);
+      expect(iconFinder, findsOneWidget);
+      final flameIcon = tester.widget<LucideFlameIcon>(iconFinder);
+      expect(flameIcon.color, const Color(0xFF542B32));
+
+      final textWidget = tester.widget<Text>(find.text('0'));
+      expect(textWidget.style?.color, const Color(0xFF3B1F24));
     });
   });
 }

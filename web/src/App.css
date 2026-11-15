@@ -2820,64 +2820,76 @@
 .streak-pill {
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
-  padding: 0.45rem 0.95rem;
-  border-radius: 9999px;
+  gap: 0.35rem;
+  padding: 0.32rem 0.75rem;
+  border-radius: 999px;
+  background: #FCF7F8;
+  border: 1px solid #EAD9DC;
+  color: #3B1F24;
   font-size: 0.85rem;
-  font-weight: 600;
+  line-height: 1;
   transition: all 0.2s ease;
   user-select: none;
+  flex-shrink: 0;
+}
+
+.streak-pill:hover {
+  border-color: #d8c3c7;
 }
 
 .streak-pill.streak-active {
-  background: #F7EEF0;
-  color: #6B3340;
-  border: 1px solid #E6CFD4;
-  box-shadow: 0 1px 3px rgba(59, 28, 34, 0.08);
+  background: #FCF7F8;
+  color: #3B1F24;
+  border: 1px solid #EAD9DC;
 }
 
 .streak-pill.streak-inactive {
-  background: #fcf8f9;
-  color: #60343d;
-  border: 1px solid #e8dde0;
+  background: #FCF7F8;
+  color: #3B1F24;
+  border: 1px solid #EAD9DC;
 }
 
 .streak-pill-icon {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  color: #542B32;
+  flex-shrink: 0;
 }
 
-.streak-pill.streak-active .streak-pill-icon {
-  color: #3B1C22;
+.streak-pill-icon svg {
+  display: block;
+  stroke: #542B32;
 }
 
-.streak-pill.streak-inactive .streak-pill-icon {
-  color: #a8a29e;
+.streak-pill.streak-active .streak-pill-icon svg {
+  stroke: #542B32;
+}
+
+.streak-pill.streak-inactive .streak-pill-icon svg {
+  stroke: #542B32;
 }
 
 .streak-pill-count {
+  font-family: var(--font-heading), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   font-weight: 700;
   font-size: 0.95rem;
+  color: #3B1F24;
+  line-height: 1;
 }
 
 .streak-pill-label {
-  font-size: 0.775rem;
-  color: inherit;
-}
-
-.streak-pill-dot.pending {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #6B3340;
-  margin-left: 0.15rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #3B1F24;
+  letter-spacing: 0.01em;
+  line-height: 1;
 }
 
 .streak-pill-skeleton {
-  width: 90px;
-  height: 24px;
-  border-radius: 9999px;
+  width: 82px;
+  height: 26px;
+  border-radius: 999px;
   background: #f5ecef;
   animation: pulse 1.5s infinite;
 }
