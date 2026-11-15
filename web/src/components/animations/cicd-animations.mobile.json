@@ -1,0 +1,6536 @@
+{
+ "course": "CI/CD & GitOps Delivery",
+ "version": 1,
+ "device": "mobile",
+ "modules": [
+  {
+   "id": "01",
+   "title": "CI/CD Fundamentals",
+   "subtopics": [
+    {
+     "id": "01.1",
+     "title": "Why Do We Need CI/CD?",
+     "stage": {
+      "w": 360,
+      "h": 640
+     },
+     "steps": [
+      {
+       "say": "Three developers work on one e-commerce app: login, shopping cart and payments.",
+       "actors": {
+        "d1": {
+         "k": "box",
+         "text": "Login",
+         "tone": "soft",
+         "sub": "developer A",
+         "x": 17,
+         "y": 9,
+         "w": 30
+        },
+        "d2": {
+         "k": "box",
+         "text": "Cart",
+         "tone": "soft",
+         "sub": "developer B",
+         "x": 50,
+         "y": 9,
+         "w": 30
+        },
+        "d3": {
+         "k": "box",
+         "text": "Payments",
+         "tone": "soft",
+         "sub": "developer C",
+         "x": 83,
+         "y": 9,
+         "w": 30
+        },
+        "app": {
+         "k": "box",
+         "text": "E-commerce app",
+         "tone": "brand",
+         "x": 50,
+         "y": 54,
+         "w": 52
+        }
+       },
+       "edges": [
+        [
+         "d1",
+         "app"
+        ],
+        [
+         "d2",
+         "app"
+        ],
+        [
+         "d3",
+         "app"
+        ]
+       ]
+      },
+      {
+       "say": "Combined without checks, their changes can clash: incompatible code, missing dependencies, unexpected bugs.",
+       "actors": {
+        "app": {
+         "tone": "bad",
+         "sub": "application fails"
+        },
+        "w1": {
+         "k": "pill",
+         "text": "incompatible code",
+         "tone": "bad",
+         "ic": "!",
+         "x": 50,
+         "y": 70
+        },
+        "w2": {
+         "k": "pill",
+         "text": "missing dependencies",
+         "tone": "bad",
+         "ic": "!",
+         "x": 50,
+         "y": 78
+        },
+        "w3": {
+         "k": "pill",
+         "text": "unexpected bugs",
+         "tone": "bad",
+         "ic": "!",
+         "x": 50,
+         "y": 86
+        }
+       }
+      },
+      {
+       "say": "Without automation, every update means installing, testing, building and deploying by hand: slow and error-prone.",
+       "actors": {
+        "w1": null,
+        "w2": null,
+        "w3": null,
+        "man": {
+         "k": "pill",
+         "text": "Manual steps: slow, error-prone",
+         "tone": "warn",
+         "ic": "!",
+         "x": 50,
+         "y": 70
+        }
+       }
+      },
+      {
+       "say": "CI/CD automates this. A pipeline connects every code change to validation, building and deployment.",
+       "actors": {
+        "man": null,
+        "app": {
+         "tone": "ok",
+         "sub": "released safely"
+        },
+        "pl": {
+         "k": "box",
+         "text": "CI/CD pipeline",
+         "tone": "brand",
+         "sub": "validate · build · deploy",
+         "x": 50,
+         "y": 30,
+         "w": 56
+        }
+       },
+       "edges": [
+        [
+         "d1",
+         "pl"
+        ],
+        [
+         "d2",
+         "pl"
+        ],
+        [
+         "d3",
+         "pl"
+        ],
+        [
+         "pl",
+         "app",
+         "",
+         "ok"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "01.2",
+     "title": "Continuous Integration (CI)",
+     "stage": {
+      "w": 360,
+      "h": 640
+     },
+     "steps": [
+      {
+       "say": "Continuous Integration means merging changes into a shared repository often and validating every change automatically.",
+       "actors": {
+        "dev": {
+         "k": "box",
+         "text": "Developer",
+         "tone": "plain",
+         "x": 50,
+         "y": 10,
+         "w": 40
+        },
+        "repo": {
+         "k": "box",
+         "text": "Shared repository",
+         "tone": "soft",
+         "sub": "GitHub",
+         "x": 50,
+         "y": 29,
+         "w": 46
+        },
+        "ci": {
+         "k": "box",
+         "text": "CI workflow",
+         "tone": "brand",
+         "sub": "runs automatically",
+         "x": 50,
+         "y": 48,
+         "w": 46
+        }
+       },
+       "edges": [
+        [
+         "dev",
+         "repo",
+         "push"
+        ],
+        [
+         "repo",
+         "ci",
+         "triggers"
+        ]
+       ]
+      },
+      {
+       "say": "Every push or pull request starts the same automated steps.",
+       "actors": {
+        "p": {
+         "k": "code",
+         "title": "CI workflow",
+         "lines": [
+          "1  download the latest code",
+          "2  install dependencies",
+          "3  run automated tests",
+          "4  check code quality",
+          "5  build the application"
+         ],
+         "x": 50,
+         "y": 77,
+         "w": 94
+        }
+       },
+       "edges": [
+        [
+         "dev",
+         "repo",
+         "push"
+        ],
+        [
+         "repo",
+         "ci",
+         "triggers",
+         "ok"
+        ]
+       ]
+      },
+      {
+       "say": "Example: a React developer pushes a login update, and CI installs, tests and builds it.",
+       "actors": {
+        "dev": {
+         "sub": "React login update"
+        },
+        "ci": {
+         "tone": "ok",
+         "sub": "all steps passed"
+        },
+        "p": {
+         "lines": [
+          [
+           "1  download the latest code",
+           "add"
+          ],
+          [
+           "2  install dependencies",
+           "add"
+          ],
+          [
+           "3  run automated tests",
+           "add"
+          ],
+          [
+           "4  check code quality",
+           "add"
+          ],
+          [
+           "5  build the application",
+           "add"
+          ]
+         ]
+        }
+       },
+       "edges": [
+        [
+         "dev",
+         "repo",
+         "push"
+        ],
+        [
+         "repo",
+         "ci",
+         "triggers",
+         "ok"
+        ]
+       ],
+       "term": [
+        "$ git push origin main",
+        "CI: npm install · npm test · npm run build"
+       ]
+      },
+      {
+       "say": "If a test fails, the developer gets feedback before the change is merged into main.",
+       "actors": {
+        "ci": {
+         "tone": "bad",
+         "sub": "tests failed"
+        },
+        "p": {
+         "lines": [
+          "1  download the latest code",
+          "2  install dependencies",
+          [
+           "3  run automated tests",
+           "del"
+          ],
+          "4  check code quality",
+          "5  build the application"
+         ]
+        },
+        "fb": {
+         "k": "pill",
+         "text": "Caught before merge",
+         "tone": "warn",
+         "ic": "!",
+         "x": 50,
+         "y": 94
+        }
+       },
+       "edges": [
+        [
+         "dev",
+         "repo",
+         "push"
+        ],
+        [
+         "repo",
+         "ci",
+         "triggers",
+         "warn"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "01.3",
+     "title": "Continuous Delivery vs Continuous Deployment",
+     "stage": {
+      "w": 360,
+      "h": 640
+     },
+     "steps": [
+      {
+       "say": "Continuous Delivery keeps every successfully tested change in a releasable state.",
+       "actors": {
+        "z1": {
+         "k": "zone",
+         "text": "Continuous Delivery",
+         "x": 25,
+         "y": 48,
+         "w": 46,
+         "h": 84
+        },
+        "a1": {
+         "k": "box",
+         "text": "Tests pass",
+         "tone": "ok",
+         "x": 25,
+         "y": 22,
+         "w": 36
+        },
+        "a2": {
+         "k": "box",
+         "text": "Staging",
+         "tone": "ok",
+         "sub": "deployed",
+         "x": 25,
+         "y": 46,
+         "w": 36
+        },
+        "a3": {
+         "k": "box",
+         "text": "Production",
+         "tone": "dim",
+         "sub": "not yet",
+         "x": 25,
+         "y": 74,
+         "w": 36
+        }
+       },
+       "edges": [
+        [
+         "a1",
+         "a2"
+        ]
+       ]
+      },
+      {
+       "say": "The production release can still wait for a manual approval.",
+       "actors": {
+        "a3": {
+         "tone": "ok",
+         "sub": "released"
+        }
+       },
+       "edges": [
+        [
+         "a1",
+         "a2"
+        ],
+        [
+         "a2",
+         "a3",
+         "approval",
+         "ok"
+        ]
+       ]
+      },
+      {
+       "say": "Continuous Deployment skips the approval: changes that pass every required check go to production automatically.",
+       "actors": {
+        "z2": {
+         "k": "zone",
+         "text": "Continuous Deployment",
+         "x": 75,
+         "y": 48,
+         "w": 46,
+         "h": 84
+        },
+        "b1": {
+         "k": "box",
+         "text": "All checks pass",
+         "tone": "ok",
+         "x": 75,
+         "y": 22,
+         "w": 36
+        },
+        "b2": {
+         "k": "box",
+         "text": "Production",
+         "tone": "ok",
+         "sub": "auto-released",
+         "x": 75,
+         "y": 74,
+         "w": 36
+        }
+       },
+       "edges": [
+        [
+         "a1",
+         "a2"
+        ],
+        [
+         "a2",
+         "a3",
+         "approval",
+         "ok"
+        ],
+        [
+         "b1",
+         "b2",
+         "automatic",
+         "ok"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "01.4",
+     "title": "CI/CD Pipeline Stages",
+     "stage": {
+      "w": 360,
+      "h": 640
+     },
+     "steps": [
+      {
+       "say": "A pipeline moves code from source to a running environment. It starts with source, build and test.",
+       "actors": {
+        "s1": {
+         "k": "pill",
+         "text": "1 · Source",
+         "tone": "plain",
+         "sub": "",
+         "x": 50,
+         "y": 7
+        },
+        "s2": {
+         "k": "pill",
+         "text": "2 · Build",
+         "tone": "plain",
+         "sub": "",
+         "x": 50,
+         "y": 20
+        },
+        "s3": {
+         "k": "pill",
+         "text": "3 · Test",
+         "tone": "plain",
+         "sub": "",
+         "x": 50,
+         "y": 33
+        }
+       },
+       "edges": [
+        [
+         "s1",
+         "s2"
+        ],
+        [
+         "s2",
+         "s3"
+        ]
+       ]
+      },
+      {
+       "say": "Code-quality checks and packaging into an artifact or container image follow.",
+       "actors": {
+        "s4": {
+         "k": "pill",
+         "text": "4 · Quality",
+         "tone": "plain",
+         "sub": "",
+         "x": 50,
+         "y": 46
+        },
+        "s5": {
+         "k": "pill",
+         "text": "5 · Package",
+         "tone": "plain",
+         "sub": "",
+         "x": 50,
+         "y": 59
+        }
+       },
+       "edges": [
+        [
+         "s1",
+         "s2"
+        ],
+        [
+         "s2",
+         "s3"
+        ],
+        [
+         "s3",
+         "s4"
+        ],
+        [
+         "s4",
+         "s5"
+        ]
+       ]
+      },
+      {
+       "say": "Finally the application is deployed to a target environment and monitored for errors and performance.",
+       "actors": {
+        "s6": {
+         "k": "pill",
+         "text": "6 · Deploy",
+         "tone": "plain",
+         "sub": "",
+         "x": 50,
+         "y": 72
+        },
+        "s7": {
+         "k": "pill",
+         "text": "7 · Monitor",
+         "tone": "plain",
+         "sub": "",
+         "x": 50,
+         "y": 85
+        }
+       },
+       "edges": [
+        [
+         "s1",
+         "s2"
+        ],
+        [
+         "s2",
+         "s3"
+        ],
+        [
+         "s3",
+         "s4"
+        ],
+        [
+         "s4",
+         "s5"
+        ],
+        [
+         "s5",
+         "s6"
+        ],
+        [
+         "s6",
+         "s7"
+        ]
+       ]
+      },
+      {
+       "say": "Not every pipeline has exactly these stages: they depend on the technology stack and deployment needs.",
+       "actors": {
+        "n": {
+         "k": "pill",
+         "text": "Stages vary with the stack",
+         "tone": "soft",
+         "x": 50,
+         "y": 96
+        }
+       }
+      }
+     ]
+    },
+    {
+     "id": "01.5",
+     "title": "Build, Test and Deployment Workflows",
+     "stage": {
+      "w": 360,
+      "h": 640
+     },
+     "steps": [
+      {
+       "say": "A basic Node.js CI workflow runs three commands. First it installs the dependencies.",
+       "actors": {
+        "i": {
+         "k": "box",
+         "text": "npm install",
+         "tone": "brand",
+         "sub": "install dependencies",
+         "x": 50,
+         "y": 8,
+         "w": 54
+        },
+        "t": {
+         "k": "box",
+         "text": "npm test",
+         "tone": "plain",
+         "sub": "run automated tests",
+         "x": 50,
+         "y": 24,
+         "w": 54
+        },
+        "b": {
+         "k": "box",
+         "text": "npm run build",
+         "tone": "plain",
+         "sub": "build the application",
+         "x": 50,
+         "y": 40,
+         "w": 54
+        }
+       },
+       "edges": [
+        [
+         "i",
+         "t"
+        ],
+        [
+         "t",
+         "b"
+        ]
+       ],
+       "term": [
+        "$ npm install"
+       ]
+      },
+      {
+       "say": "npm test runs the automated tests.",
+       "actors": {
+        "i": {
+         "tone": "ok"
+        },
+        "t": {
+         "tone": "brand"
+        }
+       },
+       "edges": [
+        [
+         "i",
+         "t",
+         "",
+         "ok"
+        ],
+        [
+         "t",
+         "b"
+        ]
+       ],
+       "term": [
+        "$ npm test"
+       ]
+      },
+      {
+       "say": "npm run build builds the application, if a build script is configured.",
+       "actors": {
+        "t": {
+         "tone": "ok"
+        },
+        "b": {
+         "tone": "brand"
+        }
+       },
+       "edges": [
+        [
+         "i",
+         "t",
+         "",
+         "ok"
+        ],
+        [
+         "t",
+         "b",
+         "",
+         "ok"
+        ]
+       ],
+       "term": [
+        "$ npm run build"
+       ]
+      },
+      {
+       "say": "A deployment workflow can then publish the build to a hosting environment.",
+       "actors": {
+        "b": {
+         "tone": "ok"
+        },
+        "dp": {
+         "k": "box",
+         "text": "Hosting environment",
+         "tone": "soft",
+         "sub": "deployment workflow",
+         "x": 50,
+         "y": 56,
+         "w": 54
+        }
+       },
+       "edges": [
+        [
+         "i",
+         "t",
+         "",
+         "ok"
+        ],
+        [
+         "t",
+         "b",
+         "",
+         "ok"
+        ],
+        [
+         "b",
+         "dp",
+         "publish"
+        ]
+       ]
+      },
+      {
+       "say": "A green build alone does not mean production-ready: tests, security checks and runtime validation matter too.",
+       "actors": {
+        "wn": {
+         "k": "pill",
+         "text": "A green build is not enough",
+         "tone": "warn",
+         "ic": "!",
+         "x": 50,
+         "y": 76
+        }
+       },
+       "edges": [
+        [
+         "i",
+         "t",
+         "",
+         "ok"
+        ],
+        [
+         "t",
+         "b",
+         "",
+         "ok"
+        ],
+        [
+         "b",
+         "dp",
+         "publish"
+        ]
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "02",
+   "title": "Jenkins & Pipeline Automation",
+   "subtopics": [
+    {
+     "id": "02.1",
+     "title": "Introduction to Jenkins",
+     "stage": {
+      "w": 360,
+      "h": 640
+     },
+     "steps": [
+      {
+       "say": "Developers keep pushing changes. Someone must download, install, test and prepare each one, which is inefficient by hand.",
+       "actors": {
+        "dev": {
+         "k": "box",
+         "text": "Developers",
+         "tone": "plain",
+         "sub": "push code often",
+         "x": 50,
+         "y": 8,
+         "w": 44
+        },
+        "man": {
+         "k": "pill",
+         "text": "Done by hand every time",
+         "tone": "warn",
+         "ic": "!",
+         "x": 50,
+         "y": 28
+        }
+       }
+      },
+      {
+       "say": "Jenkins is an open-source automation server that runs builds, tests, code analysis, packaging and deployments.",
+       "actors": {
+        "man": null,
+        "jk": {
+         "k": "box",
+         "text": "Jenkins",
+         "tone": "brand",
+         "sub": "automation server",
+         "x": 50,
+         "y": 28,
+         "w": 50
+        },
+        "t1": {
+         "k": "pill",
+         "text": "builds",
+         "tone": "soft",
+         "x": 50,
+         "y": 46
+        },
+        "t2": {
+         "k": "pill",
+         "text": "tests",
+         "tone": "soft",
+         "x": 50,
+         "y": 54
+        },
+        "t3": {
+         "k": "pill",
+         "text": "code analysis",
+         "tone": "soft",
+         "x": 50,
+         "y": 62
+        },
+        "t4": {
+         "k": "pill",
+         "text": "packaging",
+         "tone": "soft",
+         "x": 50,
+         "y": 70
+        },
+        "t5": {
+         "k": "pill",
+         "text": "deployments",
+         "tone": "soft",
+         "x": 50,
+         "y": 78
+        }
+       },
+       "edges": [
+        [
+         "dev",
+         "jk"
+        ]
+       ]
+      },
+      {
+       "say": "A large plugin ecosystem connects Jenkins to Git, Docker, Kubernetes and SonarQube.",
+       "actors": {
+        "t1": null,
+        "t2": null,
+        "t3": null,
+        "t4": null,
+        "t5": null,
+        "jk": {
+         "sub": "plugin ecosystem"
+        },
+        "p1": {
+         "k": "pill",
+         "text": "Git",
+         "tone": "ok",
+         "x": 50,
+         "y": 48
+        },
+        "p2": {
+         "k": "pill",
+         "text": "Docker",
+         "tone": "ok",
+         "x": 50,
+         "y": 58
+        },
+        "p3": {
+         "k": "pill",
+         "text": "Kubernetes",
+         "tone": "ok",
+         "x": 50,
+         "y": 68
+        },
+        "p4": {
+         "k": "pill",
+         "text": "SonarQube",
+         "tone": "ok",
+         "x": 50,
+         "y": 78
+        }
+       },
+       "edges": [
+        [
+         "dev",
+         "jk"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "02.2",
+     "title": "Jenkins Architecture",
+     "stage": {
+      "w": 360,
+      "h": 640
+     },
+     "steps": [
+      {
+       "say": "Jenkins uses a controller-agent architecture. The controller coordinates: web UI, scheduling, configuration.",
+       "actors": {
+        "c": {
+         "k": "box",
+         "text": "Controller",
+         "tone": "brand",
+         "sub": "UI · schedules · config",
+         "x": 50,
+         "y": 9,
+         "w": 56
+        }
+       }
+      },
+      {
+       "say": "Agents are the machines that do the actual build and test work the controller assigns.",
+       "actors": {
+        "a1": {
+         "k": "box",
+         "text": "Agent 1",
+         "tone": "soft",
+         "sub": "Linux · Node.js",
+         "x": 26,
+         "y": 36,
+         "w": 40
+        },
+        "a2": {
+         "k": "box",
+         "text": "Agent 2",
+         "tone": "soft",
+         "sub": "Docker installed",
+         "x": 74,
+         "y": 36,
+         "w": 40
+        }
+       },
+       "edges": [
+        [
+         "c",
+         "a1",
+         "assigns"
+        ],
+        [
+         "c",
+         "a2",
+         "assigns"
+        ]
+       ]
+      },
+      {
+       "say": "A Docker image build is sent to the agent that has Docker installed.",
+       "actors": {
+        "a2": {
+         "tone": "ok"
+        }
+       },
+       "edges": [
+        [
+         "c",
+         "a1"
+        ],
+        [
+         "c",
+         "a2",
+         "build image",
+         "ok"
+        ]
+       ]
+      },
+      {
+       "say": "Key terms: a job is a configured task, a build is one run, a plugin adds features, a workspace holds the checked-out code.",
+       "actors": {
+        "t1": {
+         "k": "pill",
+         "text": "Job: a configured task",
+         "tone": "soft",
+         "x": 50,
+         "y": 62
+        },
+        "t2": {
+         "k": "pill",
+         "text": "Build: one run of a job",
+         "tone": "soft",
+         "x": 50,
+         "y": 70
+        },
+        "t3": {
+         "k": "pill",
+         "text": "Plugin: adds features",
+         "tone": "soft",
+         "x": 50,
+         "y": 78
+        },
+        "t4": {
+         "k": "pill",
+         "text": "Workspace: code checkout dir",
+         "tone": "soft",
+         "x": 50,
+         "y": 86
+        }
+       },
+       "edges": [
+        [
+         "c",
+         "a1"
+        ],
+        [
+         "c",
+         "a2",
+         "build image",
+         "ok"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "02.3",
+     "title": "Install and Configure Jenkins",
+     "stage": {
+      "w": 360,
+      "h": 640
+     },
+     "steps": [
+      {
+       "say": "Jenkins needs a compatible Java runtime, so check Java first.",
+       "actors": {
+        "j": {
+         "k": "box",
+         "text": "Java runtime",
+         "tone": "ok",
+         "sub": "java -version",
+         "x": 50,
+         "y": 16,
+         "w": 50
+        }
+       },
+       "term": [
+        "$ java -version",
+        "openjdk version \"17.0.12\""
+       ]
+      },
+      {
+       "say": "Jenkins can also run in Docker: the web UI is mapped to port 8080 and its data is kept in a volume.",
+       "actors": {
+        "j": null,
+        "pn": {
+         "k": "code",
+         "title": "docker run",
+         "lines": [
+          "docker run -d \\",
+          "  --name jenkins \\",
+          "  -p 8080:8080 -p 50000:50000 \\",
+          "  -v jenkins_home:/var/jenkins_home \\",
+          "  jenkins/jenkins:lts"
+         ],
+         "x": 50,
+         "y": 16,
+         "w": 94
+        },
+        "pt": {
+         "k": "pill",
+         "text": "port 8080 · web UI",
+         "tone": "soft",
+         "x": 50,
+         "y": 33
+        },
+        "ct": {
+         "k": "box",
+         "text": "Jenkins",
+         "tone": "brand",
+         "sub": "container",
+         "x": 50,
+         "y": 50,
+         "w": 50
+        },
+        "v": {
+         "k": "vol",
+         "text": "jenkins_home",
+         "sub": "Docker volume",
+         "tone": "soft",
+         "x": 50,
+         "y": 80,
+         "w": 34
+        }
+       },
+       "edges": [
+        [
+         "ct",
+         "v",
+         "data"
+        ]
+       ],
+       "clear": true,
+       "term": [
+        "$ docker run -d --name jenkins -p 8080:8080 \\",
+        "  -p 50000:50000 -v jenkins_home:/var/jenkins_home jenkins/jenkins:lts"
+       ]
+      },
+      {
+       "say": "Open http://localhost:8080 and complete the setup wizard.",
+       "actors": {
+        "pn": null,
+        "pt": null,
+        "ct": null,
+        "v": null,
+        "url": {
+         "k": "pill",
+         "text": "http://localhost:8080",
+         "tone": "soft",
+         "x": 50,
+         "y": 8
+        },
+        "w1": {
+         "k": "box",
+         "text": "Unlock with the admin password",
+         "tone": "brand",
+         "x": 50,
+         "y": 24,
+         "w": 70
+        },
+        "w2": {
+         "k": "box",
+         "text": "Install suggested plugins",
+         "tone": "plain",
+         "x": 50,
+         "y": 42,
+         "w": 70
+        },
+        "w3": {
+         "k": "box",
+         "text": "Create the admin account",
+         "tone": "plain",
+         "x": 50,
+         "y": 60,
+         "w": 70
+        }
+       },
+       "edges": [
+        [
+         "w1",
+         "w2"
+        ],
+        [
+         "w2",
+         "w3"
+        ]
+       ]
+      },
+      {
+       "say": "Once the wizard is finished, Jenkins is ready to create jobs.",
+       "actors": {
+        "w1": {
+         "tone": "ok"
+        },
+        "w2": {
+         "tone": "ok"
+        },
+        "w3": {
+         "tone": "ok"
+        },
+        "rd": {
+         "k": "pill",
+         "text": "Jenkins is ready",
+         "tone": "ok",
+         "ic": "✓",
+         "x": 50,
+         "y": 78
+        }
+       },
+       "edges": [
+        [
+         "w1",
+         "w2",
+         "",
+         "ok"
+        ],
+        [
+         "w2",
+         "w3",
+         "",
+         "ok"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "02.4",
+     "title": "Jenkins Jobs and Build Triggers",
+     "stage": {
+      "w": 360,
+      "h": 640
+     },
+     "steps": [
+      {
+       "say": "A Jenkins job defines an automation task, for example a Freestyle Project.",
+       "actors": {
+        "job": {
+         "k": "box",
+         "text": "Freestyle job",
+         "tone": "brand",
+         "sub": "automation task",
+         "x": 50,
+         "y": 8,
+         "w": 56
+        },
+        "k1": {
+         "k": "pill",
+         "text": "Get code from GitHub",
+         "tone": "soft",
+         "x": 50,
+         "y": 30
+        },
+        "k2": {
+         "k": "pill",
+         "text": "Run shell commands",
+         "tone": "soft",
+         "x": 50,
+         "y": 38
+        },
+        "k3": {
+         "k": "pill",
+         "text": "Run tests",
+         "tone": "soft",
+         "x": 50,
+         "y": 46
+        },
+        "k4": {
+         "k": "pill",
+         "text": "Archive artifacts",
+         "tone": "soft",
+         "x": 50,
+         "y": 54
+        }
+       },
+       "edges": []
+      },
+      {
+       "say": "Build triggers decide when a job runs. Manual: a developer starts it from Jenkins.",
+       "actors": {
+        "k1": null,
+        "k2": null,
+        "k3": null,
+        "k4": null,
+        "tr1": {
+         "k": "box",
+         "text": "Manual",
+         "tone": "brand",
+         "sub": "developer starts it",
+         "x": 50,
+         "y": 26,
+         "w": 56
+        },
+        "tr2": {
+         "k": "box",
+         "text": "Poll SCM",
+         "tone": "soft",
+         "sub": "checks for changes",
+         "x": 50,
+         "y": 44,
+         "w": 56
+        },
+        "tr3": {
+         "k": "box",
+         "text": "Webhook",
+         "tone": "soft",
+         "sub": "GitHub notifies Jenkins",
+         "x": 50,
+         "y": 62,
+         "w": 56
+        },
+        "tr4": {
+         "k": "box",
+         "text": "Schedule",
+         "tone": "soft",
+         "sub": "runs on a timetable",
+         "x": 50,
+         "y": 80,
+         "w": 56
+        }
+       },
+       "edges": []
+      },
+      {
+       "say": "Poll SCM checks the repository periodically. A webhook is event-driven: GitHub tells Jenkins immediately.",
+       "actors": {
+        "tr1": {
+         "tone": "soft"
+        },
+        "tr2": {
+         "tone": "brand"
+        },
+        "tr3": {
+         "tone": "ok"
+        }
+       },
+       "edges": []
+      },
+      {
+       "say": "A GitHub webhook is the usual choice: Jenkins starts as soon as someone pushes code or opens a pull request.",
+       "actors": {
+        "tr2": {
+         "tone": "soft"
+        },
+        "tr3": {
+         "tone": "ok"
+        },
+        "ok": {
+         "k": "pill",
+         "text": "Push starts the job instantly",
+         "tone": "ok",
+         "ic": "⚡",
+         "x": 50,
+         "y": 94
+        }
+       },
+       "edges": []
+      }
+     ]
+    },
+    {
+     "id": "02.5",
+     "title": "Create Your First Jenkins Pipeline",
+     "stage": {
+      "w": 360,
+      "h": 640
+     },
+     "steps": [
+      {
+       "say": "A pipeline defines a sequence of automated stages. Create a file named Jenkinsfile in the repository.",
+       "actors": {
+        "f": {
+         "k": "file",
+         "text": "Jenkinsfile",
+         "tone": "brand",
+         "sub": "in the repo",
+         "x": 50,
+         "y": 8,
+         "w": 40
+        },
+        "p": {
+         "k": "code",
+         "title": "Jenkinsfile",
+         "lines": [
+          "pipeline {",
+          "  agent any",
+          "  stages { /* 4 stages */ }",
+          "}"
+         ],
+         "x": 50,
+         "y": 25,
+         "w": 94
+        }
+       }
+      },
+      {
+       "say": "This pipeline has four stages: checkout, install dependencies, run tests and build the application.",
+       "actors": {
+        "s1": {
+         "k": "box",
+         "text": "Checkout",
+         "tone": "plain",
+         "sub": "checkout scm",
+         "x": 50,
+         "y": 44,
+         "w": 60
+        },
+        "s2": {
+         "k": "box",
+         "text": "Install Dependencies",
+         "tone": "plain",
+         "sub": "sh 'npm install'",
+         "x": 50,
+         "y": 58,
+         "w": 60
+        },
+        "s3": {
+         "k": "box",
+         "text": "Run Tests",
+         "tone": "plain",
+         "sub": "sh 'npm test'",
+         "x": 50,
+         "y": 72,
+         "w": 60
+        },
+        "s4": {
+         "k": "box",
+         "text": "Build Application",
+         "tone": "plain",
+         "sub": "sh 'npm run build'",
+         "x": 50,
+         "y": 86,
+         "w": 60
+        }
+       },
+       "edges": [
+        [
+         "s1",
+         "s2"
+        ],
+        [
+         "s2",
+         "s3"
+        ],
+        [
+         "s3",
+         "s4"
+        ]
+       ]
+      },
+      {
+       "say": "Jenkins executes the stages in sequence.",
+       "actors": {
+        "s1": {
+         "tone": "ok"
+        },
+        "s2": {
+         "tone": "ok"
+        },
+        "s3": {
+         "tone": "brand"
+        }
+       },
+       "edges": [
+        [
+         "s1",
+         "s2",
+         "",
+         "ok"
+        ],
+        [
+         "s2",
+         "s3",
+         "",
+         "ok"
+        ],
+        [
+         "s3",
+         "s4",
+         "",
+         "ok"
+        ]
+       ]
+      },
+      {
+       "say": "If a stage fails, the later stages are normally skipped.",
+       "actors": {
+        "s3": {
+         "tone": "bad",
+         "sub": "tests failed"
+        },
+        "s4": {
+         "tone": "dim",
+         "sub": "skipped"
+        }
+       },
+       "edges": [
+        [
+         "s1",
+         "s2",
+         "",
+         "ok"
+        ],
+        [
+         "s2",
+         "s3",
+         "",
+         "ok"
+        ],
+        [
+         "s3",
+         "s4",
+         "",
+         "warn"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "02.6",
+     "title": "Declarative Pipelines and Jenkinsfiles",
+     "stage": {
+      "w": 360,
+      "h": 640
+     },
+     "steps": [
+      {
+       "say": "A Jenkinsfile stores the pipeline as code inside the application repository.",
+       "actors": {
+        "repo": {
+         "k": "box",
+         "text": "Application repository",
+         "tone": "soft",
+         "sub": "app code + pipeline",
+         "x": 50,
+         "y": 16,
+         "w": 64
+        },
+        "f": {
+         "k": "file",
+         "text": "Jenkinsfile",
+         "tone": "brand",
+         "sub": "pipeline as code",
+         "x": 50,
+         "y": 44,
+         "w": 34
+        }
+       },
+       "edges": [
+        [
+         "repo",
+         "f",
+         "versioned",
+         "ok"
+        ]
+       ]
+      },
+      {
+       "say": "Declarative Pipeline gives a structured syntax. Each element has a clear job.",
+       "actors": {
+        "repo": null,
+        "f": null,
+        "p": {
+         "k": "code",
+         "title": "Jenkinsfile",
+         "lines": [
+          "pipeline {",
+          "  agent any",
+          "  environment {",
+          "    APP_ENV = 'development'",
+          "  }",
+          "  stages {",
+          "    stage('Build') { steps { … } }",
+          "  }",
+          "  post {",
+          "    success { echo 'passed' }",
+          "    failure { echo 'failed' }",
+          "  }",
+          "}"
+         ],
+         "x": 50,
+         "y": 22,
+         "w": 94
+        },
+        "l1": {
+         "k": "pill",
+         "text": "pipeline: the whole pipeline",
+         "tone": "soft",
+         "x": 50,
+         "y": 50
+        },
+        "l2": {
+         "k": "pill",
+         "text": "agent: where it runs",
+         "tone": "soft",
+         "x": 50,
+         "y": 58
+        },
+        "l3": {
+         "k": "pill",
+         "text": "stages / stage: the work",
+         "tone": "soft",
+         "x": 50,
+         "y": 66
+        },
+        "l4": {
+         "k": "pill",
+         "text": "steps: commands in a stage",
+         "tone": "soft",
+         "x": 50,
+         "y": 74
+        },
+        "l5": {
+         "k": "pill",
+         "text": "environment: variables",
+         "tone": "soft",
+         "x": 50,
+         "y": 82
+        },
+        "l6": {
+         "k": "pill",
+         "text": "post: runs after the pipeline",
+         "tone": "soft",
+         "x": 50,
+         "y": 90
+        }
+       }
+      },
+      {
+       "say": "environment defines variables, and post runs success or failure actions after execution.",
+       "actors": {
+        "p": {
+         "lines": [
+          "pipeline {",
+          "  agent any",
+          [
+           "  environment {",
+           "hl"
+          ],
+          [
+           "    APP_ENV = 'development'",
+           "hl"
+          ],
+          [
+           "  }",
+           "hl"
+          ],
+          "  stages {",
+          "    stage('Build') { steps { … } }",
+          "  }",
+          [
+           "  post {",
+           "hl"
+          ],
+          [
+           "    success { echo 'passed' }",
+           "hl"
+          ],
+          [
+           "    failure { echo 'failed' }",
+           "hl"
+          ],
+          [
+           "  }",
+           "hl"
+          ],
+          "}"
+         ]
+        },
+        "l5": {
+         "tone": "ok"
+        },
+        "l6": {
+         "tone": "ok"
+        }
+       }
+      },
+      {
+       "say": "Keeping the Jenkinsfile in Git lets pipeline changes be reviewed and versioned together with the application code.",
+       "actors": {
+        "ok": {
+         "k": "pill",
+         "text": "Reviewed and versioned in Git",
+         "tone": "ok",
+         "ic": "✓",
+         "x": 50,
+         "y": 97
+        }
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "03",
+   "title": "GitHub Actions",
+   "subtopics": [
+    {
+     "id": "03.1",
+     "title": "Introduction to GitHub Actions",
+     "stage": {
+      "w": 360,
+      "h": 560
+     },
+     "steps": [
+      {
+       "say": "A team keeps a React frontend and a Node.js backend on GitHub and wants tests to run on every push.",
+       "actors": {
+        "fe": {
+         "k": "box",
+         "text": "React frontend",
+         "tone": "soft",
+         "x": 25,
+         "y": 8,
+         "w": 40
+        },
+        "be": {
+         "k": "box",
+         "text": "Node.js backend",
+         "tone": "soft",
+         "x": 75,
+         "y": 8,
+         "w": 40
+        },
+        "gh": {
+         "k": "box",
+         "text": "GitHub repository",
+         "tone": "brand",
+         "x": 50,
+         "y": 30,
+         "w": 56
+        }
+       },
+       "edges": [
+        [
+         "fe",
+         "gh"
+        ],
+        [
+         "be",
+         "gh"
+        ]
+       ]
+      },
+      {
+       "say": "GitHub Actions is an automation platform built into GitHub. Workflows run in response to repository events.",
+       "actors": {
+        "gha": {
+         "k": "box",
+         "text": "GitHub Actions",
+         "tone": "ok",
+         "sub": "built into GitHub",
+         "x": 50,
+         "y": 52,
+         "w": 50
+        }
+       },
+       "edges": [
+        [
+         "fe",
+         "gh"
+        ],
+        [
+         "be",
+         "gh"
+        ],
+        [
+         "gh",
+         "gha",
+         "events",
+         "ok"
+        ]
+       ]
+      },
+      {
+       "say": "Unlike Jenkins, there is no separate server to install. It can test, build, scan, publish images and deploy.",
+       "actors": {
+        "jk": {
+         "k": "box",
+         "text": "Jenkins",
+         "tone": "plain",
+         "sub": "separate server you manage",
+         "x": 50,
+         "y": 74,
+         "w": 56
+        },
+        "wh": {
+         "k": "pill",
+         "text": "Test · build · scan · publish · deploy",
+         "tone": "ok",
+         "ic": "✓",
+         "x": 50,
+         "y": 92
+        }
+       },
+       "edges": [
+        [
+         "fe",
+         "gh"
+        ],
+        [
+         "be",
+         "gh"
+        ],
+        [
+         "gh",
+         "gha",
+         "events",
+         "ok"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "03.2",
+     "title": "Workflows, Events and Triggers",
+     "stage": {
+      "w": 360,
+      "h": 640
+     },
+     "steps": [
+      {
+       "say": "A workflow is a YAML file stored in .github/workflows/.",
+       "actors": {
+        "d1": {
+         "k": "box",
+         "text": ".github/workflows/",
+         "tone": "soft",
+         "x": 50,
+         "y": 8,
+         "w": 60
+        },
+        "f1": {
+         "k": "file",
+         "text": "ci.yml",
+         "tone": "brand",
+         "x": 28,
+         "y": 24,
+         "w": 30
+        },
+        "f2": {
+         "k": "file",
+         "text": "deploy.yml",
+         "tone": "plain",
+         "x": 72,
+         "y": 24,
+         "w": 34
+        }
+       },
+       "edges": [
+        [
+         "d1",
+         "f1"
+        ],
+        [
+         "d1",
+         "f2"
+        ]
+       ]
+      },
+      {
+       "say": "An event decides when a workflow runs: push, pull_request, workflow_dispatch or schedule.",
+       "actors": {
+        "e1": {
+         "k": "box",
+         "text": "push",
+         "tone": "soft",
+         "sub": "commits pushed",
+         "x": 50,
+         "y": 44,
+         "w": 56
+        },
+        "e2": {
+         "k": "box",
+         "text": "pull_request",
+         "tone": "soft",
+         "sub": "pull request event",
+         "x": 50,
+         "y": 58,
+         "w": 56
+        },
+        "e3": {
+         "k": "box",
+         "text": "workflow_dispatch",
+         "tone": "soft",
+         "sub": "manual start",
+         "x": 50,
+         "y": 72,
+         "w": 56
+        },
+        "e4": {
+         "k": "box",
+         "text": "schedule",
+         "tone": "soft",
+         "sub": "runs on a timetable",
+         "x": 50,
+         "y": 86,
+         "w": 56
+        }
+       },
+       "edges": []
+      },
+      {
+       "say": "This workflow runs on pushes to main, on pull requests that target main, and on manual starts.",
+       "actors": {
+        "d1": null,
+        "f1": null,
+        "f2": null,
+        "p": {
+         "k": "code",
+         "title": "ci.yml",
+         "lines": [
+          "on:",
+          "  push:",
+          "    branches: [main]",
+          "  pull_request:",
+          "    branches: [main]",
+          "  workflow_dispatch:"
+         ],
+         "x": 50,
+         "y": 22,
+         "w": 94
+        },
+        "e1": {
+         "tone": "ok"
+        },
+        "e2": {
+         "tone": "ok"
+        },
+        "e3": {
+         "tone": "ok"
+        },
+        "e4": {
+         "tone": "dim",
+         "sub": "not used here"
+        }
+       },
+       "edges": []
+      }
+     ]
+    },
+    {
+     "id": "03.3",
+     "title": "Jobs, Steps and Runners",
+     "stage": {
+      "w": 360,
+      "h": 640
+     },
+     "steps": [
+      {
+       "say": "A workflow contains jobs, and a job contains steps that run commands or reusable actions.",
+       "actors": {
+        "wf": {
+         "k": "zone",
+         "text": "Workflow",
+         "x": 50,
+         "y": 50,
+         "w": 94,
+         "h": 94
+        },
+        "jt": {
+         "k": "box",
+         "text": "test",
+         "tone": "brand",
+         "sub": "job",
+         "x": 50,
+         "y": 11,
+         "w": 56
+        },
+        "jb": {
+         "k": "box",
+         "text": "build",
+         "tone": "brand",
+         "sub": "job",
+         "x": 50,
+         "y": 40,
+         "w": 56
+        },
+        "s1": {
+         "k": "pill",
+         "text": "Run Tests · npm test",
+         "tone": "soft",
+         "x": 50,
+         "y": 21
+        },
+        "s2": {
+         "k": "pill",
+         "text": "Build · npm run build",
+         "tone": "soft",
+         "x": 50,
+         "y": 50
+        }
+       },
+       "edges": []
+      },
+      {
+       "say": "A runner is the machine that executes a job. Here both jobs run on ubuntu-latest.",
+       "actors": {
+        "r1": {
+         "k": "pill",
+         "text": "runs-on: ubuntu-latest",
+         "tone": "ok",
+         "x": 50,
+         "y": 29
+        },
+        "r2": {
+         "k": "pill",
+         "text": "runs-on: ubuntu-latest",
+         "tone": "ok",
+         "x": 50,
+         "y": 58
+        }
+       },
+       "edges": []
+      },
+      {
+       "say": "By default independent jobs run in parallel.",
+       "actors": {
+        "pa": {
+         "k": "pill",
+         "text": "Independent jobs run in parallel",
+         "tone": "soft",
+         "x": 50,
+         "y": 78
+        }
+       },
+       "edges": []
+      },
+      {
+       "say": "needs makes a job wait: with needs: test, build starts only after test succeeds.",
+       "actors": {
+        "jb": {
+         "sub": "job · needs: test"
+        },
+        "pa": {
+         "text": "needs: test → build waits",
+         "tone": "ok"
+        }
+       },
+       "edges": []
+      }
+     ]
+    },
+    {
+     "id": "03.4",
+     "title": "GitHub Actions YAML Syntax",
+     "stage": {
+      "w": 360,
+      "h": 640
+     },
+     "steps": [
+      {
+       "say": "A workflow is plain YAML: a name, the events, and jobs with steps.",
+       "actors": {
+        "p": {
+         "k": "code",
+         "title": "ci.yml",
+         "lines": [
+          "name: Node.js CI",
+          "on:",
+          "  push:",
+          "    branches: [main]",
+          "jobs:",
+          "  build:",
+          "    runs-on: ubuntu-latest",
+          "    steps:",
+          "      - uses: actions/checkout@v4",
+          "      - uses: actions/setup-node@v4",
+          "        with:",
+          "          node-version: 22",
+          "      - run: npm ci",
+          "      - run: npm test",
+          "      - run: npm run build"
+         ],
+         "x": 50,
+         "y": 29,
+         "w": 94
+        },
+        "l1": {
+         "k": "pill",
+         "text": "uses → run a reusable action",
+         "tone": "soft",
+         "x": 50,
+         "y": 64
+        },
+        "l2": {
+         "k": "pill",
+         "text": "run → run a shell command",
+         "tone": "soft",
+         "x": 50,
+         "y": 73
+        },
+        "l3": {
+         "k": "pill",
+         "text": "with → give inputs to an action",
+         "tone": "soft",
+         "x": 50,
+         "y": 82
+        }
+       }
+      },
+      {
+       "say": "uses executes a reusable GitHub Action: here checkout and setup-node.",
+       "actors": {
+        "p": {
+         "lines": [
+          "name: Node.js CI",
+          "on:",
+          "  push:",
+          "    branches: [main]",
+          "jobs:",
+          "  build:",
+          "    runs-on: ubuntu-latest",
+          "    steps:",
+          [
+           "      - uses: actions/checkout@v4",
+           "hl"
+          ],
+          [
+           "      - uses: actions/setup-node@v4",
+           "hl"
+          ],
+          "        with:",
+          "          node-version: 22",
+          "      - run: npm ci",
+          "      - run: npm test",
+          "      - run: npm run build"
+         ]
+        },
+        "l1": {
+         "tone": "ok"
+        }
+       }
+      },
+      {
+       "say": "run executes a shell command: install, test and build.",
+       "actors": {
+        "p": {
+         "lines": [
+          "name: Node.js CI",
+          "on:",
+          "  push:",
+          "    branches: [main]",
+          "jobs:",
+          "  build:",
+          "    runs-on: ubuntu-latest",
+          "    steps:",
+          "      - uses: actions/checkout@v4",
+          "      - uses: actions/setup-node@v4",
+          "        with:",
+          "          node-version: 22",
+          [
+           "      - run: npm ci",
+           "hl"
+          ],
+          [
+           "      - run: npm test",
+           "hl"
+          ],
+          [
+           "      - run: npm run build",
+           "hl"
+          ]
+         ]
+        },
+        "l1": {
+         "tone": "soft"
+        },
+        "l2": {
+         "tone": "ok"
+        }
+       }
+      },
+      {
+       "say": "with supplies inputs to an action. Choose the Node.js version to match your application.",
+       "actors": {
+        "p": {
+         "lines": [
+          "name: Node.js CI",
+          "on:",
+          "  push:",
+          "    branches: [main]",
+          "jobs:",
+          "  build:",
+          "    runs-on: ubuntu-latest",
+          "    steps:",
+          "      - uses: actions/checkout@v4",
+          "      - uses: actions/setup-node@v4",
+          [
+           "        with:",
+           "hl"
+          ],
+          [
+           "          node-version: 22",
+           "hl"
+          ],
+          "      - run: npm ci",
+          "      - run: npm test",
+          "      - run: npm run build"
+         ]
+        },
+        "l2": {
+         "tone": "soft"
+        },
+        "l3": {
+         "tone": "ok"
+        }
+       }
+      }
+     ]
+    },
+    {
+     "id": "03.5",
+     "title": "Secrets and Environment Variables",
+     "stage": {
+      "w": 360,
+      "h": 640
+     },
+     "steps": [
+      {
+       "say": "Workflows need configuration such as API endpoints. An env block avoids hardcoding values in every step.",
+       "actors": {
+        "p": {
+         "k": "code",
+         "title": "ci.yml",
+         "lines": [
+          "jobs:",
+          "  build:",
+          "    env:",
+          "      NODE_ENV: production",
+          "    steps:",
+          "      - run: echo \"Env is $NODE_ENV\""
+         ],
+         "x": 50,
+         "y": 22,
+         "w": 94
+        },
+        "vr": {
+         "k": "vol",
+         "text": "NODE_ENV",
+         "sub": "production",
+         "tone": "soft",
+         "x": 25,
+         "y": 52,
+         "w": 30
+        }
+       }
+      },
+      {
+       "say": "Sensitive values belong in GitHub Actions Secrets, never written directly into workflow files.",
+       "actors": {
+        "p": {
+         "title": "deploy step",
+         "lines": [
+          "steps:",
+          "  - name: Deploy Application",
+          "    run: ./deploy.sh",
+          "    env:",
+          "      DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}"
+         ]
+        },
+        "sc": {
+         "k": "box",
+         "text": "Repository secrets",
+         "tone": "brand",
+         "sub": "DEPLOY_TOKEN",
+         "x": 70,
+         "y": 56,
+         "w": 52
+        }
+       },
+       "edges": [
+        [
+         "sc",
+         "p",
+         "",
+         "ok"
+        ]
+       ]
+      },
+      {
+       "say": "Create the secret in repository or organization settings first, and never print it in workflow logs.",
+       "actors": {
+        "sc": {
+         "sub": "Settings → Secrets"
+        },
+        "w": {
+         "k": "pill",
+         "text": "Never print secrets in logs",
+         "tone": "bad",
+         "ic": "✋",
+         "x": 50,
+         "y": 80
+        }
+       },
+       "edges": [
+        [
+         "sc",
+         "p",
+         "",
+         "ok"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "03.6",
+     "title": "Artifacts and Workflow Execution",
+     "stage": {
+      "w": 360,
+      "h": 640
+     },
+     "steps": [
+      {
+       "say": "A workflow can produce files that must outlive the job, such as a React production build in dist/.",
+       "actors": {
+        "job": {
+         "k": "box",
+         "text": "build job",
+         "tone": "soft",
+         "sub": "npm run build",
+         "x": 50,
+         "y": 8,
+         "w": 50
+        },
+        "dist": {
+         "k": "file",
+         "text": "dist/",
+         "tone": "ok",
+         "sub": "build output",
+         "x": 50,
+         "y": 24,
+         "w": 32
+        }
+       },
+       "edges": [
+        [
+         "job",
+         "dist"
+        ]
+       ]
+      },
+      {
+       "say": "actions/upload-artifact stores the folder so another job, or you, can download it after the job ends.",
+       "actors": {
+        "art": {
+         "k": "box",
+         "text": "frontend-build",
+         "tone": "brand",
+         "sub": "workflow artifact",
+         "x": 50,
+         "y": 40,
+         "w": 56
+        },
+        "p": {
+         "k": "code",
+         "title": "upload step",
+         "lines": [
+          "- name: Upload Build Artifact",
+          "  uses: actions/upload-artifact@v4",
+          "  with:",
+          "    name: frontend-build",
+          "    path: dist/"
+         ],
+         "x": 50,
+         "y": 70,
+         "w": 94
+        }
+       },
+       "edges": [
+        [
+         "job",
+         "dist"
+        ],
+        [
+         "dist",
+         "art",
+         "upload",
+         "ok"
+        ]
+       ]
+      },
+      {
+       "say": "To follow a run: open the Actions tab, select the workflow, open a run and inspect each step log.",
+       "actors": {
+        "p": {
+         "title": "Inspect a run",
+         "lines": [
+          "1  push the workflow file",
+          "2  open the Actions tab",
+          "3  select the workflow",
+          "4  open a workflow run",
+          "5  inspect job and step logs",
+          "6  investigate any failed step"
+         ]
+        }
+       },
+       "edges": [
+        [
+         "job",
+         "dist"
+        ],
+        [
+         "dist",
+         "art",
+         "upload",
+         "ok"
+        ]
+       ]
+      },
+      {
+       "say": "Logs reveal dependency problems, test failures, configuration mistakes and build errors.",
+       "actors": {
+        "p": null,
+        "ok": {
+         "k": "pill",
+         "text": "Logs show why a step failed",
+         "tone": "ok",
+         "ic": "✓",
+         "x": 50,
+         "y": 80
+        }
+       },
+       "edges": [
+        [
+         "job",
+         "dist"
+        ],
+        [
+         "dist",
+         "art",
+         "upload",
+         "ok"
+        ]
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "04",
+   "title": "Automated Testing & Code Quality",
+   "subtopics": [
+    {
+     "id": "04.1",
+     "title": "Why Is Automated Testing Important?",
+     "stage": {
+      "w": 360,
+      "h": 560
+     },
+     "steps": [
+      {
+       "say": "A developer changes the authentication endpoint of an application.",
+       "actors": {
+        "dev": {
+         "k": "box",
+         "text": "Developer",
+         "tone": "plain",
+         "x": 50,
+         "y": 8,
+         "w": 40
+        },
+        "ch": {
+         "k": "box",
+         "text": "Auth change",
+         "tone": "soft",
+         "x": 50,
+         "y": 28,
+         "w": 44
+        }
+       },
+       "edges": [
+        [
+         "dev",
+         "ch",
+         "commits"
+        ]
+       ]
+      },
+      {
+       "say": "Login still works, but the change accidentally breaks registration.",
+       "actors": {
+        "lg": {
+         "k": "box",
+         "text": "/login",
+         "tone": "ok",
+         "sub": "works",
+         "x": 26,
+         "y": 54,
+         "w": 38
+        },
+        "rg": {
+         "k": "box",
+         "text": "/register",
+         "tone": "bad",
+         "sub": "broken",
+         "x": 74,
+         "y": 54,
+         "w": 38
+        }
+       },
+       "edges": [
+        [
+         "dev",
+         "ch"
+        ],
+        [
+         "ch",
+         "lg",
+         "",
+         "ok"
+        ],
+        [
+         "ch",
+         "rg",
+         "",
+         "warn"
+        ]
+       ]
+      },
+      {
+       "say": "If only login is tested by hand, the registration bug stays hidden until users hit it.",
+       "actors": {
+        "man": {
+         "k": "pill",
+         "text": "Only login was tested",
+         "tone": "warn",
+         "ic": "!",
+         "x": 50,
+         "y": 74
+        }
+       },
+       "edges": [
+        [
+         "dev",
+         "ch"
+        ],
+        [
+         "ch",
+         "lg",
+         "",
+         "ok"
+        ],
+        [
+         "ch",
+         "rg",
+         "",
+         "warn"
+        ]
+       ]
+      },
+      {
+       "say": "Automated tests run on every change, so the pipeline catches the problem before it is merged.",
+       "actors": {
+        "man": null,
+        "ch": {
+         "tone": "bad",
+         "sub": "blocked"
+        },
+        "ok": {
+         "k": "pill",
+         "text": "Tests fail: merge blocked",
+         "tone": "ok",
+         "ic": "✓",
+         "x": 50,
+         "y": 74
+        }
+       },
+       "edges": [
+        [
+         "dev",
+         "ch"
+        ],
+        [
+         "ch",
+         "lg",
+         "",
+         "ok"
+        ],
+        [
+         "ch",
+         "rg",
+         "",
+         "warn"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "04.2",
+     "title": "Unit Testing",
+     "stage": {
+      "w": 360,
+      "h": 640
+     },
+     "steps": [
+      {
+       "say": "A unit test checks one function on its own. Here is a function that calculates an order total.",
+       "actors": {
+        "fn": {
+         "k": "code",
+         "title": "calculateTotal.js",
+         "lines": [
+          "function calculateTotal(price, qty) {",
+          "    return price * qty;",
+          "}",
+          "module.exports = calculateTotal;"
+         ],
+         "x": 50,
+         "y": 14,
+         "w": 94
+        },
+        "nt": {
+         "k": "pill",
+         "text": "Unit = one function, tested alone",
+         "tone": "soft",
+         "x": 50,
+         "y": 90
+        }
+       }
+      },
+      {
+       "say": "A Jest test calls the function and states the expected result.",
+       "actors": {
+        "ts": {
+         "k": "code",
+         "title": "calculateTotal.test.js",
+         "lines": [
+          "const calc = require('./calculateTotal');",
+          "test('calculates the order total', () => {",
+          "    expect(calc(100, 3)).toBe(300);",
+          "});"
+         ],
+         "x": 50,
+         "y": 40,
+         "w": 94
+        }
+       },
+       "edges": [
+        [
+         "ts",
+         "fn",
+         "calls",
+         "dash"
+        ]
+       ]
+      },
+      {
+       "say": "The test passes. Unit tests should be small, focused and quick to run.",
+       "actors": {
+        "ts": {
+         "lines": [
+          "const calc = require('./calculateTotal');",
+          "test('calculates the order total', () => {",
+          [
+           "    expect(calc(100, 3)).toBe(300);",
+           "add"
+          ],
+          "});"
+         ]
+        },
+        "res": {
+         "k": "box",
+         "text": "PASS",
+         "tone": "ok",
+         "sub": "calculates the order total",
+         "x": 50,
+         "y": 66,
+         "w": 60
+        }
+       },
+       "edges": [
+        [
+         "ts",
+         "fn",
+         "calls",
+         "ok"
+        ]
+       ],
+       "term": [
+        "$ npx jest",
+        "PASS  ./calculateTotal.test.js",
+        "+✓ calculates the order total"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "04.3",
+     "title": "Integration and End-to-End Testing",
+     "stage": {
+      "w": 360,
+      "h": 640
+     },
+     "steps": [
+      {
+       "say": "Integration tests check that several components work together: route, controller, hashing service and database.",
+       "actors": {
+        "z": {
+         "k": "zone",
+         "text": "Integration test",
+         "x": 50,
+         "y": 24,
+         "w": 92,
+         "h": 40
+        },
+        "c1": {
+         "k": "pill",
+         "text": "Express route",
+         "tone": "soft",
+         "x": 50,
+         "y": 10
+        },
+        "c2": {
+         "k": "pill",
+         "text": "Auth controller",
+         "tone": "soft",
+         "x": 50,
+         "y": 19
+        },
+        "c3": {
+         "k": "pill",
+         "text": "Hashing service",
+         "tone": "soft",
+         "x": 50,
+         "y": 28
+        },
+        "c4": {
+         "k": "pill",
+         "text": "MongoDB",
+         "tone": "soft",
+         "x": 50,
+         "y": 37
+        }
+       },
+       "edges": [
+        [
+         "c1",
+         "c2"
+        ],
+        [
+         "c2",
+         "c3"
+        ],
+        [
+         "c3",
+         "c4"
+        ]
+       ]
+      },
+      {
+       "say": "End-to-end tests drive the app like a user, for example with Playwright or Cypress.",
+       "actors": {
+        "p": {
+         "k": "code",
+         "title": "E2E test",
+         "lines": [
+          "1  open the registration page",
+          "2  enter user information",
+          "3  submit the form",
+          "4  verify the success message",
+          "5  log in with the new account"
+         ],
+         "x": 50,
+         "y": 66,
+         "w": 94
+        }
+       }
+      },
+      {
+       "say": "Unit, integration and end-to-end tests serve different purposes. A reliable app usually uses all three.",
+       "actors": {
+        "p": null,
+        "u": {
+         "k": "box",
+         "text": "Unit",
+         "tone": "ok",
+         "sub": "fast · one function",
+         "x": 50,
+         "y": 62,
+         "w": 56
+        },
+        "i": {
+         "k": "box",
+         "text": "Integration",
+         "tone": "ok",
+         "sub": "components together",
+         "x": 50,
+         "y": 74,
+         "w": 56
+        },
+        "e": {
+         "k": "box",
+         "text": "End-to-end",
+         "tone": "ok",
+         "sub": "whole user journey",
+         "x": 50,
+         "y": 86,
+         "w": 56
+        }
+       }
+      }
+     ]
+    },
+    {
+     "id": "04.4",
+     "title": "Code Coverage and Quality Gates",
+     "stage": {
+      "w": 360,
+      "h": 640
+     },
+     "steps": [
+      {
+       "say": "Code coverage measures how much code your tests execute: 80 of 100 lines run means 80% line coverage.",
+       "actors": {
+        "cv": {
+         "k": "box",
+         "text": "Line coverage",
+         "tone": "brand",
+         "sub": "80 of 100 lines run by tests",
+         "bar": 80,
+         "x": 50,
+         "y": 10,
+         "w": 60
+        },
+        "m1": {
+         "k": "pill",
+         "text": "Line",
+         "tone": "soft",
+         "x": 15,
+         "y": 28
+        },
+        "m2": {
+         "k": "pill",
+         "text": "Statement",
+         "tone": "soft",
+         "x": 38,
+         "y": 28
+        },
+        "m3": {
+         "k": "pill",
+         "text": "Branch",
+         "tone": "soft",
+         "x": 62,
+         "y": 28
+        },
+        "m4": {
+         "k": "pill",
+         "text": "Function",
+         "tone": "soft",
+         "x": 86,
+         "y": 28
+        }
+       }
+      },
+      {
+       "say": "High coverage does not prove the app is defect-free. Tests must also check meaningful behavior.",
+       "actors": {
+        "wn": {
+         "k": "pill",
+         "text": "80% covered ≠ bug-free",
+         "tone": "warn",
+         "ic": "!",
+         "x": 50,
+         "y": 48
+        }
+       }
+      },
+      {
+       "say": "A quality gate lists conditions that must be met before code is accepted.",
+       "actors": {
+        "cv": null,
+        "m1": null,
+        "m2": null,
+        "m3": null,
+        "m4": null,
+        "wn": null,
+        "gt": {
+         "k": "box",
+         "text": "Quality gate",
+         "tone": "brand",
+         "x": 50,
+         "y": 14,
+         "w": 56,
+         "sub": "all of these must pass"
+        },
+        "q1": {
+         "k": "pill",
+         "text": "All critical tests pass",
+         "tone": "soft",
+         "x": 50,
+         "y": 28
+        },
+        "q2": {
+         "k": "pill",
+         "text": "No new critical vulnerabilities",
+         "tone": "soft",
+         "x": 50,
+         "y": 36
+        },
+        "q3": {
+         "k": "pill",
+         "text": "Minimum coverage on new code",
+         "tone": "soft",
+         "x": 50,
+         "y": 44
+        },
+        "q4": {
+         "k": "pill",
+         "text": "No new blocker issues",
+         "tone": "soft",
+         "x": 50,
+         "y": 52
+        }
+       },
+       "edges": []
+      },
+      {
+       "say": "If the gate fails, the pipeline stops the change from reaching later stages.",
+       "actors": {
+        "gt": {
+         "tone": "bad",
+         "sub": "gate failed"
+        },
+        "q3": {
+         "tone": "bad"
+        },
+        "st": {
+         "k": "pill",
+         "text": "Pipeline stops here",
+         "tone": "warn",
+         "ic": "✋",
+         "x": 50,
+         "y": 66
+        }
+       },
+       "edges": []
+      }
+     ]
+    },
+    {
+     "id": "04.5",
+     "title": "Introduction to SonarQube",
+     "stage": {
+      "w": 360,
+      "h": 640
+     },
+     "steps": [
+      {
+       "say": "SonarQube analyzes source code for code smells, potential bugs, vulnerabilities, duplication and maintainability problems.",
+       "actors": {
+        "sq": {
+         "k": "box",
+         "text": "SonarQube",
+         "tone": "brand",
+         "sub": "code quality + security",
+         "x": 50,
+         "y": 8,
+         "w": 56
+        },
+        "i1": {
+         "k": "pill",
+         "text": "Code smells",
+         "tone": "soft",
+         "x": 50,
+         "y": 24
+        },
+        "i2": {
+         "k": "pill",
+         "text": "Potential bugs",
+         "tone": "soft",
+         "x": 50,
+         "y": 32
+        },
+        "i3": {
+         "k": "pill",
+         "text": "Security vulnerabilities",
+         "tone": "soft",
+         "x": 50,
+         "y": 40
+        },
+        "i4": {
+         "k": "pill",
+         "text": "Duplicated code",
+         "tone": "soft",
+         "x": 50,
+         "y": 48
+        },
+        "i5": {
+         "k": "pill",
+         "text": "Maintainability problems",
+         "tone": "soft",
+         "x": 50,
+         "y": 56
+        }
+       },
+       "edges": []
+      },
+      {
+       "say": "A typical flow: push, CI builds and tests, SonarQube analyzes, a quality report is produced, the quality gate decides.",
+       "actors": {
+        "sq": null,
+        "i1": null,
+        "i2": null,
+        "i3": null,
+        "i4": null,
+        "i5": null,
+        "c1": {
+         "k": "pill",
+         "text": "Push to GitHub",
+         "tone": "plain",
+         "x": 50,
+         "y": 8
+        },
+        "c2": {
+         "k": "pill",
+         "text": "CI build + tests",
+         "tone": "plain",
+         "x": 50,
+         "y": 20
+        },
+        "c3": {
+         "k": "pill",
+         "text": "SonarQube analysis",
+         "tone": "brand",
+         "x": 50,
+         "y": 32
+        },
+        "c4": {
+         "k": "pill",
+         "text": "Quality report",
+         "tone": "plain",
+         "x": 50,
+         "y": 44
+        },
+        "c5": {
+         "k": "pill",
+         "text": "Quality gate",
+         "tone": "plain",
+         "x": 50,
+         "y": 56
+        }
+       },
+       "edges": [
+        [
+         "c1",
+         "c2"
+        ],
+        [
+         "c2",
+         "c3"
+        ],
+        [
+         "c3",
+         "c4"
+        ],
+        [
+         "c4",
+         "c5"
+        ]
+       ]
+      },
+      {
+       "say": "SonarQube integrates with Jenkins and GitHub Actions.",
+       "actors": {
+        "j": {
+         "k": "pill",
+         "text": "Jenkins",
+         "tone": "ok",
+         "x": 30,
+         "y": 74
+        },
+        "ga": {
+         "k": "pill",
+         "text": "GitHub Actions",
+         "tone": "ok",
+         "x": 70,
+         "y": 74
+        }
+       },
+       "edges": [
+        [
+         "c1",
+         "c2"
+        ],
+        [
+         "c2",
+         "c3"
+        ],
+        [
+         "c3",
+         "c4"
+        ],
+        [
+         "c4",
+         "c5"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "04.6",
+     "title": "Dependency and Vulnerability Scanning",
+     "stage": {
+      "w": 360,
+      "h": 640
+     },
+     "steps": [
+      {
+       "say": "Modern apps depend on external packages such as Express and React, and those can contain known vulnerabilities.",
+       "actors": {
+        "app": {
+         "k": "box",
+         "text": "Node.js app",
+         "tone": "brand",
+         "x": 50,
+         "y": 8,
+         "w": 50
+        },
+        "d1": {
+         "k": "box",
+         "text": "express",
+         "tone": "soft",
+         "x": 17,
+         "y": 30,
+         "w": 30
+        },
+        "d2": {
+         "k": "box",
+         "text": "react",
+         "tone": "ok",
+         "x": 50,
+         "y": 30,
+         "w": 30
+        },
+        "d3": {
+         "k": "box",
+         "text": "lodash",
+         "tone": "bad",
+         "sub": "vulnerable",
+         "x": 83,
+         "y": 30,
+         "w": 30
+        }
+       },
+       "edges": [
+        [
+         "app",
+         "d1"
+        ],
+        [
+         "app",
+         "d2"
+        ],
+        [
+         "app",
+         "d3"
+        ]
+       ]
+      },
+      {
+       "say": "npm audit reports the vulnerable packages.",
+       "actors": {
+        "p": {
+         "k": "code",
+         "title": "npm audit",
+         "lines": [
+          "lodash  <4.17.21",
+          "  Severity: high",
+          "  fix available: npm audit fix",
+          "1 high severity vulnerability"
+         ],
+         "x": 50,
+         "y": 60,
+         "w": 94
+        }
+       },
+       "edges": [
+        [
+         "app",
+         "d1"
+        ],
+        [
+         "app",
+         "d2"
+        ],
+        [
+         "app",
+         "d3"
+        ]
+       ],
+       "term": [
+        "$ npm audit"
+       ]
+      },
+      {
+       "say": "npm audit fix can apply updates, but review them first because updates may cause compatibility problems.",
+       "actors": {
+        "d3": {
+         "tone": "warn",
+         "sub": "updated?"
+        },
+        "p": {
+         "title": "npm audit fix",
+         "lines": [
+          "changed 1 package",
+          [
+           "lodash 4.17.20 → 4.17.21",
+           "add"
+          ],
+          "found 0 vulnerabilities"
+         ]
+        },
+        "w": {
+         "k": "pill",
+         "text": "Review changes first",
+         "tone": "warn",
+         "ic": "!",
+         "x": 50,
+         "y": 82
+        }
+       },
+       "edges": [
+        [
+         "app",
+         "d1"
+        ],
+        [
+         "app",
+         "d2"
+        ],
+        [
+         "app",
+         "d3"
+        ]
+       ],
+       "term": [
+        "$ npm audit fix"
+       ]
+      },
+      {
+       "say": "Add scanning to CI, and use Dependabot alerts, so problems are found continuously instead of after an incident.",
+       "actors": {
+        "w": null,
+        "d3": {
+         "tone": "ok",
+         "sub": "patched"
+        },
+        "ok": {
+         "k": "pill",
+         "text": "Scan in CI, not after an incident",
+         "tone": "ok",
+         "ic": "✓",
+         "x": 50,
+         "y": 82
+        }
+       },
+       "edges": [
+        [
+         "app",
+         "d1"
+        ],
+        [
+         "app",
+         "d2"
+        ],
+        [
+         "app",
+         "d3"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "04.7",
+     "title": "Integrate Quality Checks into CI/CD",
+     "stage": {
+      "w": 360,
+      "h": 640
+     },
+     "steps": [
+      {
+       "say": "On every pull request to main, one job validates the code before it can be merged.",
+       "actors": {
+        "p": {
+         "k": "code",
+         "title": "Quality Check workflow",
+         "lines": [
+          "on:",
+          "  pull_request:",
+          "    branches: [main]",
+          "jobs:",
+          "  validate:",
+          "    steps:",
+          "      - run: npm ci",
+          "      - run: npm test",
+          "      - run: npm audit --audit-level=high",
+          "      - run: npm run build"
+         ],
+         "x": 50,
+         "y": 16,
+         "w": 94
+        }
+       }
+      },
+      {
+       "say": "The steps run in order: install, test, audit the dependencies, build.",
+       "actors": {
+        "p": {
+         "lines": [
+          "on:",
+          "  pull_request:",
+          "    branches: [main]",
+          "jobs:",
+          "  validate:",
+          "    steps:",
+          "      - run: npm ci",
+          [
+           "      - run: npm test",
+           "hl"
+          ],
+          "      - run: npm audit --audit-level=high",
+          "      - run: npm run build"
+         ]
+        },
+        "k1": {
+         "k": "pill",
+         "text": "Install: npm ci",
+         "tone": "ok",
+         "x": 50,
+         "y": 42
+        },
+        "k2": {
+         "k": "pill",
+         "text": "Test: npm test",
+         "tone": "brand",
+         "x": 50,
+         "y": 52
+        },
+        "k3": {
+         "k": "pill",
+         "text": "Audit: npm audit",
+         "tone": "plain",
+         "x": 50,
+         "y": 62
+        },
+        "k4": {
+         "k": "pill",
+         "text": "Build: npm run build",
+         "tone": "plain",
+         "x": 50,
+         "y": 72
+        }
+       },
+       "edges": [
+        [
+         "k1",
+         "k2"
+        ],
+        [
+         "k2",
+         "k3"
+        ],
+        [
+         "k3",
+         "k4"
+        ]
+       ]
+      },
+      {
+       "say": "If a required command fails, here the audit, the later stages do not run.",
+       "actors": {
+        "p": {
+         "lines": [
+          "on:",
+          "  pull_request:",
+          "    branches: [main]",
+          "jobs:",
+          "  validate:",
+          "    steps:",
+          "      - run: npm ci",
+          "      - run: npm test",
+          [
+           "      - run: npm audit --audit-level=high",
+           "del"
+          ],
+          "      - run: npm run build"
+         ]
+        },
+        "k2": {
+         "tone": "ok"
+        },
+        "k3": {
+         "tone": "bad",
+         "sub": ""
+        },
+        "k4": {
+         "tone": "dim",
+         "sub": ""
+        }
+       },
+       "edges": [
+        [
+         "k1",
+         "k2",
+         "",
+         "ok"
+        ],
+        [
+         "k2",
+         "k3",
+         "",
+         "ok"
+        ],
+        [
+         "k3",
+         "k4",
+         "",
+         "warn"
+        ]
+       ]
+      },
+      {
+       "say": "Once every check is green, the change can move on to the next stage.",
+       "actors": {
+        "p": {
+         "lines": [
+          "on:",
+          "  pull_request:",
+          "    branches: [main]",
+          "jobs:",
+          "  validate:",
+          "    steps:",
+          "      - run: npm ci",
+          "      - run: npm test",
+          "      - run: npm audit --audit-level=high",
+          "      - run: npm run build"
+         ]
+        },
+        "k3": {
+         "tone": "ok",
+         "sub": ""
+        },
+        "k4": {
+         "tone": "ok",
+         "sub": ""
+        },
+        "mg": {
+         "k": "pill",
+         "text": "Checks passed: merge allowed",
+         "tone": "ok",
+         "ic": "✓",
+         "x": 50,
+         "y": 86
+        }
+       },
+       "edges": [
+        [
+         "k1",
+         "k2",
+         "",
+         "ok"
+        ],
+        [
+         "k2",
+         "k3",
+         "",
+         "ok"
+        ],
+        [
+         "k3",
+         "k4",
+         "",
+         "ok"
+        ]
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "05",
+   "title": "Deployment Strategies & Release Management",
+   "subtopics": [
+    {
+     "id": "05.1",
+     "title": "Deployment Environments",
+     "stage": {
+      "w": 360,
+      "h": 560
+     },
+     "steps": [
+      {
+       "say": "Development is where developers implement and try new features.",
+       "actors": {
+        "dev": {
+         "k": "box",
+         "text": "Development",
+         "tone": "brand",
+         "sub": "build and try features",
+         "x": 50,
+         "y": 10,
+         "w": 60
+        }
+       }
+      },
+      {
+       "say": "Staging validates behavior under conditions similar to production.",
+       "actors": {
+        "stg": {
+         "k": "box",
+         "text": "Staging",
+         "tone": "brand",
+         "sub": "production-like checks",
+         "x": 50,
+         "y": 34,
+         "w": 60
+        }
+       },
+       "edges": [
+        [
+         "dev",
+         "stg",
+         "deploy"
+        ]
+       ]
+      },
+      {
+       "say": "Production is where real users use the application. A release goes there after approval.",
+       "actors": {
+        "prod": {
+         "k": "box",
+         "text": "Production",
+         "tone": "brand",
+         "sub": "real users",
+         "x": 50,
+         "y": 58,
+         "w": 60
+        }
+       },
+       "edges": [
+        [
+         "dev",
+         "stg",
+         "deploy"
+        ],
+        [
+         "stg",
+         "prod",
+         "approve",
+         "ok"
+        ]
+       ]
+      },
+      {
+       "say": "Each environment has its own configuration, database, permissions and infrastructure, so unfinished work cannot reach real users.",
+       "actors": {
+        "n1": {
+         "k": "pill",
+         "text": "Separate config · DB · access",
+         "tone": "soft",
+         "x": 50,
+         "y": 82
+        }
+       },
+       "edges": [
+        [
+         "dev",
+         "stg",
+         "deploy"
+        ],
+        [
+         "stg",
+         "prod",
+         "approve",
+         "ok"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "05.2",
+     "title": "Rolling Deployments",
+     "stage": {
+      "w": 360,
+      "h": 480
+     },
+     "steps": [
+      {
+       "say": "An application runs as three instances, all on Version 1.",
+       "actors": {
+        "lb": {
+         "k": "pill",
+         "text": "Users keep being served",
+         "tone": "ok",
+         "ic": "✓",
+         "x": 50,
+         "y": 8
+        },
+        "i1": {
+         "k": "box",
+         "text": "Instance A",
+         "tone": "soft",
+         "sub": "Version 1",
+         "x": 50,
+         "y": 26,
+         "w": 56
+        },
+        "i2": {
+         "k": "box",
+         "text": "Instance B",
+         "tone": "soft",
+         "sub": "Version 1",
+         "x": 50,
+         "y": 46,
+         "w": 56
+        },
+        "i3": {
+         "k": "box",
+         "text": "Instance C",
+         "tone": "soft",
+         "sub": "Version 1",
+         "x": 50,
+         "y": 66,
+         "w": 56
+        }
+       }
+      },
+      {
+       "say": "A rolling deployment replaces instances gradually. Instance A now runs Version 2.",
+       "actors": {
+        "i1": {
+         "tone": "brand",
+         "sub": "Version 2"
+        }
+       }
+      },
+      {
+       "say": "Then B, then C, until every instance runs Version 2, without stopping the whole application.",
+       "actors": {
+        "i2": {
+         "tone": "brand",
+         "sub": "Version 2"
+        },
+        "i3": {
+         "tone": "brand",
+         "sub": "Version 2"
+        }
+       }
+      },
+      {
+       "say": "In Kubernetes, kubectl set image starts a rolling update, and rollout status follows it.",
+       "actors": {
+        "i1": {
+         "tone": "ok"
+        },
+        "i2": {
+         "tone": "ok"
+        },
+        "i3": {
+         "tone": "ok"
+        }
+       },
+       "term": [
+        "$ kubectl set image deployment/web web=example/web:v2",
+        "$ kubectl rollout status deployment/web",
+        "+deployment \"web\" successfully rolled out"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "05.3",
+     "title": "Blue-Green Deployments",
+     "stage": {
+      "w": 360,
+      "h": 640
+     },
+     "steps": [
+      {
+       "say": "Blue is the live production environment running Version 1. All users are on Blue.",
+       "actors": {
+        "us": {
+         "k": "box",
+         "text": "Users",
+         "tone": "plain",
+         "x": 50,
+         "y": 8,
+         "w": 36
+        },
+        "bl": {
+         "k": "box",
+         "text": "Blue",
+         "tone": "brand",
+         "sub": "Version 1 · live",
+         "x": 26,
+         "y": 38,
+         "w": 40
+        },
+        "gr": {
+         "k": "box",
+         "text": "Green",
+         "tone": "soft",
+         "sub": "Version 2 · idle",
+         "x": 74,
+         "y": 38,
+         "w": 40
+        }
+       },
+       "edges": [
+        [
+         "us",
+         "bl",
+         "live",
+         "ok"
+        ]
+       ]
+      },
+      {
+       "say": "Version 2 is deployed to Green and tested there, while users stay on Blue.",
+       "actors": {
+        "ts": {
+         "k": "box",
+         "text": "Testers",
+         "tone": "plain",
+         "x": 74,
+         "y": 74,
+         "w": 36
+        },
+        "gr": {
+         "sub": "Version 2 · testing"
+        }
+       },
+       "edges": [
+        [
+         "us",
+         "bl",
+         "live",
+         "ok"
+        ],
+        [
+         "ts",
+         "gr",
+         "test",
+         "dash"
+        ]
+       ]
+      },
+      {
+       "say": "Once Green is validated, traffic is switched from Blue to Green.",
+       "actors": {
+        "bl": {
+         "tone": "dim",
+         "sub": "standby"
+        },
+        "gr": {
+         "tone": "ok",
+         "sub": "Version 2 · live"
+        }
+       },
+       "edges": [
+        [
+         "us",
+         "gr",
+         "switch",
+         "ok"
+        ]
+       ]
+      },
+      {
+       "say": "If Green misbehaves, send users back to Blue. This works while Blue is still available and compatible.",
+       "actors": {
+        "bl": {
+         "tone": "ok",
+         "sub": "Version 1 · live"
+        },
+        "gr": {
+         "tone": "bad",
+         "sub": "Version 2 · problem"
+        }
+       },
+       "edges": [
+        [
+         "us",
+         "bl",
+         "rollback",
+         "warn"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "05.4",
+     "title": "Canary Releases",
+     "stage": {
+      "w": 360,
+      "h": 560
+     },
+     "steps": [
+      {
+       "say": "A canary release sends a small share of traffic to the new version: 95% stays on Version 1, 5% goes to Version 2.",
+       "actors": {
+        "us": {
+         "k": "box",
+         "text": "Users",
+         "tone": "plain",
+         "x": 50,
+         "y": 8,
+         "w": 36
+        },
+        "lb": {
+         "k": "box",
+         "text": "Traffic split",
+         "tone": "soft",
+         "x": 50,
+         "y": 28,
+         "w": 46
+        },
+        "v1": {
+         "k": "box",
+         "text": "Version 1",
+         "tone": "brand",
+         "sub": "stable",
+         "x": 26,
+         "y": 54,
+         "w": 40
+        },
+        "v2": {
+         "k": "box",
+         "text": "Version 2",
+         "tone": "soft",
+         "sub": "canary",
+         "x": 74,
+         "y": 54,
+         "w": 40
+        },
+        "mo": {
+         "k": "pill",
+         "text": "Watch errors and latency",
+         "tone": "soft",
+         "x": 50,
+         "y": 78
+        }
+       },
+       "edges": [
+        [
+         "us",
+         "lb"
+        ],
+        [
+         "lb",
+         "v1",
+         "95%"
+        ],
+        [
+         "lb",
+         "v2",
+         "5%"
+        ]
+       ]
+      },
+      {
+       "say": "If the new version behaves well, its share grows: 25% to Version 2.",
+       "actors": {
+        "v2": {
+         "tone": "brand"
+        }
+       },
+       "edges": [
+        [
+         "us",
+         "lb"
+        ],
+        [
+         "lb",
+         "v1",
+         "75%"
+        ],
+        [
+         "lb",
+         "v2",
+         "25%",
+         "ok"
+        ]
+       ]
+      },
+      {
+       "say": "Then 50%, as long as the monitoring stays healthy.",
+       "actors": {},
+       "edges": [
+        [
+         "us",
+         "lb"
+        ],
+        [
+         "lb",
+         "v1",
+         "50%"
+        ],
+        [
+         "lb",
+         "v2",
+         "50%",
+         "ok"
+        ]
+       ]
+      },
+      {
+       "say": "Finally 100%. If problems had appeared, traffic would go back to the stable version.",
+       "actors": {
+        "v1": {
+         "tone": "dim",
+         "sub": "retired"
+        },
+        "v2": {
+         "tone": "ok",
+         "sub": "all traffic"
+        }
+       },
+       "edges": [
+        [
+         "us",
+         "lb"
+        ],
+        [
+         "lb",
+         "v2",
+         "100%",
+         "ok"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "05.5",
+     "title": "Rollbacks and Release Management",
+     "stage": {
+      "w": 360,
+      "h": 640
+     },
+     "steps": [
+      {
+       "say": "A release can crash, slow responses down or break database compatibility.",
+       "actors": {
+        "cur": {
+         "k": "box",
+         "text": "Version 2",
+         "tone": "bad",
+         "sub": "crashing",
+         "x": 50,
+         "y": 8,
+         "w": 48
+        },
+        "prev": {
+         "k": "box",
+         "text": "Version 1",
+         "tone": "ok",
+         "sub": "last known good",
+         "x": 50,
+         "y": 34,
+         "w": 48
+        }
+       }
+      },
+      {
+       "say": "A rollback restores the previous working version. In Kubernetes: rollout history, then rollout undo.",
+       "actors": {
+        "cur": {
+         "sub": "rolled back"
+        }
+       },
+       "edges": [
+        [
+         "cur",
+         "prev",
+         "rollback",
+         "ok"
+        ]
+       ],
+       "term": [
+        "$ kubectl rollout history deployment/web",
+        "$ kubectl rollout undo deployment/web"
+       ]
+      },
+      {
+       "say": "Reverting the app image does not undo an incompatible database migration, so plan for data too.",
+       "actors": {
+        "db": {
+         "k": "box",
+         "text": "Database migration",
+         "tone": "warn",
+         "sub": "not reverted by the image",
+         "x": 50,
+         "y": 58,
+         "w": 60
+        }
+       },
+       "edges": [
+        [
+         "cur",
+         "prev",
+         "rollback",
+         "ok"
+        ]
+       ]
+      },
+      {
+       "say": "Release management adds versioning, notes, approvals, scheduling, monitoring and a rollback plan.",
+       "actors": {
+        "db": null,
+        "r1": {
+         "k": "pill",
+         "text": "Versioning",
+         "tone": "soft",
+         "x": 27,
+         "y": 74
+        },
+        "r2": {
+         "k": "pill",
+         "text": "Release notes",
+         "tone": "soft",
+         "x": 73,
+         "y": 74
+        },
+        "r3": {
+         "k": "pill",
+         "text": "Approvals",
+         "tone": "soft",
+         "x": 27,
+         "y": 84
+        },
+        "r4": {
+         "k": "pill",
+         "text": "Scheduling",
+         "tone": "soft",
+         "x": 73,
+         "y": 84
+        },
+        "r5": {
+         "k": "pill",
+         "text": "Monitoring",
+         "tone": "soft",
+         "x": 27,
+         "y": 94
+        },
+        "r6": {
+         "k": "pill",
+         "text": "Rollback plan",
+         "tone": "soft",
+         "x": 73,
+         "y": 94
+        }
+       },
+       "edges": [
+        [
+         "cur",
+         "prev",
+         "rollback",
+         "ok"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "05.6",
+     "title": "Compare Deployment Strategies",
+     "stage": {
+      "w": 360,
+      "h": 640
+     },
+     "steps": [
+      {
+       "say": "Rolling, blue-green and canary solve different operational problems.",
+       "actors": {
+        "b1": {
+         "k": "box",
+         "text": "Rolling",
+         "tone": "soft",
+         "sub": "gradually replaces instances",
+         "x": 50,
+         "y": 8,
+         "w": 70
+        },
+        "b2": {
+         "k": "box",
+         "text": "Blue-Green",
+         "tone": "soft",
+         "sub": "two environments, switch traffic",
+         "x": 50,
+         "y": 34,
+         "w": 70
+        },
+        "b3": {
+         "k": "box",
+         "text": "Canary",
+         "tone": "soft",
+         "sub": "small share of users first",
+         "x": 50,
+         "y": 60,
+         "w": 70
+        }
+       }
+      },
+      {
+       "say": "The trade-offs differ: cost, speed of switching and how tightly the risk is limited.",
+       "actors": {
+        "t1": {
+         "k": "pill",
+         "text": "cheap · gradual",
+         "tone": "ok",
+         "x": 50,
+         "y": 20
+        },
+        "t2": {
+         "k": "pill",
+         "text": "2x infrastructure · instant switch",
+         "tone": "warn",
+         "x": 50,
+         "y": 46
+        },
+        "t3": {
+         "k": "pill",
+         "text": "needs traffic control",
+         "tone": "ok",
+         "x": 50,
+         "y": 72
+        }
+       }
+      },
+      {
+       "say": "The right choice depends on cost, traffic management, architecture and risk. Always keep a way to detect problems and respond.",
+       "actors": {
+        "ok": {
+         "k": "pill",
+         "text": "Always keep monitoring and a way back",
+         "tone": "brand",
+         "ic": "✓",
+         "x": 50,
+         "y": 90
+        }
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "06",
+   "title": "GitOps & Argo CD",
+   "subtopics": [
+    {
+     "id": "06.1",
+     "title": "Introduction to GitOps",
+     "stage": {
+      "w": 360,
+      "h": 640
+     },
+     "steps": [
+      {
+       "say": "Two developers change a Kubernetes app by hand: one scales the replicas, the other changes the image.",
+       "actors": {
+        "d1": {
+         "k": "box",
+         "text": "Developer A",
+         "tone": "plain",
+         "sub": "kubectl scale",
+         "x": 26,
+         "y": 8,
+         "w": 40
+        },
+        "d2": {
+         "k": "box",
+         "text": "Developer B",
+         "tone": "plain",
+         "sub": "kubectl set image",
+         "x": 74,
+         "y": 8,
+         "w": 40
+        },
+        "cl": {
+         "k": "box",
+         "text": "Cluster",
+         "tone": "warn",
+         "sub": "live state",
+         "x": 50,
+         "y": 62,
+         "w": 50
+        }
+       },
+       "edges": [
+        [
+         "d1",
+         "cl",
+         "replicas: 5"
+        ],
+        [
+         "d2",
+         "cl",
+         "new image"
+        ]
+       ]
+      },
+      {
+       "say": "The cluster drifts away from what Git says, and nobody can tell which is right.",
+       "actors": {
+        "git": {
+         "k": "box",
+         "text": "Git",
+         "tone": "soft",
+         "sub": "what we think is deployed",
+         "x": 50,
+         "y": 34,
+         "w": 52
+        }
+       },
+       "edges": [
+        [
+         "cl",
+         "git",
+         "differs",
+         "warn"
+        ]
+       ]
+      },
+      {
+       "say": "GitOps makes Git the source of truth for the desired state. Changes go to Git, and automation syncs the cluster.",
+       "actors": {
+        "git": {
+         "tone": "brand",
+         "sub": "source of truth"
+        },
+        "cl": {
+         "tone": "ok",
+         "sub": "matches Git"
+        }
+       },
+       "edges": [
+        [
+         "d1",
+         "git",
+         "push"
+        ],
+        [
+         "d2",
+         "git",
+         "push"
+        ],
+        [
+         "git",
+         "cl",
+         "sync",
+         "ok"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "06.2",
+     "title": "GitOps Principles and Architecture",
+     "stage": {
+      "w": 360,
+      "h": 640
+     },
+     "steps": [
+      {
+       "say": "GitOps follows four principles. Declarative configuration describes the desired state of the system.",
+       "actors": {
+        "p1": {
+         "k": "box",
+         "text": "Declarative configuration",
+         "tone": "brand",
+         "sub": "describe the desired state",
+         "x": 50,
+         "y": 10,
+         "w": 64
+        },
+        "p2": {
+         "k": "box",
+         "text": "Version control",
+         "tone": "soft",
+         "sub": "store it in Git",
+         "x": 50,
+         "y": 26,
+         "w": 64
+        },
+        "p3": {
+         "k": "box",
+         "text": "Automated synchronization",
+         "tone": "soft",
+         "sub": "reconcile actual with desired",
+         "x": 50,
+         "y": 42,
+         "w": 64
+        },
+        "p4": {
+         "k": "box",
+         "text": "Continuous monitoring",
+         "tone": "soft",
+         "sub": "detect differences",
+         "x": 50,
+         "y": 58,
+         "w": 64
+        }
+       }
+      },
+      {
+       "say": "A typical workflow: a developer changes Git, a GitOps controller notices, and the cluster is updated.",
+       "actors": {
+        "p1": null,
+        "p2": null,
+        "p3": null,
+        "p4": null,
+        "a": {
+         "k": "box",
+         "text": "Developer",
+         "tone": "plain",
+         "x": 50,
+         "y": 8,
+         "w": 56
+        },
+        "b": {
+         "k": "box",
+         "text": "Git repository",
+         "tone": "brand",
+         "x": 50,
+         "y": 23,
+         "w": 56
+        },
+        "c": {
+         "k": "box",
+         "text": "GitOps controller",
+         "tone": "soft",
+         "x": 50,
+         "y": 38,
+         "w": 56
+        },
+        "d": {
+         "k": "box",
+         "text": "Kubernetes cluster",
+         "tone": "soft",
+         "x": 50,
+         "y": 53,
+         "w": 56
+        },
+        "e": {
+         "k": "box",
+         "text": "Running application",
+         "tone": "soft",
+         "x": 50,
+         "y": 68,
+         "w": 56
+        }
+       },
+       "edges": [
+        [
+         "a",
+         "b"
+        ],
+        [
+         "b",
+         "c"
+        ],
+        [
+         "c",
+         "d"
+        ],
+        [
+         "d",
+         "e"
+        ]
+       ]
+      },
+      {
+       "say": "Example: raising the replica count in a Deployment YAML and pushing it is enough. The change is traceable in Git.",
+       "actors": {
+        "b": {
+         "tone": "ok"
+        },
+        "c": {
+         "tone": "ok"
+        },
+        "d": {
+         "tone": "ok"
+        },
+        "e": {
+         "tone": "ok"
+        },
+        "n": {
+         "k": "pill",
+         "text": "replicas: 3 → 5 in Git, auto-applied",
+         "tone": "ok",
+         "ic": "✓",
+         "x": 50,
+         "y": 86
+        }
+       },
+       "edges": [
+        [
+         "a",
+         "b",
+         "",
+         "ok"
+        ],
+        [
+         "b",
+         "c",
+         "",
+         "ok"
+        ],
+        [
+         "c",
+         "d",
+         "",
+         "ok"
+        ],
+        [
+         "d",
+         "e",
+         "",
+         "ok"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "06.3",
+     "title": "Declarative Configuration and Desired State",
+     "stage": {
+      "w": 360,
+      "h": 640
+     },
+     "steps": [
+      {
+       "say": "Declarative configuration states what the system should look like, not every command needed to get there.",
+       "actors": {
+        "p": {
+         "k": "code",
+         "title": "deployment.yaml",
+         "lines": [
+          "apiVersion: apps/v1",
+          "kind: Deployment",
+          "metadata:",
+          "  name: web-app",
+          "spec:",
+          "  replicas: 3",
+          "  template:",
+          "    spec:",
+          "      containers:",
+          "      - name: web",
+          "        image: nginx:latest"
+         ],
+         "x": 50,
+         "y": 22,
+         "w": 94
+        }
+       }
+      },
+      {
+       "say": "This declares three replicas. Kubernetes keeps three Pods running.",
+       "actors": {
+        "p": {
+         "lines": [
+          "apiVersion: apps/v1",
+          "kind: Deployment",
+          "metadata:",
+          "  name: web-app",
+          "spec:",
+          [
+           "  replicas: 3",
+           "hl"
+          ],
+          "  template:",
+          "    spec:",
+          "      containers:",
+          "      - name: web",
+          "        image: nginx:latest"
+         ]
+        },
+        "p1": {
+         "k": "box",
+         "text": "Pod 1",
+         "tone": "ok",
+         "sub": "Running",
+         "x": 17,
+         "y": 52,
+         "w": 30
+        },
+        "p2": {
+         "k": "box",
+         "text": "Pod 2",
+         "tone": "ok",
+         "sub": "Running",
+         "x": 50,
+         "y": 52,
+         "w": 30
+        },
+        "p3": {
+         "k": "box",
+         "text": "Pod 3",
+         "tone": "ok",
+         "sub": "Running",
+         "x": 83,
+         "y": 52,
+         "w": 30
+        }
+       },
+       "edges": []
+      },
+      {
+       "say": "If a Pod fails, Kubernetes notices the difference from the desired state.",
+       "actors": {
+        "p2": {
+         "tone": "bad",
+         "sub": "failed"
+        }
+       },
+       "edges": []
+      },
+      {
+       "say": "It creates a replacement to restore three replicas. GitOps keeps this YAML in Git and syncs it automatically.",
+       "actors": {
+        "p2": {
+         "tone": "ok",
+         "sub": "replaced"
+        },
+        "ok": {
+         "k": "pill",
+         "text": "Desired state lives in Git",
+         "tone": "ok",
+         "ic": "✓",
+         "x": 50,
+         "y": 72
+        }
+       },
+       "edges": []
+      }
+     ]
+    },
+    {
+     "id": "06.4",
+     "title": "Introduction to Argo CD",
+     "stage": {
+      "w": 360,
+      "h": 640
+     },
+     "steps": [
+      {
+       "say": "Argo CD is a declarative GitOps continuous delivery tool for Kubernetes. Its UI and API server are how people use it.",
+       "actors": {
+        "z": {
+         "k": "zone",
+         "text": "Argo CD",
+         "x": 50,
+         "y": 52,
+         "w": 92,
+         "h": 64
+        },
+        "ui": {
+         "k": "box",
+         "text": "User Interface",
+         "tone": "soft",
+         "sub": "inspect and manage apps",
+         "x": 73,
+         "y": 56,
+         "w": 42
+        },
+        "api": {
+         "k": "box",
+         "text": "API Server",
+         "tone": "brand",
+         "sub": "interface and API",
+         "x": 27,
+         "y": 56,
+         "w": 42
+        }
+       }
+      },
+      {
+       "say": "The Repository Server fetches and renders configuration from Git.",
+       "actors": {
+        "gt": {
+         "k": "box",
+         "text": "Git repo",
+         "tone": "plain",
+         "sub": "manifests",
+         "x": 50,
+         "y": 6,
+         "w": 36
+        },
+        "rs": {
+         "k": "box",
+         "text": "Repository Server",
+         "tone": "brand",
+         "sub": "renders manifests",
+         "x": 27,
+         "y": 34,
+         "w": 42
+        }
+       },
+       "edges": [
+        [
+         "gt",
+         "rs",
+         "fetch"
+        ]
+       ]
+      },
+      {
+       "say": "The Application Controller compares desired and actual state and syncs the cluster.",
+       "actors": {
+        "ac": {
+         "k": "box",
+         "text": "Application Controller",
+         "tone": "brand",
+         "sub": "compares desired vs actual",
+         "x": 73,
+         "y": 34,
+         "w": 42
+        },
+        "k8": {
+         "k": "box",
+         "text": "Cluster",
+         "tone": "soft",
+         "x": 50,
+         "y": 95,
+         "w": 36,
+         "sub": "target of the sync"
+        }
+       },
+       "edges": [
+        [
+         "gt",
+         "rs",
+         "fetch"
+        ]
+       ]
+      },
+      {
+       "say": "Redis caches data for Argo CD operations. Sources can be plain manifests, Helm charts or Kustomize.",
+       "actors": {
+        "rd": {
+         "k": "box",
+         "text": "Redis",
+         "tone": "soft",
+         "sub": "caching",
+         "x": 50,
+         "y": 76,
+         "w": 36
+        },
+        "sr": {
+         "k": "pill",
+         "text": "Manifests · Helm · Kustomize",
+         "tone": "ok",
+         "x": 50,
+         "y": 88
+        }
+       },
+       "edges": [
+        [
+         "gt",
+         "rs",
+         "fetch"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "06.5",
+     "title": "Install Argo CD on Kubernetes",
+     "stage": {
+      "w": 360,
+      "h": 640
+     },
+     "steps": [
+      {
+       "say": "First create a namespace for Argo CD.",
+       "actors": {
+        "z": {
+         "k": "zone",
+         "text": "namespace: argocd",
+         "x": 50,
+         "y": 38,
+         "w": 92,
+         "h": 64
+        }
+       },
+       "term": [
+        "$ kubectl create namespace argocd"
+       ]
+      },
+      {
+       "say": "Applying the official install manifest creates the Argo CD components.",
+       "actors": {
+        "p2": {
+         "k": "box",
+         "text": "repo-server",
+         "tone": "warn",
+         "sub": "creating…",
+         "x": 50,
+         "y": 16,
+         "w": 60
+        },
+        "p1": {
+         "k": "box",
+         "text": "argocd-server",
+         "tone": "warn",
+         "sub": "creating…",
+         "x": 50,
+         "y": 58,
+         "w": 60
+        },
+        "p3": {
+         "k": "box",
+         "text": "application-controller",
+         "tone": "warn",
+         "sub": "creating…",
+         "x": 50,
+         "y": 30,
+         "w": 60
+        },
+        "p4": {
+         "k": "box",
+         "text": "redis",
+         "tone": "warn",
+         "sub": "creating…",
+         "x": 50,
+         "y": 44,
+         "w": 60
+        }
+       },
+       "term": [
+        "$ kubectl apply -n argocd \\",
+        "  -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml"
+       ]
+      },
+      {
+       "say": "Check the Pods and wait until the components are running.",
+       "actors": {
+        "p1": {
+         "tone": "ok",
+         "sub": "Running"
+        },
+        "p2": {
+         "tone": "ok",
+         "sub": "Running"
+        },
+        "p3": {
+         "tone": "ok",
+         "sub": "Running"
+        },
+        "p4": {
+         "tone": "ok",
+         "sub": "Running"
+        }
+       },
+       "term": [
+        "$ kubectl get pods -n argocd"
+       ]
+      },
+      {
+       "say": "port-forward exposes the API server locally at https://localhost:8080. For production, configure authentication, TLS and network policies.",
+       "actors": {
+        "br": {
+         "k": "box",
+         "text": "Browser",
+         "tone": "brand",
+         "sub": "localhost:8080",
+         "x": 50,
+         "y": 86,
+         "w": 50
+        }
+       },
+       "edges": [
+        [
+         "p1",
+         "br",
+         "",
+         "ok"
+        ]
+       ],
+       "term": [
+        "$ kubectl port-forward svc/argocd-server -n argocd 8080:443"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "06.6",
+     "title": "Connect a Git Repository to Argo CD",
+     "stage": {
+      "w": 360,
+      "h": 560
+     },
+     "steps": [
+      {
+       "say": "Argo CD needs an application definition: a name, plus where the configuration lives and where to deploy it.",
+       "actors": {
+        "app": {
+         "k": "box",
+         "text": "web-app",
+         "tone": "brand",
+         "sub": "Argo CD application",
+         "x": 50,
+         "y": 30,
+         "w": 50
+        }
+       },
+       "term": [
+        "$ argocd app create web-app \\",
+        "  --repo https://github.com/example/devops-manifests.git \\",
+        "  --path kubernetes/web \\",
+        "  --dest-server https://kubernetes.default.svc \\",
+        "  --dest-namespace default"
+       ]
+      },
+      {
+       "say": "--repo points to the Git repository that holds the Kubernetes manifests.",
+       "actors": {
+        "repo": {
+         "k": "box",
+         "text": "Git repository",
+         "tone": "soft",
+         "sub": "devops-manifests",
+         "x": 50,
+         "y": 8,
+         "w": 60
+        }
+       },
+       "edges": [
+        [
+         "repo",
+         "app",
+         "watches",
+         "ok"
+        ]
+       ]
+      },
+      {
+       "say": "--dest-server and --dest-namespace say which cluster and namespace to deploy to.",
+       "actors": {
+        "dest": {
+         "k": "box",
+         "text": "Cluster",
+         "tone": "soft",
+         "sub": "namespace: default",
+         "x": 50,
+         "y": 52,
+         "w": 56
+        }
+       },
+       "edges": [
+        [
+         "repo",
+         "app",
+         "watches",
+         "ok"
+        ],
+        [
+         "app",
+         "dest",
+         "deploys",
+         "ok"
+        ]
+       ]
+      },
+      {
+       "say": "--path selects the folder inside the repository. For private repositories, add credentials securely.",
+       "actors": {
+        "path": {
+         "k": "pill",
+         "text": "--path kubernetes/web",
+         "tone": "soft",
+         "x": 50,
+         "y": 72
+        },
+        "cred": {
+         "k": "pill",
+         "text": "Private repo: add credentials",
+         "tone": "warn",
+         "ic": "!",
+         "x": 50,
+         "y": 84
+        }
+       },
+       "edges": [
+        [
+         "repo",
+         "app",
+         "watches",
+         "ok"
+        ],
+        [
+         "app",
+         "dest",
+         "deploys",
+         "ok"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "06.7",
+     "title": "Synchronization and Drift Detection",
+     "stage": {
+      "w": 360,
+      "h": 640
+     },
+     "steps": [
+      {
+       "say": "Argo CD compares the desired state in Git with the live state in Kubernetes. Here both say three replicas.",
+       "actors": {
+        "git": {
+         "k": "box",
+         "text": "Git",
+         "tone": "brand",
+         "sub": "replicas: 3",
+         "x": 50,
+         "y": 8,
+         "w": 44
+        },
+        "live": {
+         "k": "box",
+         "text": "Cluster",
+         "tone": "ok",
+         "sub": "replicas: 3",
+         "x": 50,
+         "y": 52,
+         "w": 44
+        },
+        "cmp": {
+         "k": "box",
+         "text": "Argo CD compares",
+         "tone": "brand",
+         "x": 50,
+         "y": 30,
+         "w": 52
+        },
+        "st": {
+         "k": "pill",
+         "text": "Synced",
+         "tone": "ok",
+         "ic": "✓",
+         "x": 50,
+         "y": 70
+        }
+       },
+       "edges": [
+        [
+         "git",
+         "cmp"
+        ],
+        [
+         "live",
+         "cmp"
+        ]
+       ]
+      },
+      {
+       "say": "Someone scales the Deployment to five replicas by hand.",
+       "actors": {
+        "live": {
+         "tone": "warn",
+         "sub": "replicas: 5"
+        }
+       },
+       "edges": [
+        [
+         "git",
+         "cmp"
+        ],
+        [
+         "live",
+         "cmp"
+        ]
+       ]
+      },
+      {
+       "say": "Argo CD reports OutOfSync. The difference is configuration drift.",
+       "actors": {
+        "cmp": {
+         "tone": "bad",
+         "sub": "drift found"
+        },
+        "st": {
+         "text": "OutOfSync",
+         "tone": "warn",
+         "ic": "!"
+        }
+       },
+       "edges": [
+        [
+         "git",
+         "cmp"
+        ],
+        [
+         "live",
+         "cmp",
+         "",
+         "warn"
+        ]
+       ]
+      },
+      {
+       "say": "Depending on the sync policy, Argo CD applies the desired state manually or automatically. Unknown means it cannot tell.",
+       "actors": {
+        "cmp": {
+         "tone": "ok",
+         "sub": "synced again"
+        },
+        "live": {
+         "tone": "ok",
+         "sub": "replicas: 3"
+        },
+        "st": {
+         "text": "Synced",
+         "tone": "ok",
+         "ic": "✓"
+        },
+        "u": {
+         "k": "pill",
+         "text": "Unknown: cannot be determined",
+         "tone": "soft",
+         "x": 50,
+         "y": 82
+        }
+       },
+       "edges": [
+        [
+         "git",
+         "cmp",
+         "",
+         "ok"
+        ],
+        [
+         "live",
+         "cmp",
+         "",
+         "ok"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "06.8",
+     "title": "Rollbacks in GitOps",
+     "stage": {
+      "w": 360,
+      "h": 640
+     },
+     "steps": [
+      {
+       "say": "The image changed from Version 1 to Version 2, and the new version causes a problem.",
+       "actors": {
+        "c1": {
+         "k": "box",
+         "text": "image: v1",
+         "tone": "ok",
+         "sub": "known good",
+         "x": 50,
+         "y": 8,
+         "w": 50
+        },
+        "c2": {
+         "k": "box",
+         "text": "image: v2",
+         "tone": "bad",
+         "sub": "caused the problem",
+         "x": 50,
+         "y": 26,
+         "w": 56
+        }
+       },
+       "edges": [
+        [
+         "c1",
+         "c2"
+        ]
+       ]
+      },
+      {
+       "say": "A rollback is a Git operation: git revert creates a new commit that undoes the change.",
+       "actors": {
+        "c3": {
+         "k": "box",
+         "text": "Revert commit",
+         "tone": "brand",
+         "sub": "restores v1",
+         "x": 50,
+         "y": 44,
+         "w": 50
+        }
+       },
+       "edges": [
+        [
+         "c1",
+         "c2"
+        ],
+        [
+         "c2",
+         "c3",
+         "revert"
+        ]
+       ],
+       "term": [
+        "$ git revert COMMIT_HASH",
+        "$ git push origin main"
+       ]
+      },
+      {
+       "say": "Argo CD sees the new desired state in Git and syncs the cluster back to it.",
+       "actors": {
+        "ac": {
+         "k": "box",
+         "text": "Argo CD",
+         "tone": "soft",
+         "sub": "detects the change",
+         "x": 50,
+         "y": 62,
+         "w": 44
+        },
+        "cl": {
+         "k": "box",
+         "text": "Cluster",
+         "tone": "ok",
+         "sub": "image: v1",
+         "x": 50,
+         "y": 78,
+         "w": 44
+        }
+       },
+       "edges": [
+        [
+         "c1",
+         "c2"
+        ],
+        [
+         "c2",
+         "c3",
+         "revert"
+        ],
+        [
+         "c3",
+         "ac",
+         "detects"
+        ],
+        [
+         "ac",
+         "cl",
+         "sync",
+         "ok"
+        ]
+       ]
+      },
+      {
+       "say": "History stays visible in Git. Change the desired state through Git, not with untracked manual edits to the cluster.",
+       "actors": {
+        "nt": {
+         "k": "pill",
+         "text": "Rollback = a commit in Git",
+         "tone": "ok",
+         "ic": "✓",
+         "x": 50,
+         "y": 94
+        }
+       },
+       "edges": [
+        [
+         "c1",
+         "c2"
+        ],
+        [
+         "c2",
+         "c3",
+         "revert"
+        ],
+        [
+         "c3",
+         "ac",
+         "detects"
+        ],
+        [
+         "ac",
+         "cl",
+         "sync",
+         "ok"
+        ]
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "07",
+   "title": "Production CI/CD Pipeline Project",
+   "subtopics": [
+    {
+     "id": "07.1",
+     "title": "Design an End-to-End CI/CD Pipeline",
+     "stage": {
+      "w": 360,
+      "h": 640
+     },
+     "steps": [
+      {
+       "say": "A developer pushes code to GitHub and GitHub Actions starts the pipeline.",
+       "actors": {
+        "n1": {
+         "k": "pill",
+         "text": "1 · Developer",
+         "tone": "plain",
+         "x": 50,
+         "y": 5
+        },
+        "n2": {
+         "k": "pill",
+         "text": "2 · Push code",
+         "tone": "plain",
+         "x": 50,
+         "y": 14.7
+        },
+        "n3": {
+         "k": "pill",
+         "text": "3 · GitHub Actions",
+         "tone": "plain",
+         "x": 50,
+         "y": 24.4
+        }
+       },
+       "edges": [
+        [
+         "n1",
+         "n2"
+        ],
+        [
+         "n2",
+         "n3"
+        ]
+       ]
+      },
+      {
+       "say": "It installs the dependencies and runs the automated tests. If a test fails, the pipeline stops before anything is published.",
+       "actors": {
+        "n4": {
+         "k": "pill",
+         "text": "4 · Install deps",
+         "tone": "plain",
+         "x": 50,
+         "y": 34.099999999999994
+        },
+        "n5": {
+         "k": "pill",
+         "text": "5 · Run tests",
+         "tone": "plain",
+         "x": 50,
+         "y": 43.8
+        },
+        "x": {
+         "k": "pill",
+         "text": "Fail = stop",
+         "tone": "warn",
+         "ic": "✋",
+         "x": 82,
+         "y": 43.8
+        }
+       },
+       "edges": [
+        [
+         "n1",
+         "n2"
+        ],
+        [
+         "n2",
+         "n3"
+        ],
+        [
+         "n3",
+         "n4"
+        ],
+        [
+         "n4",
+         "n5"
+        ]
+       ]
+      },
+      {
+       "say": "Then it builds the Docker images, pushes them to a registry and updates the Kubernetes manifests in Git.",
+       "actors": {
+        "x": null,
+        "n6": {
+         "k": "pill",
+         "text": "6 · Build images",
+         "tone": "plain",
+         "x": 50,
+         "y": 53.5
+        },
+        "n7": {
+         "k": "pill",
+         "text": "7 · Push to registry",
+         "tone": "plain",
+         "x": 50,
+         "y": 63.199999999999996
+        },
+        "n8": {
+         "k": "pill",
+         "text": "8 · Update manifests",
+         "tone": "plain",
+         "x": 50,
+         "y": 72.89999999999999
+        }
+       },
+       "edges": [
+        [
+         "n1",
+         "n2"
+        ],
+        [
+         "n2",
+         "n3"
+        ],
+        [
+         "n3",
+         "n4"
+        ],
+        [
+         "n4",
+         "n5"
+        ],
+        [
+         "n5",
+         "n6"
+        ],
+        [
+         "n6",
+         "n7"
+        ],
+        [
+         "n7",
+         "n8"
+        ]
+       ]
+      },
+      {
+       "say": "Argo CD synchronizes the cluster, and the new version runs on Kubernetes.",
+       "actors": {
+        "n9": {
+         "k": "pill",
+         "text": "9 · Argo CD syncs",
+         "tone": "plain",
+         "x": 50,
+         "y": 82.6
+        },
+        "n10": {
+         "k": "pill",
+         "text": "10 · Running on K8s",
+         "tone": "plain",
+         "x": 50,
+         "y": 92.3
+        }
+       },
+       "edges": [
+        [
+         "n1",
+         "n2",
+         "",
+         "ok"
+        ],
+        [
+         "n2",
+         "n3",
+         "",
+         "ok"
+        ],
+        [
+         "n3",
+         "n4",
+         "",
+         "ok"
+        ],
+        [
+         "n4",
+         "n5",
+         "",
+         "ok"
+        ],
+        [
+         "n5",
+         "n6",
+         "",
+         "ok"
+        ],
+        [
+         "n6",
+         "n7",
+         "",
+         "ok"
+        ],
+        [
+         "n7",
+         "n8",
+         "",
+         "ok"
+        ],
+        [
+         "n8",
+         "n9",
+         "",
+         "ok"
+        ],
+        [
+         "n9",
+         "n10",
+         "",
+         "ok"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "07.2",
+     "title": "Integrate GitHub Actions with Docker",
+     "stage": {
+      "w": 360,
+      "h": 640
+     },
+     "steps": [
+      {
+       "say": "A Dockerfile defines how the application image is built. Build and run it locally first.",
+       "actors": {
+        "df": {
+         "k": "code",
+         "title": "Dockerfile",
+         "lines": [
+          "FROM node:22-alpine",
+          "WORKDIR /app",
+          "COPY package*.json ./",
+          "RUN npm ci",
+          "COPY . .",
+          "EXPOSE 5000",
+          "CMD [\"npm\", \"start\"]"
+         ],
+         "x": 50,
+         "y": 14,
+         "w": 94
+        }
+       },
+       "term": [
+        "$ docker build -t devops-backend:v1 .",
+        "$ docker run -d --name backend -p 5000:5000 devops-backend:v1"
+       ]
+      },
+      {
+       "say": "A workflow in .github/workflows/docker-build.yml automates that build on every push to main.",
+       "actors": {
+        "wf": {
+         "k": "code",
+         "title": "docker-build.yml",
+         "lines": [
+          "on:",
+          "  push:",
+          "    branches: [main]",
+          "jobs:",
+          "  build:",
+          "    steps:",
+          "      - uses: actions/checkout@v4",
+          "      - run: docker build -t",
+          "          devops-backend:${{ github.sha }} ."
+         ],
+         "x": 50,
+         "y": 52,
+         "w": 94
+        }
+       },
+       "edges": [
+        [
+         "df",
+         "wf",
+         "automate",
+         "dash"
+        ]
+       ]
+      },
+      {
+       "say": "Each push produces an image tagged with the commit SHA.",
+       "actors": {
+        "im": {
+         "k": "box",
+         "text": "Docker image",
+         "tone": "ok",
+         "sub": "devops-backend:<commit sha>",
+         "x": 50,
+         "y": 86,
+         "w": 70
+        }
+       },
+       "edges": [
+        [
+         "df",
+         "wf",
+         "automate",
+         "dash"
+        ],
+        [
+         "wf",
+         "im",
+         "",
+         "ok"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "07.3",
+     "title": "Push Docker Images to a Container Registry",
+     "stage": {
+      "w": 360,
+      "h": 640
+     },
+     "steps": [
+      {
+       "say": "A registry stores and distributes container images so deployment environments can pull them.",
+       "actors": {
+        "rg": {
+         "k": "box",
+         "text": "Container registry",
+         "tone": "brand",
+         "sub": "stores and distributes images",
+         "x": 50,
+         "y": 70,
+         "w": 56
+        },
+        "r1": {
+         "k": "pill",
+         "text": "Docker Hub",
+         "tone": "soft",
+         "x": 50,
+         "y": 10
+        },
+        "r2": {
+         "k": "pill",
+         "text": "GitHub Container Registry",
+         "tone": "soft",
+         "x": 50,
+         "y": 18
+        },
+        "r3": {
+         "k": "pill",
+         "text": "Amazon ECR",
+         "tone": "soft",
+         "x": 50,
+         "y": 26
+        },
+        "r4": {
+         "k": "pill",
+         "text": "Google Artifact Registry",
+         "tone": "soft",
+         "x": 50,
+         "y": 34
+        },
+        "r5": {
+         "k": "pill",
+         "text": "Azure Container Registry",
+         "tone": "soft",
+         "x": 50,
+         "y": 42
+        }
+       }
+      },
+      {
+       "say": "Tag the local image with the registry name first.",
+       "actors": {
+        "r1": null,
+        "r2": null,
+        "r3": null,
+        "r4": null,
+        "r5": null,
+        "im": {
+         "k": "box",
+         "text": "devops-backend:v1",
+         "tone": "plain",
+         "sub": "local image",
+         "x": 50,
+         "y": 10,
+         "w": 56
+        },
+        "tg": {
+         "k": "box",
+         "text": "username/devops-backend:v1",
+         "tone": "soft",
+         "sub": "tagged",
+         "x": 50,
+         "y": 36,
+         "w": 60
+        }
+       },
+       "edges": [
+        [
+         "im",
+         "tg",
+         "docker tag",
+         "ok"
+        ]
+       ],
+       "term": [
+        "$ docker tag devops-backend:v1 username/devops-backend:v1"
+       ]
+      },
+      {
+       "say": "After logging in with credentials stored as secrets, push the image.",
+       "actors": {
+        "tg": {
+         "tone": "ok"
+        },
+        "rg": {
+         "sub": "image stored"
+        }
+       },
+       "edges": [
+        [
+         "im",
+         "tg",
+         "docker tag",
+         "ok"
+        ],
+        [
+         "tg",
+         "rg",
+         "docker push",
+         "ok"
+        ]
+       ],
+       "term": [
+        "$ docker push username/devops-backend:v1"
+       ]
+      },
+      {
+       "say": "Tag images with unique identifiers such as the commit SHA, instead of relying only on latest.",
+       "actors": {
+        "ok": {
+         "k": "pill",
+         "text": "Tag with commit SHA, not only latest",
+         "tone": "ok",
+         "ic": "✓",
+         "x": 50,
+         "y": 92
+        }
+       },
+       "edges": [
+        [
+         "im",
+         "tg",
+         "docker tag",
+         "ok"
+        ],
+        [
+         "tg",
+         "rg",
+         "docker push",
+         "ok"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "07.4",
+     "title": "Automate Testing and Image Building",
+     "stage": {
+      "w": 360,
+      "h": 640
+     },
+     "steps": [
+      {
+       "say": "One workflow validates the code first: it runs on every push and every pull request to main.",
+       "actors": {
+        "ev": {
+         "k": "box",
+         "text": "Push or PR",
+         "tone": "plain",
+         "x": 50,
+         "y": 8,
+         "w": 50
+        },
+        "ts": {
+         "k": "box",
+         "text": "Install + run tests",
+         "tone": "brand",
+         "x": 50,
+         "y": 25,
+         "w": 56
+        }
+       },
+       "edges": [
+        [
+         "ev",
+         "ts",
+         "",
+         "ok"
+        ]
+       ]
+      },
+      {
+       "say": "Building the Docker image is the next step, but only after the tests passed.",
+       "actors": {
+        "ts": {
+         "tone": "ok"
+        },
+        "bd": {
+         "k": "box",
+         "text": "Build Docker image",
+         "tone": "brand",
+         "sub": "only on push",
+         "x": 50,
+         "y": 42,
+         "w": 60
+        }
+       },
+       "edges": [
+        [
+         "ev",
+         "ts",
+         "",
+         "ok"
+        ],
+        [
+         "ts",
+         "bd",
+         "",
+         "ok"
+        ]
+       ]
+      },
+      {
+       "say": "An if condition limits the image build to pushes. A pull request only runs the tests.",
+       "actors": {
+        "p": {
+         "k": "code",
+         "title": "build step",
+         "lines": [
+          "- name: Build Docker Image",
+          "  if: github.event_name == 'push'",
+          "  run: docker build -t",
+          "    devops-backend:${{ github.sha }} ."
+         ],
+         "x": 50,
+         "y": 66,
+         "w": 94
+        }
+       }
+      },
+      {
+       "say": "A production workflow also needs registry login, publishing, security scanning and the right permissions.",
+       "actors": {
+        "p": {
+         "lines": [
+          "- name: Build Docker Image",
+          [
+           "  if: github.event_name == 'push'",
+           "hl"
+          ],
+          "  run: docker build -t",
+          "    devops-backend:${{ github.sha }} ."
+         ]
+        },
+        "w": {
+         "k": "pill",
+         "text": "Also needs login, scans, permissions",
+         "tone": "warn",
+         "ic": "!",
+         "x": 50,
+         "y": 86
+        }
+       }
+      }
+     ]
+    },
+    {
+     "id": "07.5",
+     "title": "Kubernetes Deployment Integration",
+     "stage": {
+      "w": 360,
+      "h": 640
+     },
+     "steps": [
+      {
+       "say": "Once the image is published, Kubernetes can run it. A Deployment declares two replicas of the backend.",
+       "actors": {
+        "p": {
+         "k": "code",
+         "title": "deployment.yaml",
+         "lines": [
+          "kind: Deployment",
+          "metadata:",
+          "  name: backend",
+          "spec:",
+          "  replicas: 2",
+          "  template:",
+          "    spec:",
+          "      containers:",
+          "      - name: backend",
+          "        image: username/devops-backend:v1"
+         ],
+         "x": 50,
+         "y": 16,
+         "w": 94
+        }
+       }
+      },
+      {
+       "say": "kubectl apply creates the Deployment for an initial demonstration.",
+       "actors": {
+        "dp": {
+         "k": "box",
+         "text": "Deployment",
+         "tone": "brand",
+         "sub": "replicas: 2",
+         "x": 50,
+         "y": 50,
+         "w": 50
+        }
+       },
+       "edges": [
+        [
+         "p",
+         "dp",
+         "apply",
+         "ok"
+        ]
+       ],
+       "term": [
+        "$ kubectl apply -f deployment.yaml",
+        "$ kubectl get deployments"
+       ]
+      },
+      {
+       "say": "It starts the Pods. Check them and follow the rollout.",
+       "actors": {
+        "p1": {
+         "k": "box",
+         "text": "Pod 1",
+         "tone": "ok",
+         "sub": "Running",
+         "x": 26,
+         "y": 72,
+         "w": 40
+        },
+        "p2": {
+         "k": "box",
+         "text": "Pod 2",
+         "tone": "ok",
+         "sub": "Running",
+         "x": 74,
+         "y": 72,
+         "w": 40
+        }
+       },
+       "edges": [
+        [
+         "p",
+         "dp",
+         "apply",
+         "ok"
+        ],
+        [
+         "dp",
+         "p1"
+        ],
+        [
+         "dp",
+         "p2"
+        ]
+       ],
+       "term": [
+        "$ kubectl get pods",
+        "$ kubectl rollout status deployment/backend"
+       ]
+      },
+      {
+       "say": "In a production GitOps workflow, update the manifest in Git and let Argo CD sync it instead.",
+       "actors": {
+        "n": {
+         "k": "pill",
+         "text": "In production: update Git, Argo CD syncs",
+         "tone": "brand",
+         "ic": "✓",
+         "x": 50,
+         "y": 90
+        }
+       },
+       "edges": [
+        [
+         "p",
+         "dp",
+         "apply",
+         "ok"
+        ],
+        [
+         "dp",
+         "p1"
+        ],
+        [
+         "dp",
+         "p2"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "07.6",
+     "title": "Integrate Kubernetes Deployment with GitOps",
+     "stage": {
+      "w": 360,
+      "h": 640
+     },
+     "steps": [
+      {
+       "say": "Instead of deploying straight from GitHub Actions, the pipeline builds and pushes the image, then updates a separate config repository.",
+       "actors": {
+        "ga": {
+         "k": "box",
+         "text": "GitHub Actions",
+         "tone": "brand",
+         "sub": "test · build · push",
+         "x": 50,
+         "y": 7,
+         "w": 56
+        },
+        "rg": {
+         "k": "box",
+         "text": "Registry",
+         "tone": "soft",
+         "sub": "new image",
+         "x": 50,
+         "y": 24,
+         "w": 50
+        },
+        "cf": {
+         "k": "box",
+         "text": "Config repo (Git)",
+         "tone": "soft",
+         "sub": "desired state",
+         "x": 50,
+         "y": 41,
+         "w": 56
+        }
+       },
+       "edges": [
+        [
+         "ga",
+         "rg",
+         "push"
+        ],
+        [
+         "rg",
+         "cf",
+         "new tag"
+        ]
+       ]
+      },
+      {
+       "say": "Only the image reference changes in the manifest: from v1 to the new commit SHA.",
+       "actors": {
+        "p": {
+         "k": "code",
+         "title": "deployment.yaml",
+         "lines": [
+          [
+           "-  image: username/devops-backend:v1",
+           "del"
+          ],
+          [
+           "+  image: username/devops-backend:COMMIT_SHA",
+           "add"
+          ]
+         ],
+         "x": 50,
+         "y": 66,
+         "w": 94
+        }
+       },
+       "edges": [
+        [
+         "ga",
+         "rg",
+         "push"
+        ],
+        [
+         "rg",
+         "cf",
+         "new tag"
+        ]
+       ]
+      },
+      {
+       "say": "Argo CD notices the repository change and synchronizes the Kubernetes cluster with the new desired state.",
+       "actors": {
+        "p": null,
+        "ac": {
+         "k": "box",
+         "text": "Argo CD",
+         "tone": "brand",
+         "sub": "synchronizes",
+         "x": 50,
+         "y": 58,
+         "w": 50
+        },
+        "k8": {
+         "k": "box",
+         "text": "Kubernetes",
+         "tone": "ok",
+         "sub": "runs the app",
+         "x": 50,
+         "y": 75,
+         "w": 50
+        }
+       },
+       "edges": [
+        [
+         "ga",
+         "rg",
+         "push"
+        ],
+        [
+         "rg",
+         "cf",
+         "new tag"
+        ],
+        [
+         "cf",
+         "ac",
+         "detects"
+        ],
+        [
+         "ac",
+         "k8",
+         "sync",
+         "ok"
+        ]
+       ]
+      },
+      {
+       "say": "Responsibilities are separated: Actions builds, Git stores desired state, Argo CD syncs, Kubernetes runs.",
+       "actors": {
+        "ga": {
+         "sub": "builds and publishes"
+        },
+        "cf": {
+         "sub": "stores desired state"
+        }
+       },
+       "edges": [
+        [
+         "ga",
+         "rg",
+         "push"
+        ],
+        [
+         "rg",
+         "cf",
+         "new tag"
+        ],
+        [
+         "cf",
+         "ac",
+         "detects"
+        ],
+        [
+         "ac",
+         "k8",
+         "sync",
+         "ok"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "07.7",
+     "title": "Monitor Pipeline Execution and Troubleshoot",
+     "stage": {
+      "w": 360,
+      "h": 640
+     },
+     "steps": [
+      {
+       "say": "A pipeline can fail at many points. Each stage has its typical problems.",
+       "actors": {
+        "c1": {
+         "k": "box",
+         "text": "Install deps",
+         "tone": "plain",
+         "x": 50,
+         "y": 8,
+         "w": 60,
+         "sub": "dependency failure"
+        },
+        "c2": {
+         "k": "box",
+         "text": "Tests",
+         "tone": "plain",
+         "x": 50,
+         "y": 23,
+         "w": 60,
+         "sub": "test failure"
+        },
+        "c3": {
+         "k": "box",
+         "text": "Docker build",
+         "tone": "plain",
+         "x": 50,
+         "y": 38,
+         "w": 60,
+         "sub": "build error"
+        },
+        "c4": {
+         "k": "box",
+         "text": "Registry push",
+         "tone": "plain",
+         "x": 50,
+         "y": 53,
+         "w": 60,
+         "sub": "registry auth · bad tag"
+        },
+        "c5": {
+         "k": "box",
+         "text": "Deploy · sync",
+         "tone": "plain",
+         "x": 50,
+         "y": 68,
+         "w": 60,
+         "sub": "pull · config · sync error"
+        }
+       },
+       "edges": [
+        [
+         "c1",
+         "c2"
+        ],
+        [
+         "c2",
+         "c3"
+        ],
+        [
+         "c3",
+         "c4"
+        ],
+        [
+         "c4",
+         "c5"
+        ]
+       ]
+      },
+      {
+       "say": "For images and containers, list local images and all containers, including stopped ones.",
+       "actors": {
+        "p": {
+         "k": "code",
+         "title": "Docker",
+         "lines": [
+          "docker images",
+          "docker ps -a"
+         ],
+         "x": 50,
+         "y": 86,
+         "w": 94
+        }
+       },
+       "edges": [
+        [
+         "c1",
+         "c2"
+        ],
+        [
+         "c2",
+         "c3"
+        ],
+        [
+         "c3",
+         "c4"
+        ],
+        [
+         "c4",
+         "c5"
+        ]
+       ],
+       "term": [
+        "$ docker images",
+        "$ docker ps -a"
+       ]
+      },
+      {
+       "say": "For Kubernetes, check Pods, read the events with describe, and read container logs.",
+       "actors": {
+        "p": {
+         "title": "kubectl",
+         "lines": [
+          "kubectl get pods",
+          "kubectl describe pod POD_NAME",
+          "kubectl logs POD_NAME",
+          "kubectl get deployments",
+          "kubectl rollout status deployment/backend"
+         ]
+        }
+       },
+       "edges": [
+        [
+         "c1",
+         "c2"
+        ],
+        [
+         "c2",
+         "c3"
+        ],
+        [
+         "c3",
+         "c4"
+        ],
+        [
+         "c4",
+         "c5"
+        ]
+       ],
+       "term": [
+        "$ kubectl get pods",
+        "$ kubectl describe pod POD_NAME",
+        "$ kubectl logs POD_NAME"
+       ]
+      },
+      {
+       "say": "In Argo CD, inspect the sync status and events. A successful command is not the end: verify the app is healthy.",
+       "actors": {
+        "p": null,
+        "ok": {
+         "k": "pill",
+         "text": "Verify health, not just the command",
+         "tone": "ok",
+         "ic": "✓",
+         "x": 50,
+         "y": 88
+        }
+       },
+       "edges": [
+        [
+         "c1",
+         "c2"
+        ],
+        [
+         "c2",
+         "c3"
+        ],
+        [
+         "c3",
+         "c4"
+        ],
+        [
+         "c4",
+         "c5"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "id": "07.8",
+     "title": "Complete the Production CI/CD Project",
+     "stage": {
+      "w": 360,
+      "h": 640
+     },
+     "steps": [
+      {
+       "say": "The final project connects everything: source, CI, tests, images, registry, manifests, Argo CD and health checks. First, the build half.",
+       "actors": {
+        "k1": {
+         "k": "pill",
+         "text": "1 · Source in GitHub",
+         "tone": "plain",
+         "x": 50,
+         "y": 5
+        },
+        "k2": {
+         "k": "pill",
+         "text": "2 · CI workflow",
+         "tone": "plain",
+         "x": 50,
+         "y": 15.4
+        },
+        "k3": {
+         "k": "pill",
+         "text": "3 · Tests + quality",
+         "tone": "plain",
+         "x": 50,
+         "y": 25.8
+        },
+        "k4": {
+         "k": "pill",
+         "text": "4 · Docker images",
+         "tone": "plain",
+         "x": 50,
+         "y": 36.2
+        }
+       },
+       "edges": [
+        [
+         "k1",
+         "k2"
+        ],
+        [
+         "k2",
+         "k3"
+        ],
+        [
+         "k3",
+         "k4"
+        ]
+       ]
+      },
+      {
+       "say": "Then the delivery half: registry, manifests in Git, Argo CD sync and a health check.",
+       "actors": {
+        "k5": {
+         "k": "pill",
+         "text": "5 · Registry",
+         "tone": "plain",
+         "x": 50,
+         "y": 46.6
+        },
+        "k6": {
+         "k": "pill",
+         "text": "6 · Manifests in Git",
+         "tone": "plain",
+         "x": 50,
+         "y": 57
+        },
+        "k7": {
+         "k": "pill",
+         "text": "7 · Argo CD sync",
+         "tone": "plain",
+         "x": 50,
+         "y": 67.4
+        },
+        "k8": {
+         "k": "pill",
+         "text": "8 · Health check",
+         "tone": "plain",
+         "x": 50,
+         "y": 77.8
+        }
+       },
+       "edges": [
+        [
+         "k1",
+         "k2"
+        ],
+        [
+         "k2",
+         "k3"
+        ],
+        [
+         "k3",
+         "k4"
+        ],
+        [
+         "k4",
+         "k5"
+        ],
+        [
+         "k5",
+         "k6"
+        ],
+        [
+         "k6",
+         "k7"
+        ],
+        [
+         "k7",
+         "k8"
+        ]
+       ]
+      },
+      {
+       "say": "A developer pushes a change. The pipeline validates and packages it, and the GitOps workflow delivers the new version to Kubernetes.",
+       "actors": {
+        "k1": {
+         "tone": "ok"
+        },
+        "k2": {
+         "tone": "ok"
+        },
+        "k3": {
+         "tone": "ok"
+        },
+        "k4": {
+         "tone": "ok"
+        },
+        "k5": {
+         "tone": "ok"
+        },
+        "k6": {
+         "tone": "ok"
+        },
+        "k7": {
+         "tone": "ok"
+        },
+        "k8": {
+         "tone": "ok"
+        }
+       },
+       "edges": [
+        [
+         "k1",
+         "k2",
+         "",
+         "ok"
+        ],
+        [
+         "k2",
+         "k3",
+         "",
+         "ok"
+        ],
+        [
+         "k3",
+         "k4",
+         "",
+         "ok"
+        ],
+        [
+         "k4",
+         "k5",
+         "",
+         "ok"
+        ],
+        [
+         "k5",
+         "k6",
+         "",
+         "ok"
+        ],
+        [
+         "k6",
+         "k7",
+         "",
+         "ok"
+        ],
+        [
+         "k7",
+         "k8",
+         "",
+         "ok"
+        ]
+       ]
+      },
+      {
+       "say": "Version control, automation, containers, testing, Kubernetes and GitOps together deliver software reliably.",
+       "actors": {
+        "done": {
+         "k": "pill",
+         "text": "Pushed → validated → delivered",
+         "tone": "ok",
+         "ic": "✓",
+         "x": 50,
+         "y": 90
+        }
+       },
+       "edges": [
+        [
+         "k1",
+         "k2",
+         "",
+         "ok"
+        ],
+        [
+         "k2",
+         "k3",
+         "",
+         "ok"
+        ],
+        [
+         "k3",
+         "k4",
+         "",
+         "ok"
+        ],
+        [
+         "k4",
+         "k5",
+         "",
+         "ok"
+        ],
+        [
+         "k5",
+         "k6",
+         "",
+         "ok"
+        ],
+        [
+         "k6",
+         "k7",
+         "",
+         "ok"
+        ],
+        [
+         "k7",
+         "k8",
+         "",
+         "ok"
+        ]
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

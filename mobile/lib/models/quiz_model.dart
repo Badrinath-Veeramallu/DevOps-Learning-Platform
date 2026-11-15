@@ -1,13 +1,13 @@
-/// Data models representing the Final Quiz System across all learning pathways.
-library;
 
 class QuizQuestion {
   final String id;
+  final String moduleId;
   final String question;
   final List<String> options;
 
   const QuizQuestion({
     required this.id,
+    required this.moduleId,
     required this.question,
     required this.options,
   });
@@ -15,6 +15,7 @@ class QuizQuestion {
   factory QuizQuestion.fromJson(Map<String, dynamic> json) {
     return QuizQuestion(
       id: (json['id'] ?? '').toString(),
+      moduleId: (json['moduleId'] ?? '').toString(),
       question: (json['question'] ?? '').toString(),
       options: (json['options'] as List? ?? [])
           .map((e) => e.toString())
@@ -22,11 +23,14 @@ class QuizQuestion {
     );
   }
 
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'question': question,
-        'options': options,
-      };
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'moduleId': moduleId,
+      'question': question,
+      'options': options,
+    };
+  }
 }
 
 class QuizReviewItem {
@@ -73,6 +77,8 @@ class QuizResult {
   final int bestScore;
   final int attemptsCount;
   final List<QuizReviewItem> review;
+  final bool isFastTrack;
+  final List<String> completedModules;
 
   const QuizResult({
     required this.pathwayId,
@@ -84,6 +90,8 @@ class QuizResult {
     required this.bestScore,
     required this.attemptsCount,
     required this.review,
+    this.isFastTrack = false,
+    this.completedModules = const [],
   });
 
   factory QuizResult.fromJson(Map<String, dynamic> json) {
@@ -99,6 +107,10 @@ class QuizResult {
       attemptsCount: (json['attemptsCount'] as num?)?.toInt() ?? 0,
       review: rawReview
           .map((r) => QuizReviewItem.fromJson(r as Map<String, dynamic>))
+          .toList(),
+      isFastTrack: json['isFastTrack'] == true,
+      completedModules: (json['completedModules'] as List? ?? [])
+          .map((e) => e.toString())
           .toList(),
     );
   }

@@ -317,4 +317,55 @@ class ApiClient {
       throw ApiException.fromDioException(e);
     }
   }
+  /// Fetch fast-track quiz questions for a pathway.
+  ///
+  /// Calls `GET /api/quiz/:pathwayId/fast-track`.
+  Future<Map<String, dynamic>> getFastTrackQuiz({required String pathwayId}) async {
+    try {
+      final response = await _dio.get(
+        '/quiz/${Uri.encodeComponent(pathwayId)}/fast-track',
+      );
+      return response.data as Map<String, dynamic>;
+    } on DioException catch (e) {
+      throw ApiException.fromDioException(e);
+    }
+  }
+
+  /// Submit fast-track quiz answers for evaluation.
+  ///
+  /// Calls `POST /api/quiz/:pathwayId/fast-track/submit`.
+  Future<Map<String, dynamic>> submitFastTrackQuiz({
+    required String pathwayId,
+    required Map<String, int> answers,
+  }) async {
+    try {
+      final response = await _dio.post(
+        '/quiz/${Uri.encodeComponent(pathwayId)}/fast-track',
+        data: {'answers': answers},
+      );
+      return response.data as Map<String, dynamic>;
+    } on DioException catch (e) {
+      throw ApiException.fromDioException(e);
+    }
+  }
+
+  /// Fetch learning streak metrics.
+  ///
+  /// Calls `GET /api/activity/streak?tz=...`.
+  /// Returns `{ "success": bool, "streak": { "currentStreak": int, "longestStreak": int, "isActiveToday": bool, "hasActivityYesterday": bool } }`.
+  Future<Map<String, dynamic>> getStreak({String? tz}) async {
+    try {
+      final queryParams = <String, dynamic>{};
+      if (tz != null && tz.isNotEmpty) {
+        queryParams['tz'] = tz;
+      }
+      final response = await _dio.get(
+        '/activity/streak',
+        queryParameters: queryParams,
+      );
+      return response.data as Map<String, dynamic>;
+    } on DioException catch (e) {
+      throw ApiException.fromDioException(e);
+    }
+  }
 }

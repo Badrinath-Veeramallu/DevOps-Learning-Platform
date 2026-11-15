@@ -84,6 +84,15 @@ class ProgressService extends ChangeNotifier {
       'linux-05',
       'linux-06',
     ],
+    'cicd': [
+      'cicd-01',
+      'cicd-02',
+      'cicd-03',
+      'cicd-04',
+      'cicd-05',
+      'cicd-06',
+      'cicd-07',
+    ],
   };
 
   /// Validates whether a module is unlocked based on completed modules.
@@ -483,34 +492,44 @@ class ProgressService extends ChangeNotifier {
       final gitModules = pathwayModules['git'] ?? [];
       return gitModules.isNotEmpty && gitModules.every((id) => completed.contains(id));
     }
-    if (cleanPathway == 'docker') {
+    if (cleanPathway == 'linux') {
       if (!isPathwayCompleted(pathway: 'git', userId: userId)) return false;
+      final completed = getCompletedModulesSync(userId, pathway: 'linux');
+      final linuxModules = pathwayModules['linux'] ?? [];
+      return linuxModules.isNotEmpty && linuxModules.every((id) => completed.contains(id));
+    }
+    if (cleanPathway == 'docker') {
+      if (!isPathwayCompleted(pathway: 'linux', userId: userId)) return false;
       final completed = getCompletedModulesSync(userId, pathway: 'docker');
       final dockerModules = pathwayModules['docker'] ?? [];
       return dockerModules.isNotEmpty && dockerModules.every((id) => completed.contains(id));
     }
-    if (cleanPathway == 'linux') {
+    if (cleanPathway == 'cicd') {
       if (!isPathwayCompleted(pathway: 'docker', userId: userId)) return false;
-      final completed = getCompletedModulesSync(userId, pathway: 'linux');
-      final linuxModules = pathwayModules['linux'] ?? [];
-      return linuxModules.isNotEmpty && linuxModules.every((id) => completed.contains(id));
+      final completed = getCompletedModulesSync(userId, pathway: 'cicd');
+      final cicdModules = pathwayModules['cicd'] ?? [];
+      return cicdModules.isNotEmpty && cicdModules.every((id) => completed.contains(id));
     }
     return false;
   }
 
   /// Checks whether a pathway is unlocked based on prerequisite pathways:
-  /// Progression: Git -> Docker -> Linux
+  /// Progression: Git -> Linux -> Docker -> CI/CD -> Kubernetes
   /// - Git: always unlocked.
-  /// - Docker: unlocked if Git is fully completed.
-  /// - Linux: unlocked if Docker is fully completed (which requires Git to be completed).
+  /// - Linux: unlocked if Git is fully completed.
+  /// - Docker: unlocked if Linux is fully completed (which requires Git to be completed).
+  /// - CI/CD: unlocked if Docker is fully completed.
+  /// - Kubernetes: unlocked if CI/CD is fully completed.
   bool isPathwayUnlocked({
     required String pathway,
     required String userId,
   }) {
     final cleanPathway = pathway.toLowerCase();
     if (cleanPathway == 'git') return true;
-    if (cleanPathway == 'docker') return isPathwayCompleted(pathway: 'git', userId: userId);
-    if (cleanPathway == 'linux') return isPathwayCompleted(pathway: 'docker', userId: userId);
+    if (cleanPathway == 'linux') return isPathwayCompleted(pathway: 'git', userId: userId);
+    if (cleanPathway == 'docker') return isPathwayCompleted(pathway: 'linux', userId: userId);
+    if (cleanPathway == 'cicd') return isPathwayCompleted(pathway: 'docker', userId: userId);
+    if (cleanPathway == 'kubernetes') return isPathwayCompleted(pathway: 'cicd', userId: userId);
     return false;
   }
 
@@ -521,18 +540,45 @@ class ProgressService extends ChangeNotifier {
   }) {
     final cleanPathway = pathway.toLowerCase();
     if (cleanPathway == 'git') return null;
-    if (cleanPathway == 'docker') {
+    if (cleanPathway == 'linux') {
       if (!isPathwayCompleted(pathway: 'git', userId: userId)) {
-        return 'Complete all 7 Git modules to unlock the Docker pathway.';
+        return 'Linux pathway is locked. Complete all Git modules to unlock.';
       }
       return null;
     }
-    if (cleanPathway == 'linux') {
+    if (cleanPathway == 'docker') {
       if (!isPathwayCompleted(pathway: 'git', userId: userId)) {
-        return 'Complete all 7 Git modules first.';
+        return 'Docker pathway is locked. Complete all Git modules first.';
+      }
+      if (!isPathwayCompleted(pathway: 'linux', userId: userId)) {
+        return 'Complete the Linux module to unlock the Docker module.';
+      }
+      return null;
+    }
+    if (cleanPathway == 'cicd') {
+      if (!isPathwayCompleted(pathway: 'git', userId: userId)) {
+        return 'CI/CD pathway is locked. Complete all Git modules first.';
+      }
+      if (!isPathwayCompleted(pathway: 'linux', userId: userId)) {
+        return 'CI/CD pathway is locked. Complete all Linux lessons first.';
       }
       if (!isPathwayCompleted(pathway: 'docker', userId: userId)) {
-        return 'Complete all 7 Docker modules to unlock the Linux pathway.';
+        return 'Complete all 7 Docker modules to unlock the CI/CD pathway.';
+      }
+      return null;
+    }
+    if (cleanPathway == 'kubernetes') {
+      if (!isPathwayCompleted(pathway: 'git', userId: userId)) {
+        return 'Kubernetes pathway is locked. Complete all Git modules first.';
+      }
+      if (!isPathwayCompleted(pathway: 'linux', userId: userId)) {
+        return 'Kubernetes pathway is locked. Complete all Linux lessons first.';
+      }
+      if (!isPathwayCompleted(pathway: 'docker', userId: userId)) {
+        return 'Kubernetes pathway is locked. Complete all Docker modules first.';
+      }
+      if (!isPathwayCompleted(pathway: 'cicd', userId: userId)) {
+        return 'Complete all 7 CI/CD modules to unlock the Kubernetes pathway.';
       }
       return null;
     }

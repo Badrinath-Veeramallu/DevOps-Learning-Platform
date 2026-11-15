@@ -10,14 +10,20 @@ import '../../../core/widgets/app_header_bar.dart';
 import '../../../models/quiz_model.dart';
 import '../../../providers/auth_provider.dart';
 import '../data/quiz_service.dart';
+import '../../pathway/data/progress_service.dart';
 
-/// Interactive Final Quiz Screen for Git, Docker, and Linux pathways.
+/// Interactive Final Quiz Screen for Git, Docker, Linux, and CI/CD pathways.
+/// Supports both standard pathway completion quizzes and fast-track assessments.
 class PathwayQuizScreen extends StatefulWidget {
   final String pathwayId;
+  final bool isFastTrack;
+  final bool autoStart;
 
   const PathwayQuizScreen({
     super.key,
     required this.pathwayId,
+    this.isFastTrack = false,
+    this.autoStart = false,
   });
 
   @override
@@ -37,6 +43,7 @@ class _PathwayQuizScreenState extends State<PathwayQuizScreen> {
   int _currentIndex = 0;
   final Map<String, int> _answers = {};
 
+  bool _hasStarted = false;
   bool _isSubmitting = false;
   QuizResult? _result;
   bool _showReview = false;
@@ -49,6 +56,8 @@ class _PathwayQuizScreenState extends State<PathwayQuizScreen> {
         return 'Docker & Containers';
       case 'linux':
         return 'Linux Essentials';
+      case 'cicd':
+        return 'CI/CD & GitOps Delivery';
       default:
         return widget.pathwayId.toUpperCase();
     }
@@ -57,7 +66,18 @@ class _PathwayQuizScreenState extends State<PathwayQuizScreen> {
   @override
   void initState() {
     super.initState();
+    _hasStarted = widget.autoStart;
     _loadQuiz();
+  }
+
+  @override
+  void didUpdateWidget(covariant PathwayQuizScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.pathwayId != widget.pathwayId ||
+        oldWidget.isFastTrack != widget.isFastTrack) {
+      _hasStarted = widget.autoStart;
+      _loadQuiz();
+    }
   }
 
   @override
@@ -77,7 +97,9 @@ class _PathwayQuizScreenState extends State<PathwayQuizScreen> {
     });
 
     try {
-      final res = await _quizService.fetchQuiz(widget.pathwayId);
+      final res = widget.isFastTrack
+          ? await _quizService.fetchFastTrackQuiz(widget.pathwayId)
+          : await _quizService.fetchQuiz(widget.pathwayId);
       if (mounted) {
         setState(() {
           _questions = res.questions;
@@ -223,12 +245,34 @@ class _PathwayQuizScreenState extends State<PathwayQuizScreen> {
   }
 
   Future<void> _submitQuiz() async {
+    final authProvider = context.read<AuthProvider>();
+    final userId = authProvider.user?.id ?? 'guest';
+
     setState(() => _isSubmitting = true);
     try {
-      final res = await _quizService.submitQuiz(
-        pathwayId: widget.pathwayId,
-        answers: _answers,
-      );
+      final res = widget.isFastTrack
+          ? await _quizService.submitFastTrackQuiz(
+              pathwayId: widget.pathwayId,
+              answers: _answers,
+            )
+          : await _quizService.submitQuiz(
+              pathwayId: widget.pathwayId,
+              answers: _answers,
+            );
+
+      if (res.passed) {
+        if (widget.isFastTrack && res.completedModules.isNotEmpty) {
+          ProgressService().setCompletedModulesCache(
+            userId,
+            res.completedModules.toSet(),
+            pathway: widget.pathwayId,
+            synced: true,
+          );
+        }
+        try {
+          await ProgressService().fetchAllPathwaysStatus(userId);
+        } catch (_) {}
+      }
       if (mounted) {
         setState(() {
           _result = res;
@@ -326,6 +370,10 @@ class _PathwayQuizScreenState extends State<PathwayQuizScreen> {
       return _buildResultView();
     }
 
+    if (!_hasStarted) {
+      return _buildQuizIntroView();
+    }
+
     return _buildQuizActiveView();
   }
 
@@ -417,6 +465,249 @@ class _PathwayQuizScreenState extends State<PathwayQuizScreen> {
     );
   }
 
+  Widget _buildBulletPoint(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('• ', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
+          Expanded(
+            child: Text(
+              text,
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.textMuted,
+                fontSize: 12,
+                height: 1.35,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuizIntroView() {
+    final total = _questions.length;
+    final passingCount = (_questions.length * 0.5).round();
+
+    return SingleChildScrollView(
+      controller: _scrollController,
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Top Exit Quiz Link
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton.icon(
+              onPressed: () {
+                if (context.canPop()) {
+                  context.pop();
+                } else {
+                  context.go('/pathways/${widget.pathwayId}');
+                }
+              },
+              icon: const Icon(Icons.arrow_back_rounded, size: 16),
+              label: const Text('Exit Quiz'),
+              style: TextButton.styleFrom(
+                foregroundColor: AppColors.primary,
+                padding: EdgeInsets.zero,
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // Introduction Card
+          Container(
+            padding: const EdgeInsets.all(22),
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.primaryBorder),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primary.withValues(alpha: 0.05),
+                  blurRadius: 16,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: AppColors.primarySubtle,
+                        borderRadius: BorderRadius.circular(999),
+                        border: Border.all(color: AppColors.primaryBorder),
+                      ),
+                      child: Text(
+                        _pathwayTitle.toUpperCase(),
+                        style: AppTypography.badgeText.copyWith(
+                          color: AppColors.primary,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                    if (_quizStatus?.hasPassed == true)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFDCFCE7),
+                          borderRadius: BorderRadius.circular(999),
+                          border: Border.all(color: const Color(0xFF86EFAC)),
+                        ),
+                        child: const Text(
+                          '✓ Previously Passed',
+                          style: TextStyle(
+                            color: Color(0xFF15803D),
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  widget.isFastTrack ? 'Pathway Assessment' : 'Final Comprehensive Quiz',
+                  style: AppTypography.titleLarge.copyWith(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  widget.isFastTrack
+                      ? 'Demonstrate your existing knowledge of $_pathwayTitle. Score 10/20 (50%) or higher to pass and skip to the next pathway!'
+                      : 'Test your complete knowledge across all lessons. Score 10/20 (50%) or higher to officially record your mastery!',
+                  style: AppTypography.bodyMedium.copyWith(
+                    color: AppColors.textMuted,
+                    height: 1.45,
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // Key metrics row
+                Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: AppColors.surfaceElevated,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: AppColors.borderDefault),
+                        ),
+                        child: Column(
+                          children: [
+                            const Icon(Icons.format_list_numbered_rounded, color: AppColors.primary, size: 20),
+                            const SizedBox(height: 6),
+                            Text(
+                              '$total Questions',
+                              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                            ),
+                            const SizedBox(height: 2),
+                            const Text(
+                              'Multiple Choice',
+                              style: TextStyle(color: AppColors.textSubtle, fontSize: 11),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: AppColors.surfaceElevated,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: AppColors.borderDefault),
+                        ),
+                        child: Column(
+                          children: [
+                            const Icon(Icons.verified_rounded, color: AppColors.success, size: 20),
+                            const SizedBox(height: 6),
+                            Text(
+                              '$passingCount / $total (50%)',
+                              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                            ),
+                            const SizedBox(height: 2),
+                            const Text(
+                              'Passing Criteria',
+                              style: TextStyle(color: AppColors.textSubtle, fontSize: 11),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+
+                // Guidelines
+                Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFAF7F8),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: const Color(0xFFE8DDE0)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Instructions & Rules',
+                        style: AppTypography.bodySmall.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textMain,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      _buildBulletPoint('Answer each question one by one or navigate freely using question pills.'),
+                      _buildBulletPoint('Score 10/20 (50%) or higher to pass.'),
+                      _buildBulletPoint('You may retake the quiz anytime with unlimited attempts.'),
+                      _buildBulletPoint('Detailed answers and explanations are available upon submission.'),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // Start Quiz Button
+                ElevatedButton.icon(
+                  onPressed: () {
+                    setState(() => _hasStarted = true);
+                    _scrollToTop();
+                  },
+                  icon: const Icon(Icons.play_arrow_rounded, size: 20),
+                  label: const Text(
+                    'Start Quiz',
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildQuizActiveView() {
     final currentQ = _questions[_currentIndex];
     final selectedOption = _answers[currentQ.id];
@@ -429,6 +720,36 @@ class _PathwayQuizScreenState extends State<PathwayQuizScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          // Top Nav: Exit Quiz Link & Answered Counter
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              TextButton.icon(
+                onPressed: () {
+                  if (context.canPop()) {
+                    context.pop();
+                  } else {
+                    context.go('/pathways/${widget.pathwayId}');
+                  }
+                },
+                icon: const Icon(Icons.arrow_back_rounded, size: 16),
+                label: const Text('Exit Quiz'),
+                style: TextButton.styleFrom(
+                  foregroundColor: AppColors.primary,
+                  padding: EdgeInsets.zero,
+                ),
+              ),
+              Text(
+                'Answered: ${_answers.length}/$total',
+                style: AppTypography.bodySmall.copyWith(
+                  color: AppColors.textMuted,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+
           // 1. Header Card with Pathway Badge & Progress
           Container(
             padding: const EdgeInsets.all(16),
@@ -470,10 +791,10 @@ class _PathwayQuizScreenState extends State<PathwayQuizScreen> {
                               borderRadius: BorderRadius.circular(999),
                               border: Border.all(color: const Color(0xFF86EFAC)),
                             ),
-                            child: Text(
+                            child: const Text(
                               'PASSED',
-                              style: AppTypography.badgeText.copyWith(
-                                color: const Color(0xFF15803D),
+                              style: TextStyle(
+                                color: Color(0xFF15803D),
                                 fontSize: 10,
                                 fontWeight: FontWeight.w800,
                               ),
@@ -493,7 +814,7 @@ class _PathwayQuizScreenState extends State<PathwayQuizScreen> {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'Final Comprehensive Quiz',
+                  widget.isFastTrack ? 'Pathway Assessment' : 'Final Comprehensive Quiz',
                   style: AppTypography.titleMedium.copyWith(
                     color: AppColors.primary,
                     fontWeight: FontWeight.w800,
@@ -501,7 +822,9 @@ class _PathwayQuizScreenState extends State<PathwayQuizScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Passing score: 10/20 (50%). Unlimited retakes.',
+                  widget.isFastTrack
+                      ? 'Demonstrate your existing knowledge of $_pathwayTitle. Score 10/20 (50%) or higher to pass and skip to the next pathway!'
+                      : 'Passing score: 10/20 (50%). Unlimited retakes.',
                   style: AppTypography.bodySmall.copyWith(
                     color: AppColors.textMuted,
                   ),
@@ -737,6 +1060,8 @@ class _PathwayQuizScreenState extends State<PathwayQuizScreen> {
   Widget _buildResultView() {
     final res = _result!;
     final isPass = res.passed;
+    final hasPassedEver = res.hasPassedEver;
+    final canContinue = isPass || (widget.isFastTrack && hasPassedEver);
 
     return SingleChildScrollView(
       controller: _scrollController,
@@ -744,6 +1069,21 @@ class _PathwayQuizScreenState extends State<PathwayQuizScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          // Top Nav: Return to Pathway Map Link
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton.icon(
+              onPressed: () => context.go('/pathways/${widget.pathwayId}'),
+              icon: const Icon(Icons.arrow_back_rounded, size: 16),
+              label: const Text('Return to Pathway Map'),
+              style: TextButton.styleFrom(
+                foregroundColor: AppColors.primary,
+                padding: EdgeInsets.zero,
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+
           // Hero Result Card
           Container(
             padding: const EdgeInsets.all(24),
@@ -815,16 +1155,49 @@ class _PathwayQuizScreenState extends State<PathwayQuizScreen> {
                 ),
 
                 const SizedBox(height: 16),
-                Text(
-                  isPass
-                      ? 'You demonstrated comprehensive understanding of $_pathwayTitle. Pathway completion is verified!'
-                      : 'You scored ${res.score} out of 20. A score of 10 or more is required to pass. Retakes are unlimited!',
-                  textAlign: TextAlign.center,
-                  style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.textMuted,
-                    height: 1.45,
-                  ),
-                ),
+                Builder(builder: (context) {
+                  const nextPathwayLabels = {
+                    'git': 'Linux Essentials',
+                    'linux': 'Docker & Containers',
+                    'docker': 'CI/CD & GitOps Delivery',
+                    'cicd': 'Kubernetes Cluster Architecture',
+                  };
+                  final nextLabel = nextPathwayLabels[widget.pathwayId.toLowerCase()];
+                  final passText = widget.isFastTrack
+                      ? 'Outstanding! You have demonstrated prior mastery of $_pathwayTitle. All stops have been marked complete${nextLabel != null ? " and $nextLabel is now unlocked!" : "."}'
+                      : 'You have demonstrated mastery of $_pathwayTitle. Your final quiz completion is officially recorded!';
+
+                  if (isPass) {
+                    return Text(
+                      passText,
+                      textAlign: TextAlign.center,
+                      style: AppTypography.bodyMedium.copyWith(
+                        color: AppColors.textMuted,
+                        height: 1.45,
+                      ),
+                    );
+                  }
+
+                  if (widget.isFastTrack && hasPassedEver) {
+                    return Text(
+                      'You scored ${res.score} out of ${res.totalQuestions} on this attempt. Your prior passing completion and unlocked pathways remain fully preserved. You may continue to ${nextLabel ?? "the next pathway"} or retake anytime.',
+                      textAlign: TextAlign.center,
+                      style: AppTypography.bodyMedium.copyWith(
+                        color: AppColors.textMuted,
+                        height: 1.45,
+                      ),
+                    );
+                  }
+
+                  return Text(
+                    'You scored ${res.score} out of ${res.totalQuestions}. A score of at least 10 (50%) is required to pass. You can retake the quiz anytime!',
+                    textAlign: TextAlign.center,
+                    style: AppTypography.bodyMedium.copyWith(
+                      color: AppColors.textMuted,
+                      height: 1.45,
+                    ),
+                  );
+                }),
 
                 const SizedBox(height: 24),
                 Wrap(
@@ -861,6 +1234,36 @@ class _PathwayQuizScreenState extends State<PathwayQuizScreen> {
                       ),
                       child: const Text('Back to Pathway'),
                     ),
+                    if (canContinue)
+                      Builder(builder: (context) {
+                        const nextPathways = {
+                          'git': 'linux',
+                          'linux': 'docker',
+                          'docker': 'cicd',
+                          'cicd': 'kubernetes',
+                        };
+                        const nextPathwayLabels = {
+                          'git': 'Linux Essentials',
+                          'linux': 'Docker & Containers',
+                          'docker': 'CI/CD & GitOps Delivery',
+                          'cicd': 'Kubernetes Cluster Architecture',
+                        };
+                        final nextId = nextPathways[widget.pathwayId.toLowerCase()];
+                        final nextLabel = nextPathwayLabels[widget.pathwayId.toLowerCase()];
+                        if (nextId == null || nextLabel == null || nextId == 'kubernetes') {
+                          return const SizedBox.shrink();
+                        }
+                        return ElevatedButton(
+                          onPressed: () {
+                            context.go('/pathways/$nextId');
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF15803D),
+                            foregroundColor: Colors.white,
+                          ),
+                          child: Text('Continue to $nextLabel →'),
+                        );
+                      }),
                   ],
                 ),
               ],

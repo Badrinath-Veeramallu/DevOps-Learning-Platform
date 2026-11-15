@@ -33,10 +33,8 @@ class SubtopicAnimationCard extends StatefulWidget {
 class _SubtopicAnimationCardState extends State<SubtopicAnimationCard> {
   Future<List<AnimationModule>>? _loadFuture;
 
-  @override
-  void initState() {
-    super.initState();
-    _checkLoad();
+  bool _isMobile(BuildContext context) {
+    return MediaQuery.of(context).size.width < 600.0;
   }
 
   @override
@@ -45,27 +43,21 @@ class _SubtopicAnimationCardState extends State<SubtopicAnimationCard> {
     if (oldWidget.pathway != widget.pathway ||
         oldWidget.animationKey != widget.animationKey ||
         oldWidget.fallbackTitle != widget.fallbackTitle) {
-      _checkLoad();
-    }
-  }
-
-  void _checkLoad() {
-    if (AnimationLoader.cachedModules(pathway: widget.pathway) == null) {
-      _loadFuture = AnimationLoader.loadAnimations(pathway: widget.pathway);
-    } else {
       _loadFuture = null;
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = _isMobile(context);
+
     // 1. Warm cache: Synchronously render player immediately (0 frames latency, no flicker)
-    if (AnimationLoader.cachedModules(pathway: widget.pathway) != null) {
-      return _buildPlayer();
+    if (AnimationLoader.cachedModules(pathway: widget.pathway, isMobile: isMobile) != null) {
+      return _buildPlayer(isMobile);
     }
 
     // 2. Cold cache: Asynchronously load animations and render player once ready
-    _loadFuture ??= AnimationLoader.loadAnimations(pathway: widget.pathway);
+    _loadFuture ??= AnimationLoader.loadAnimations(pathway: widget.pathway, isMobile: isMobile);
 
     return FutureBuilder<List<AnimationModule>>(
       future: _loadFuture,
@@ -73,15 +65,15 @@ class _SubtopicAnimationCardState extends State<SubtopicAnimationCard> {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const SizedBox(height: 200);
         }
-        return _buildPlayer();
+        return _buildPlayer(isMobile);
       },
     );
   }
 
-  Widget _buildPlayer() {
+  Widget _buildPlayer(bool isMobile) {
     final SubtopicAnimation? animation =
-        AnimationLoader.findAnimation(widget.animationKey, pathway: widget.pathway) ??
-        AnimationLoader.findAnimation(widget.fallbackTitle, pathway: widget.pathway);
+        AnimationLoader.findAnimation(widget.animationKey, pathway: widget.pathway, isMobile: isMobile) ??
+        AnimationLoader.findAnimation(widget.fallbackTitle, pathway: widget.pathway, isMobile: isMobile);
 
     if (animation == null) {
       debugPrint(
@@ -95,7 +87,7 @@ class _SubtopicAnimationCardState extends State<SubtopicAnimationCard> {
     );
 
     return StepAnimationPlayer(
-      key: ValueKey('${widget.pathway}_${animation.id}'),
+      key: ValueKey('${widget.pathway}_${animation.id}_${isMobile ? "m" : "d"}'),
       animation: animation,
       onFinish: widget.onFinish,
     );

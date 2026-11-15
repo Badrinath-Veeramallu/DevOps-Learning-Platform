@@ -193,6 +193,32 @@ class FakeApiClient extends ApiClient {
           isEmailVerified: true,
         );
   }
+
+  @override
+  Future<Map<String, dynamic>> getStreak({String? tz}) async {
+    return {
+      'success': true,
+      'streak': {
+        'currentStreak': 3,
+        'longestStreak': 5,
+        'isActiveToday': true,
+        'hasActivityYesterday': true,
+      },
+    };
+  }
+
+  @override
+  Future<Map<String, dynamic>> getPathwaysStatus() async {
+    return {
+      'success': true,
+      'pathways': {
+        'git': {'isUnlocked': true, 'isCompleted': false, 'completedCount': 0, 'totalModules': 7},
+        'linux': {'isUnlocked': false, 'isCompleted': false, 'completedCount': 0, 'totalModules': 6},
+        'docker': {'isUnlocked': false, 'isCompleted': false, 'completedCount': 0, 'totalModules': 7},
+        'cicd': {'isUnlocked': false, 'isCompleted': false, 'completedCount': 0, 'totalModules': 7},
+      },
+    };
+  }
 }
 
 void main() {

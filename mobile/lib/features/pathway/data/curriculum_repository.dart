@@ -23,6 +23,7 @@ class CurriculumRepository {
     final assetPath = switch (pathway) {
       'docker' => 'assets/data/docker_curriculum.json',
       'linux' => 'assets/data/linux_curriculum.json',
+      'cicd' => 'assets/data/cicd_curriculum.json',
       _ => 'assets/data/git_curriculum.json',
     };
 

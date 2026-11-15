@@ -7,10 +7,12 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/widgets/app_bottom_nav_bar.dart';
 import '../../../core/widgets/app_header_bar.dart';
+import '../../../models/streak_model.dart';
 import '../../../providers/auth_provider.dart';
 import '../../pathway/data/progress_service.dart';
 import '../models/learning_path_track.dart';
 import '../widgets/continue_learning_card.dart';
+import '../widgets/learning_streak_pill.dart';
 import '../widgets/learning_track_card.dart';
 
 /// Full feature and UI parity Dashboard matching Web's `Dashboard.jsx`.
@@ -23,6 +25,8 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   String _activeTrackId = 'git';
+  StreakModel? _streak;
+  bool _isLoadingStreak = true;
 
   @override
   void initState() {
@@ -32,9 +36,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
       final authProvider = context.read<AuthProvider>();
       final userId = authProvider.user?.id ?? 'guest';
       ProgressService().fetchUserProgress(userId, pathway: 'git');
-      ProgressService().fetchUserProgress(userId, pathway: 'docker');
       ProgressService().fetchUserProgress(userId, pathway: 'linux');
+      ProgressService().fetchUserProgress(userId, pathway: 'docker');
+      ProgressService().fetchUserProgress(userId, pathway: 'cicd');
       ProgressService().fetchAllPathwaysStatus(userId);
+      _fetchStreak();
     });
   }
 
@@ -44,9 +50,32 @@ class _DashboardScreenState extends State<DashboardScreen> {
     super.dispose();
   }
 
+  Future<void> _fetchStreak() async {
+    try {
+      final authProvider = context.read<AuthProvider>();
+      final client = authProvider.apiClient;
+      final res = await client.getStreak();
+      if (res['success'] == true && res['streak'] is Map<String, dynamic>) {
+        if (mounted) {
+          setState(() {
+            _streak = StreakModel.fromJson(res['streak'] as Map<String, dynamic>);
+            _isLoadingStreak = false;
+          });
+        }
+        return;
+      }
+    } catch (_) {
+      // Quiet fallback if offline or backend route pending
+    }
+    if (mounted) {
+      setState(() => _isLoadingStreak = false);
+    }
+  }
+
   void _onProgressChanged() {
     if (mounted) {
       setState(() {});
+      _fetchStreak();
     }
   }
 
@@ -88,10 +117,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
     setState(() => _activeTrackId = trackId);
     if (trackId == 'git') {
       context.push(RouteNames.gitPathway);
-    } else if (trackId == 'docker') {
-      context.push(RouteNames.dockerPathway);
     } else if (trackId == 'linux') {
       context.push(RouteNames.linuxPathway);
+    } else if (trackId == 'docker') {
+      context.push(RouteNames.dockerPathway);
+    } else if (trackId == 'cicd') {
+      context.push(RouteNames.cicdPathway);
     }
   }
 
@@ -122,10 +153,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     if (track.id == 'git') {
       context.push(RouteNames.gitPathway);
-    } else if (track.id == 'docker') {
-      context.push(RouteNames.dockerPathway);
     } else if (track.id == 'linux') {
       context.push(RouteNames.linuxPathway);
+    } else if (track.id == 'docker') {
+      context.push(RouteNames.dockerPathway);
+    } else if (track.id == 'cicd') {
+      context.push(RouteNames.cicdPathway);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -190,21 +223,39 @@ class _DashboardScreenState extends State<DashboardScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Welcome Header
-              Text(
-                'Welcome back, $displayName',
-                style: AppTypography.displayMedium.copyWith(
-                  color: AppColors.textMain,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                'Continue learning or choose a learning path to get started.',
-                style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.textMuted,
-                  height: 1.4,
-                ),
+              // Welcome Header with Learning Streak Pill (LeetCode style parity)
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Welcome back, $displayName',
+                          style: AppTypography.displayMedium.copyWith(
+                            color: AppColors.textMain,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          'Continue learning or choose a learning path to get started.',
+                          style: AppTypography.bodyMedium.copyWith(
+                            color: AppColors.textMuted,
+                            height: 1.4,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  LearningStreakPill(
+                    streak: _streak,
+                    isLoading: _isLoadingStreak,
+                  ),
+                ],
               ),
               const SizedBox(height: 28),
 

@@ -198,3 +198,17 @@
 @media (prefers-reduced-motion: reduce) {
   .sa.is-compact .sa-tl.new .sa-typed { clip-path: none; }
 }
+
+/* ==========================================================================
+   PHONE HARDENING (added for the Linux set; phone only, desktop unchanged)
+   - a pill that wraps onto 2 lines is a rounded rectangle, not a giant oval
+   - small sub-labels inside tiles/boxes get a readable floor
+   ========================================================================== */
+/* pills have no default width: without this an absolutely positioned pill can only grow into the space to the
+   right of its anchor (50% of the stage when centred), so long/right-hand pills wrap into tall ovals */
+.sa.is-compact .sa-pill { border-radius: 1.1em; width: max-content; }
+.sa.is-compact .sa-file .sa-sub,
+.sa.is-compact .sa-box .sa-sub,
+.sa.is-compact .sa-layer .sa-sub,
+.sa.is-compact .sa-vol .sa-sub { font-size: max(9px, .92em); margin-top: .2em; }
+.sa.is-compact .sa-text { overflow-wrap: break-word; }
