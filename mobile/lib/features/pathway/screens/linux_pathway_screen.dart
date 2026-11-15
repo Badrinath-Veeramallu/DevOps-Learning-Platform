@@ -14,6 +14,7 @@ import '../data/linux_curriculum_repository.dart';
 import '../data/progress_service.dart';
 import '../widgets/linux_pathway_map.dart';
 import '../widgets/pathway_header_card.dart';
+import '../widgets/pathway_fasttrack_banner.dart';
 
 /// Full Linux Learning Pathway Journey Screen matching Web's `LinuxPathwayPage.jsx`.
 ///
@@ -53,7 +54,8 @@ class _LinuxPathwayScreenState extends State<LinuxPathwayScreen> {
         return <Never>[];
       });
     }
-    final cached = widget.initialModules ?? LinuxCurriculumRepository.cachedModules;
+    final cached =
+        widget.initialModules ?? LinuxCurriculumRepository.cachedModules;
     if (cached != null && cached.isNotEmpty) {
       _modules = cached;
       _completedIds = widget.initialCompletedIds ?? const {};
@@ -72,9 +74,9 @@ class _LinuxPathwayScreenState extends State<LinuxPathwayScreen> {
   void _onProgressChanged() {
     final authProvider = context.read<AuthProvider>();
     final userId = authProvider.user?.id ?? 'guest';
-    ProgressService()
-        .getCompletedModules(userId, pathway: 'linux')
-        .then((completed) {
+    ProgressService().getCompletedModules(userId, pathway: 'linux').then((
+      completed,
+    ) {
       if (mounted) {
         setState(() => _completedIds = completed);
       }
@@ -103,8 +105,10 @@ class _LinuxPathwayScreenState extends State<LinuxPathwayScreen> {
       final authProvider = context.read<AuthProvider>();
       final userId = authProvider.user?.id ?? 'guest';
 
-      final localCompleted =
-          await ProgressService().getCompletedModules(userId, pathway: 'linux');
+      final localCompleted = await ProgressService().getCompletedModules(
+        userId,
+        pathway: 'linux',
+      );
       if (mounted && localCompleted.isNotEmpty && _completedIds.isEmpty) {
         setState(() => _completedIds = localCompleted);
       }
@@ -122,8 +126,10 @@ class _LinuxPathwayScreenState extends State<LinuxPathwayScreen> {
         });
       }
 
-      final serverCompleted =
-          await ProgressService().fetchUserProgress(userId, pathway: 'linux');
+      final serverCompleted = await ProgressService().fetchUserProgress(
+        userId,
+        pathway: 'linux',
+      );
       if (mounted) {
         setState(() => _completedIds = serverCompleted);
       }
@@ -182,7 +188,8 @@ class _LinuxPathwayScreenState extends State<LinuxPathwayScreen> {
     final user = authProvider.user;
     final userId = user?.id ?? 'guest';
 
-    final isUnlocked = (widget.initialModules != null) ||
+    final isUnlocked =
+        (widget.initialModules != null) ||
         ProgressService().isPathwayUnlocked(pathway: 'linux', userId: userId);
 
     if (!isUnlocked) {
@@ -193,10 +200,7 @@ class _LinuxPathwayScreenState extends State<LinuxPathwayScreen> {
 
       return Scaffold(
         backgroundColor: AppColors.background,
-        appBar: AppHeaderBar(
-          user: user,
-          authProvider: authProvider,
-        ),
+        appBar: AppHeaderBar(user: user, authProvider: authProvider),
         bottomNavigationBar: AppBottomNavBar(
           currentIndex: 1,
           onTabSelected: _handleBottomNavTap,
@@ -230,7 +234,10 @@ class _LinuxPathwayScreenState extends State<LinuxPathwayScreen> {
                   ),
                   const SizedBox(height: 16),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: const Color(0xFFF1F5F9),
                       borderRadius: BorderRadius.circular(999),
@@ -258,7 +265,8 @@ class _LinuxPathwayScreenState extends State<LinuxPathwayScreen> {
                   ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 400),
                     child: Text(
-                      lockReason ?? 'Complete all prerequisite pathways to unlock Linux.',
+                      lockReason ??
+                          'Complete all prerequisite pathways to unlock Linux.',
                       textAlign: TextAlign.center,
                       style: AppTypography.bodyMedium.copyWith(
                         color: AppColors.textMuted,
@@ -279,15 +287,23 @@ class _LinuxPathwayScreenState extends State<LinuxPathwayScreen> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primary,
                           foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 12,
+                          ),
                         ),
                       ),
                       OutlinedButton(
                         onPressed: _handleBackToDashboard,
                         style: OutlinedButton.styleFrom(
                           foregroundColor: AppColors.textMain,
-                          side: const BorderSide(color: AppColors.borderDefault),
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                          side: const BorderSide(
+                            color: AppColors.borderDefault,
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 12,
+                          ),
                         ),
                         child: const Text('Back to Dashboard'),
                       ),
@@ -303,18 +319,12 @@ class _LinuxPathwayScreenState extends State<LinuxPathwayScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppHeaderBar(
-        user: user,
-        authProvider: authProvider,
-      ),
+      appBar: AppHeaderBar(user: user, authProvider: authProvider),
       bottomNavigationBar: AppBottomNavBar(
         currentIndex: 1,
         onTabSelected: _handleBottomNavTap,
       ),
-      body: SafeArea(
-        top: false,
-        child: _buildBody(),
-      ),
+      body: SafeArea(top: false, child: _buildBody()),
     );
   }
 
@@ -369,35 +379,41 @@ class _LinuxPathwayScreenState extends State<LinuxPathwayScreen> {
       onRefresh: () async {
         final authProvider = context.read<AuthProvider>();
         final userId = authProvider.user?.id ?? 'guest';
-        final updated =
-            await ProgressService().fetchUserProgress(userId, pathway: 'linux');
+        final updated = await ProgressService().fetchUserProgress(
+          userId,
+          pathway: 'linux',
+        );
         if (mounted) {
           setState(() => _completedIds = updated);
         }
       },
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.symmetric(
-          horizontal: 20,
-          vertical: 16,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Pathway Hero Header Card
             PathwayHeaderCard(
-              completedCount: _modules.where((m) => _completedIds.contains(m.id)).length,
+              completedCount: _modules
+                  .where((m) => _completedIds.contains(m.id))
+                  .length,
               totalCount: _modules.length,
               modules: _modules,
               completedIds: _completedIds,
               onBack: _handleBackToDashboard,
               title: 'Linux Essentials Pathway',
-              description:
-                  'A progressive, step-by-step interactive map guiding you through Linux file systems, permissions, process and service management, networking, package administration, and shell scripting automation.',
+              description: 'A progressive, step-by-step interactive map guiding you through Linux file systems, permissions, process and service management, networking, package administration, and shell scripting automation.',
               badgeText: 'Foundational Pathway',
-              allDoneText:
-                  '🎉 You have completed all stops in this pathway! Excellent work.',
+              allDoneText: '🎉 You have completed all stops in this pathway! Excellent work.',
             ),
+            if (_modules.where((m) => _completedIds.contains(m.id)).length <
+                _modules.length)
+              PathwayFastTrackBanner(
+                pathwayTitle: 'Linux Essentials',
+                onAttemptQuiz: () =>
+                    context.push('/pathways/linux/quiz?fastTrack=true'),
+              ),
             const SizedBox(height: 36),
 
             // Section Header matching Git and Docker
